@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import path from "node:path";
 import { demand, hash, SHA, DIGEST, assertContext, classifyPaths } from "./release-contract.mjs";
 import { canonical } from "./release-exact-interval.mjs";
 import { parseReleaseJson, jsonObject } from "./release-json.mjs";
@@ -14,12 +13,7 @@ const freeze = (v) => {
 
 export const EATCLEAN_1A_563 = freeze(
   JSON.parse(
-    fs.readFileSync(
-      process.env.TEST_EATCLEAN_1A_563_CONFIG
-        ? path.resolve(process.env.TEST_EATCLEAN_1A_563_CONFIG)
-        : new URL("./release-eatclean-1a-flow04-563.json", import.meta.url),
-      "utf8",
-    ),
+    fs.readFileSync(new URL("./release-eatclean-1a-flow04-563.json", import.meta.url), "utf8"),
   ),
 );
 

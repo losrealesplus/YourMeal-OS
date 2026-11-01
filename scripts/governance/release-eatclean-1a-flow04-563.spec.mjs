@@ -396,48 +396,49 @@ test("EatClean 1A FLOW-04 FAIL: normal mode instead of exact_interval", () => {
 
 test("EatClean 1A FLOW-04 publisher integrated: valid control succeeds and tampered manifest fails closed before deployment", () => {
   const repoRoot = path.resolve(".");
-  const candCommit = execFileSync(
-    "git",
-    [
-      "commit-tree",
-      "2ab3c2bc28ed7670067ee50ca11208b56aa9d117^{tree}",
-      "-p",
-      "ffff9d14019e4e71f76de126a5fccfa78b43aff7",
-      "-m",
-      "feat: candidate PR 563 synthetic squash",
-    ],
-    { cwd: repoRoot, encoding: "utf8" },
-  ).trim();
-
-  const govCommit = execFileSync(
-    "git",
-    [
-      "commit-tree",
-      "HEAD^{tree}",
-      "-p",
-      candCommit,
-      "-m",
-      "chore(governance): PR 564 synthetic remediation",
-    ],
-    { cwd: repoRoot, encoding: "utf8" },
-  ).trim();
-
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gate7-eatclean-integrated-"));
   try {
     execFileSync("git", ["clone", "--shared", "--quiet", repoRoot, dir]);
-    execFileSync("git", ["checkout", "--quiet", govCommit], { cwd: dir });
 
-    fs.copyFileSync(
-      path.join(repoRoot, "scripts/governance/release-eatclean-1a-flow04-563.mjs"),
-      path.join(dir, "scripts/governance/release-eatclean-1a-flow04-563.mjs"),
-    );
+    const candCommit = execFileSync(
+      "git",
+      [
+        "commit-tree",
+        "2ab3c2bc28ed7670067ee50ca11208b56aa9d117^{tree}",
+        "-p",
+        "ffff9d14019e4e71f76de126a5fccfa78b43aff7",
+        "-m",
+        "feat: candidate PR 563 synthetic squash",
+      ],
+      { cwd: dir, encoding: "utf8" },
+    ).trim();
 
     const testConfig = {
       ...r,
       candidateSha: candCommit,
     };
-    const testConfigFile = path.join(dir, "release-eatclean-1a-flow04-563.json");
-    fs.writeFileSync(testConfigFile, JSON.stringify(testConfig, null, 2));
+    const testConfigFile = path.join(dir, "scripts/governance/release-eatclean-1a-flow04-563.json");
+    fs.writeFileSync(testConfigFile, JSON.stringify(testConfig, null, 2) + "\n");
+
+    execFileSync("git", ["add", "scripts/governance/release-eatclean-1a-flow04-563.json"], {
+      cwd: dir,
+    });
+    const govTree = execFileSync("git", ["write-tree"], { cwd: dir, encoding: "utf8" }).trim();
+
+    const govCommit = execFileSync(
+      "git",
+      [
+        "commit-tree",
+        govTree,
+        "-p",
+        candCommit,
+        "-m",
+        "chore(governance): PR 564 synthetic remediation",
+      ],
+      { cwd: dir, encoding: "utf8" },
+    ).trim();
+
+    execFileSync("git", ["checkout", "--quiet", govCommit], { cwd: dir });
 
     const fileHash = (rev, p) => {
       try {
@@ -694,7 +695,6 @@ test("EatClean 1A FLOW-04 publisher integrated: valid control succeeds and tampe
           CLOUDFLARE_ACCOUNT_ID: "a".repeat(32),
           FAKE_RESPONSES: path.join(dir, "responses.json"),
           FAKE_CALLS: path.join(dir, "calls"),
-          TEST_EATCLEAN_1A_563_CONFIG: testConfigFile,
           NODE_OPTIONS: `--import=${path.join(dir, "fetch-fixture.mjs")}`,
         },
       });
@@ -734,6 +734,363 @@ test("EatClean 1A FLOW-04 publisher integrated: valid control succeeds and tampe
     );
     assert.equal(tampered.report?.mutationStarted, false);
     assert.equal(tampered.calls, "");
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("EatClean 1A FLOW-04 regression: environment variables cannot override operational release configuration", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      "-e",
+      `import { EATCLEAN_1A_563 } from "./scripts/governance/release-eatclean-1a-flow04-563.mjs";
+       if (EATCLEAN_1A_563.candidateSha !== null) process.exit(2);
+       process.exit(0);`,
+    ],
+    {
+      cwd: path.resolve("."),
+      env: {
+        ...process.env,
+        TEST_EATCLEAN_1A_563_CONFIG: "/tmp/fake-candidate-override.json",
+        EATCLEAN_1A_563_CONFIG: "/tmp/fake-candidate-override.json",
+      },
+    },
+  );
+  assert.equal(result.status, 0);
+});
+
+test("EatClean 1A FLOW-04 regression: removing assertEatClean1A563Manifest causes tampered check to fail", () => {
+  const repoRoot = path.resolve(".");
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gate7-eatclean-regression-"));
+  try {
+    execFileSync("git", ["clone", "--shared", "--quiet", repoRoot, dir]);
+
+    const candCommit = execFileSync(
+      "git",
+      [
+        "commit-tree",
+        "2ab3c2bc28ed7670067ee50ca11208b56aa9d117^{tree}",
+        "-p",
+        "ffff9d14019e4e71f76de126a5fccfa78b43aff7",
+        "-m",
+        "feat: candidate PR 563 synthetic squash",
+      ],
+      { cwd: dir, encoding: "utf8" },
+    ).trim();
+
+    const testConfig = {
+      ...r,
+      candidateSha: candCommit,
+    };
+    const testConfigFile = path.join(dir, "scripts/governance/release-eatclean-1a-flow04-563.json");
+    fs.writeFileSync(testConfigFile, JSON.stringify(testConfig, null, 2) + "\n");
+
+    // Intentionally remove assertEatClean1A563Manifest call from release-reconciliation.mjs to simulate guard removal
+    const reconFile = path.join(dir, "scripts/governance/release-reconciliation.mjs");
+    const origRecon = fs.readFileSync(reconFile, "utf8");
+    assert.match(origRecon, /assertEatClean1A563Manifest\(manifest, fresh\);/);
+    const brokenRecon = origRecon.replace(
+      "assertEatClean1A563Manifest(manifest, fresh);",
+      "// GUARD REMOVED FOR REGRESSION TEST",
+    );
+    fs.writeFileSync(reconFile, brokenRecon);
+
+    execFileSync(
+      "git",
+      [
+        "add",
+        "scripts/governance/release-eatclean-1a-flow04-563.json",
+        "scripts/governance/release-reconciliation.mjs",
+      ],
+      { cwd: dir },
+    );
+    const govTree = execFileSync("git", ["write-tree"], { cwd: dir, encoding: "utf8" }).trim();
+
+    const govCommit = execFileSync(
+      "git",
+      [
+        "commit-tree",
+        govTree,
+        "-p",
+        candCommit,
+        "-m",
+        "chore(governance): PR 564 synthetic remediation",
+      ],
+      { cwd: dir, encoding: "utf8" },
+    ).trim();
+
+    execFileSync("git", ["checkout", "--quiet", govCommit], { cwd: dir });
+
+    const fileHash = (rev, p) => {
+      try {
+        const entry = execFileSync("git", ["ls-tree", rev, "--", p], {
+          cwd: dir,
+          encoding: "utf8",
+        }).trim();
+        if (!entry) return null;
+        const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+        if (!blob) return null;
+        return hash(
+          execFileSync("git", ["cat-file", "blob", blob[1]], {
+            cwd: dir,
+            maxBuffer: 16 * 1024 * 1024,
+          }),
+        );
+      } catch {
+        return null;
+      }
+    };
+
+    const commits = [
+      ...structuredClone(r.productCommits),
+      {
+        sha: candCommit,
+        parent: r.candidatePr.baseSha,
+        pr: r.candidatePr.number,
+        files: structuredClone(r.candidatePr.files),
+      },
+      {
+        sha: govCommit,
+        parent: candCommit,
+        pr: 564,
+        headSha: "a".repeat(40),
+        files: r.governancePaths.map((p) => ({
+          path: p,
+          before: fileHash(`${govCommit}^1`, p),
+          after: fileHash(govCommit, p),
+        })),
+      },
+    ];
+
+    const productPaths = [
+      ...new Set([
+        ...r.productCommits.flatMap((c) => c.files.map((f) => f.path)),
+        ...r.candidatePr.files.map((f) => f.path),
+      ]),
+    ].sort();
+
+    const s = {
+      repository: policy.repository,
+      baseline: structuredClone(r.baseline),
+      targetSha: govCommit,
+      currentMainSha: govCommit,
+      commits,
+      productPrs: r.productCommits.map((c) => humanPr(c.pr, c.sha, c.headSha, `branch-${c.pr}`)),
+      candidatePr: humanPr(
+        r.candidatePr.number,
+        candCommit,
+        r.candidatePr.headSha,
+        "feat/eatclean-1a-kitchen-flow04-ui",
+      ),
+      remediation: humanPr(564, govCommit, "a".repeat(40), r.governanceBranch),
+      diff: {
+        commits: commits.map((c) => c.sha),
+        paths: [...new Set([...productPaths, ...r.governancePaths])].sort(),
+      },
+    };
+
+    const payload = eatclean1A563Payload(s, policy, testConfig);
+    const authorizationId = eatclean1A563ScopeId(payload);
+
+    const inputs = {
+      mode: "exact_interval",
+      expected_base_sha: r.baseline.sha,
+      expected_target_sha: govCommit,
+      authorized_prs: JSON.stringify([...r.productPrs, 564]),
+      authorization_id: authorizationId,
+      exact_interval_scope: JSON.stringify(canonical(payload)),
+      reason: "Controlled EatClean 1A FLOW-04 #563 publication",
+    };
+
+    fs.writeFileSync(path.join(dir, "event.json"), JSON.stringify({ inputs }));
+
+    const configBytes = fs.readFileSync(
+      path.join(dir, "instances/yourmeal-eatclean/wrangler.prod.json"),
+    );
+    const configHash = hash(configBytes);
+    const digest = "b".repeat(64);
+
+    const reconciliation = {
+      reconciled: true,
+      reconciliationId: hash(JSON.stringify(payload)),
+      payload,
+    };
+
+    const tamperedManifest = {
+      schema: 1,
+      repository: policy.repository,
+      sourceSha: govCommit,
+      runId: "123",
+      attempt: "1",
+      tarSha256: digest,
+      configSha256: configHash,
+      reconciliation: {
+        reconciled: true,
+        reconciliationId: hash(JSON.stringify(payload)),
+        payload: { ...payload, candidatePr: 999 },
+      },
+      plan: {
+        decision: "AUTHORIZED_RECONCILED_RELEASE",
+        sourceSha: govCommit,
+        reconciliation: {
+          reconciled: true,
+          reconciliationId: hash(JSON.stringify(payload)),
+          payload: { ...payload, candidatePr: 999 },
+        },
+      },
+    };
+
+    const reviewer = {
+      state: "approved",
+      user: { id: policy.reviewerId },
+      environments: [{ name: policy.environment }],
+    };
+    const environment = {
+      name: policy.environment,
+      can_admins_bypass: false,
+      protection_rules: [
+        {
+          type: "required_reviewers",
+          reviewers: [{ type: "User", reviewer: { id: policy.reviewerId } }],
+        },
+      ],
+    };
+
+    const responses = {
+      [`environments/${policy.environment}`]: environment,
+      "actions/runs/123/approvals": [reviewer],
+      "actions/artifacts/99": {
+        expired: false,
+        name: "production-worker-artifact-123-1",
+        workflow_run: { id: 123, head_sha: govCommit },
+      },
+      "actions/runs/123": {
+        id: 123,
+        run_attempt: 1,
+        event: "workflow_dispatch",
+        head_branch: "main",
+        head_sha: govCommit,
+        path: policy.workflow,
+        actor: { id: policy.reviewerId, login: policy.reviewerLogin },
+        triggering_actor: { id: policy.reviewerId, login: policy.reviewerLogin },
+      },
+      "git/ref/heads/main": { object: { sha: govCommit } },
+      [`deployments?environment=${policy.environment}`]: [{ id: 7300101642, sha: r.baseline.sha }],
+      "deployments/7300101642/statuses": [
+        {
+          state: "success",
+          log_url: `https://github.com/${policy.repository}/actions/runs/40103726985/job/1`,
+        },
+      ],
+      "actions/runs/40103726985": {
+        id: 40103726985,
+        path: policy.workflow,
+        head_sha: r.baseline.sha,
+        head_branch: "main",
+        conclusion: "success",
+      },
+      "actions/runs/40103726985/artifacts": {
+        total_count: 1,
+        artifacts: [{ name: "gate7-release-report-40103726985-1", expired: false }],
+      },
+    };
+
+    r.productCommits.forEach((c) => {
+      const prObj = humanPr(c.pr, c.sha, c.headSha, `branch-${c.pr}`);
+      responses[`commits/${c.sha}/pulls`] = [prObj];
+      responses[`pulls/${c.pr}`] = prObj;
+    });
+    const candPrObj = humanPr(
+      563,
+      candCommit,
+      r.candidatePr.headSha,
+      "feat/eatclean-1a-kitchen-flow04-ui",
+    );
+    responses[`commits/${candCommit}/pulls`] = [candPrObj];
+    responses[`pulls/563`] = candPrObj;
+
+    const govPrObj = humanPr(564, govCommit, "a".repeat(40), r.governanceBranch);
+    responses[`commits/${govCommit}/pulls`] = [govPrObj];
+    responses[`pulls/564`] = govPrObj;
+
+    fs.writeFileSync(path.join(dir, "responses.json"), JSON.stringify(responses));
+
+    const baselineReport = {
+      schema: 1,
+      repository: policy.repository,
+      sourceSha: r.baseline.sha,
+      runId: "40103726985",
+      attempt: "1",
+      state: "DEPLOYED",
+      mutationStarted: true,
+      versionId: r.baseline.versionId,
+      deploymentId: "53b09377-9e84-4b7f-b960-925829ef54d1",
+      tarSha256: "1bd23f12ff0305af2aa27493a9cbaf8856404d302bc24f8d74bdd328c7dc041e",
+      configSha256: "6b430f21921697883924ee1457dd680e8bb056ac8b970d1481230e73ccddbd5c",
+      artifactId: "12564385065",
+    };
+    fs.writeFileSync(path.join(dir, "baseline-report.json"), JSON.stringify(baselineReport));
+
+    fs.mkdirSync(path.join(dir, "bin"), { recursive: true });
+    const ghSource = `#!${process.execPath}\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst __dirname = path.dirname(fileURLToPath(import.meta.url));\nif (process.argv[2] === 'run' && process.argv[3] === 'download') {\n  const dirIdx = process.argv.indexOf('--dir');\n  const targetDir = process.argv[dirIdx + 1];\n  fs.copyFileSync(path.join(__dirname, '../baseline-report.json'), path.join(targetDir, 'release-report.json'));\n  process.exit(0);\n}\nconst p=JSON.parse(fs.readFileSync(process.env.FAKE_RESPONSES));\nconst key=process.argv[3].replace(/^repos\\/[^/]+\\/[^/]+\\//,'').replace(/[?&]per_page=100&page=1$/,'').replace(/[?&]per_page=100$/,'');\nif(!(key in p))throw Error('Unexpected API: '+key);\nconsole.log(JSON.stringify(p[key]));`;
+    fs.writeFileSync(path.join(dir, "bin/gh"), ghSource, { mode: 0o755 });
+
+    fs.writeFileSync(
+      path.join(dir, "bin/npx"),
+      `#!${process.execPath}\nimport fs from 'node:fs';\nfs.appendFileSync(process.env.FAKE_CALLS, process.argv.slice(2).join(' ') + '\\n');\nif (process.argv.includes('upload')) {\n  fs.writeFileSync(process.env.WRANGLER_OUTPUT_FILE_PATH, JSON.stringify({ type: 'version-upload', version: 1, worker_name: 'yourmeal-instance-eatclean', version_id: '75bfca8f-fc8c-4ef7-9cbd-c0aaaebf7e60' }));\n} else {\n  fs.writeFileSync(process.env.WRANGLER_OUTPUT_FILE_PATH, JSON.stringify({ type: 'version-deploy', version: 1, worker_name: 'yourmeal-instance-eatclean', deployment_id: '11111111-1111-4111-8111-111111111111', version_traffic: {} }));\n}`,
+      { mode: 0o755 },
+    );
+
+    fs.mkdirSync(path.join(dir, ".output/public/assets"), { recursive: true });
+    fs.writeFileSync(path.join(dir, ".output/public/assets/a.js"), "fixture-static-asset");
+
+    fs.writeFileSync(
+      path.join(dir, "fetch-fixture.mjs"),
+      `globalThis.fetch=async(url)=> {\n  if(String(url).startsWith('https://api.cloudflare.com/client/v4/')) {\n    const deployment={id:'11111111-1111-4111-8111-111111111111',versions:[{version_id:'75bfca8f-fc8c-4ef7-9cbd-c0aaaebf7e60',percentage:100}]};\n    return {ok:true,json:async()=>({success:true,result:String(url).endsWith('/deployments')?{deployments:[deployment]}:deployment})};\n  }\n  if(url==='https://eatclean.yourmealos.com/assets/a.js')return {status:200,arrayBuffer:async()=>Buffer.from('fixture-static-asset')};\n  throw Error('Unexpected network request: '+url);\n};`,
+    );
+
+    const publisher = path.resolve(dir, "scripts/governance/release-publish.mjs");
+
+    fs.mkdirSync(path.join(dir, "artifacts"), { recursive: true });
+    fs.writeFileSync(
+      path.join(dir, "artifacts/release-manifest.json"),
+      JSON.stringify(tamperedManifest, null, 2),
+    );
+    fs.writeFileSync(path.join(dir, "calls"), "");
+
+    const result = spawnSync(process.execPath, [publisher], {
+      cwd: dir,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        PATH: `${path.join(dir, "bin")}:${process.env.PATH}`,
+        GH_TOKEN: "fixture",
+        GITHUB_REPOSITORY: policy.repository,
+        GITHUB_REF: "refs/heads/main",
+        GITHUB_SHA: govCommit,
+        GITHUB_RUN_ID: "123",
+        GITHUB_RUN_ATTEMPT: "1",
+        GITHUB_EVENT_NAME: "workflow_dispatch",
+        GITHUB_EVENT_PATH: path.join(dir, "event.json"),
+        GITHUB_STEP_SUMMARY: path.join(dir, "summary"),
+        RUNNER_TEMP: dir,
+        EXPECTED_DIGEST: digest,
+        EXPECTED_CONFIG_DIGEST: configHash,
+        EXPECTED_ARTIFACT_ID: "99",
+        CLOUDFLARE_API_TOKEN: "fixture-no-network",
+        CLOUDFLARE_ACCOUNT_ID: "a".repeat(32),
+        FAKE_RESPONSES: path.join(dir, "responses.json"),
+        FAKE_CALLS: path.join(dir, "calls"),
+        NODE_OPTIONS: `--import=${path.join(dir, "fetch-fixture.mjs")}`,
+      },
+    });
+
+    // When the specific assertEatClean1A563Manifest check is omitted, the publisher does NOT reject with the FLOW-04 specific error
+    assert.doesNotMatch(
+      result.stderr,
+      /EatClean 1A FLOW-04 #563 preparation\/publication scope changed/,
+    );
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
