@@ -99,7 +99,7 @@ describe("Cost Simulation & Scenario Engine (E9)", () => {
     // Teriyaki uses Makro pollo -> cost increases
     expect(teriyaki.costDelta).toBeGreaterThan(0);
     expect(teriyaki.simulatedCost).toBeGreaterThan(teriyaki.currentCost);
-    expect(teriyaki.simulatedMarginPct).toBeLessThan(teriyaki.currentMarginPct);
+    expect(teriyaki.simulatedMarginPct!).toBeLessThan(teriyaki.currentMarginPct!);
 
     // Salmon uses SUPP-PESCADOS -> cost unchanged
     expect(salmon.costDelta).toBe(0);
@@ -275,5 +275,133 @@ describe("Cost Simulation & Scenario Engine (E9)", () => {
     expect(result.summary.totalSimulatedMonthlyCost).toBe(0);
     expect(result.summary.avgCostDeltaPct).toBe(0);
     expect(result.summary.avgMarginDeltaPct).toBe(0);
+  });
+
+  it("7. Decision D-010: compareScenarios excludes incomplete products from avgMarginPct and attaches coverage", () => {
+    const partialBaseline: CostBaselineSnapshot = {
+      snapshotId: "SNAP-PARTIAL",
+      createdAt: "2026-11-01T10:00:00Z",
+      products: [
+        {
+          productId: "PROD-CALC-1",
+          productName: "Plato Completo 1",
+          salesPrice: 10.0,
+          monthlyVolume: 100,
+          bomComponents: [
+            {
+              componentId: "ING-1",
+              componentName: "Ingrediente 1",
+              quantity: 1,
+              unit: "kg",
+              unitCost: 4.0,
+            },
+          ],
+          overheads: { laborCost: 1.0, energyCost: 0, packagingCost: 0 },
+          isCalculable: true,
+          costProvenance: "recipe_catalog",
+        },
+        {
+          productId: "PROD-INCOMPLETE-2",
+          productName: "Plato Incompleto 2",
+          salesPrice: 20.0,
+          monthlyVolume: 50,
+          bomComponents: [],
+          overheads: { laborCost: 0, energyCost: 0, packagingCost: 0 },
+          isCalculable: false,
+          costProvenance: "incomplete",
+        },
+      ],
+    };
+
+    const scen = simulateScenario(
+      partialBaseline,
+      {},
+      {
+        scenarioId: "SCEN-COMP-1",
+        name: "Coverage Scenario",
+      },
+    );
+
+    const comparison = compareScenarios("SNAP-PARTIAL", [scen]);
+    expect(comparison.scenarios.length).toBe(1);
+
+    const compScen = comparison.scenarios[0];
+    // Product 1 cost: 4.0 + 1.0 = 5.0. salesPrice: 10.0 => Margin = 50.0%
+    // Incomplete product MUST NOT drag the average down to 25.0% or 0%
+    expect(compScen.avgMarginPct).toBe(50.0);
+    expect(compScen.totalProductsCount).toBe(2);
+    expect(compScen.calculableProductsCount).toBe(1);
+    expect(compScen.excludedProductsCount).toBe(1);
+    expect(compScen.coveragePct).toBe(50.0);
+    expect(compScen.isFullyCalculable).toBe(false);
+  });
+
+  it("8. Decision D-010: Dish with null or zero salesPrice returns null margins (never fake 0%)", () => {
+    const unpricedBaseline: CostBaselineSnapshot = {
+      snapshotId: "SNAP-UNPRICED",
+      createdAt: "2026-11-01T10:00:00Z",
+      products: [
+        {
+          productId: "PROD-FREE-SAMPLE",
+          productName: "Muestra Degustación",
+          salesPrice: null,
+          monthlyVolume: 50,
+          bomComponents: [
+            {
+              componentId: "ING-1",
+              componentName: "Ingrediente 1",
+              quantity: 1,
+              unit: "kg",
+              unitCost: 2.0,
+            },
+          ],
+          overheads: { laborCost: 0.5, energyCost: 0, packagingCost: 0 },
+          isCalculable: true,
+          costProvenance: "recipe_catalog",
+        },
+        {
+          productId: "PROD-ZERO-PRICE",
+          productName: "Regalo Cortesía",
+          salesPrice: 0,
+          monthlyVolume: 50,
+          bomComponents: [
+            {
+              componentId: "ING-1",
+              componentName: "Ingrediente 1",
+              quantity: 1,
+              unit: "kg",
+              unitCost: 1.5,
+            },
+          ],
+          overheads: { laborCost: 0.5, energyCost: 0, packagingCost: 0 },
+          isCalculable: true,
+          costProvenance: "recipe_catalog",
+        },
+      ],
+    };
+
+    const scen = simulateScenario(
+      unpricedBaseline,
+      {},
+      {
+        scenarioId: "SCEN-NO-PRICE",
+        name: "No Price Scenario",
+      },
+    );
+
+    const sample = scen.products.find((p) => p.productId === "PROD-FREE-SAMPLE")!;
+    expect(sample.salesPrice).toBeNull();
+    expect(sample.currentMarginPct).toBeNull();
+    expect(sample.simulatedMarginPct).toBeNull();
+    expect(sample.marginDeltaPct).toBeNull();
+
+    const zero = scen.products.find((p) => p.productId === "PROD-ZERO-PRICE")!;
+    expect(zero.salesPrice).toBe(0);
+    expect(zero.currentMarginPct).toBeNull();
+    expect(zero.simulatedMarginPct).toBeNull();
+    expect(zero.marginDeltaPct).toBeNull();
+
+    // Summary average margin delta should be 0 because no products have calculable margins
+    expect(scen.summary.avgMarginDeltaPct).toBe(0);
   });
 });

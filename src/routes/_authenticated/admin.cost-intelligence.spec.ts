@@ -87,4 +87,20 @@ describe("CR-COST-03 — Cost Intelligence Cockpit (admin.cost-intelligence)", (
     expect(src).toContain("Margen Bruto (D-003)");
     expect(src).toContain("Completar Datos");
   });
+
+  it("D-010: Reflects unpriced dishes as 'Sin PVP', identifies manual catalog provenance, and secures editing permissions", () => {
+    const src = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.cost-intelligence.tsx"),
+      "utf8",
+    );
+
+    // Displays "Sin PVP" when price is absent/zero
+    expect(src).toContain("Sin PVP");
+    // Displays distinct manual catalog description without ingredients
+    expect(src).toContain("Coste manual de ficha (sin ingredientes desglosados)");
+    // Marks simulation volume as operational assumption
+    expect(src).toContain("Volumen Mensual (Supuesto Operativo)");
+    // Passes permission checks to editing components
+    expect(src).toContain('can("dishes.update") || can("dishes.write")');
+  });
 });

@@ -76,7 +76,11 @@ export function IndirectCostQuickEditModal({
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tenantId || !dishId || !canEdit) return;
+    if (!tenantId || !dishId) return;
+    if (!canEdit) {
+      toast.error("Permiso denegado: modo de solo consulta.");
+      return;
+    }
 
     setIsSaving(true);
     try {

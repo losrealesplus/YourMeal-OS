@@ -582,6 +582,7 @@ export function CostIntelligenceCockpitPage() {
           tenantName={user?.user_metadata?.company_name || "Restaurante"}
           userId={user?.id}
           userName={user?.email || "Gerente"}
+          canEditDishes={can("dishes.update") || can("dishes.write")}
           ingredients={liveIngredients.map((ing) => ({
             id: ing.id,
             name: ing.name,
@@ -591,17 +592,20 @@ export function CostIntelligenceCockpitPage() {
           }))}
           dishes={liveDishes.map((d) => {
             const baselineProduct = liveBaselineSnapshot.products.find((p) => p.productId === d.id);
+            const isCalculable = baselineProduct ? baselineProduct.isCalculable : d.cost != null;
             const rawCost =
-              baselineProduct?.rawMaterialsCost ?? (d.cost != null ? Number(d.cost) : 0);
+              baselineProduct?.rawMaterialsCost ?? (d.cost != null ? Number(d.cost) : null);
+            const salesPrice = d.price != null && Number(d.price) > 0 ? Number(d.price) : null;
             return {
               id: d.id,
               name: d.name,
-              price: Number(d.price || 0),
+              price: salesPrice,
               cost: rawCost,
               laborCost: Number(d.laborCost || 0),
               energyCost: Number(d.energyCost || 0),
               packagingCost: Number(d.packagingCost || 0),
               monthlyVolume: standardSimulationVolume,
+              isCalculable,
               recipeIngredients: liveRecipes
                 .filter((r) => r.dishId === d.id)
                 .map((r) => ({ ingredientId: r.ingredientId, amount: r.amount })),
@@ -724,14 +728,16 @@ export function CostIntelligenceCockpitPage() {
                 </Badge>
               </div>
               <div className="text-2xl font-bold mt-1">
-                {simulationResult.summary.calculableProductsCount > 0
-                  ? (
-                      simulationResult.products
-                        .filter((p) => p.isCalculable)
-                        .reduce((acc, p) => acc + p.simulatedMarginPct, 0) /
-                      simulationResult.summary.calculableProductsCount
-                    ).toFixed(2) + " %"
-                  : "No disponible"}
+                {(() => {
+                  const calculableWithMargin = simulationResult.products.filter(
+                    (p) => p.isCalculable && p.simulatedMarginPct != null,
+                  );
+                  if (calculableWithMargin.length === 0) return "No disponible";
+                  const avg =
+                    calculableWithMargin.reduce((acc, p) => acc + p.simulatedMarginPct!, 0) /
+                    calculableWithMargin.length;
+                  return `${avg.toFixed(2)} %`;
+                })()}
               </div>
               <div className="text-xs mt-1 text-muted-foreground flex items-center gap-1">
                 <span>Variación de margen:</span>
@@ -743,7 +749,8 @@ export function CostIntelligenceCockpitPage() {
                       : "text-primary",
                   )}
                 >
-                  {simulationResult.summary.calculableProductsCount > 0
+                  {simulationResult.summary.calculableProductsCount > 0 &&
+                  simulationResult.products.some((p) => p.marginDeltaPct != null)
                     ? formatPercent(simulationResult.summary.avgMarginDeltaPct)
                     : "—"}
                 </span>
@@ -933,7 +940,7 @@ export function CostIntelligenceCockpitPage() {
 
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-medium">
-                  <Label htmlFor="std-volume">Volumen Mensual (Hipótesis)</Label>
+                  <Label htmlFor="std-volume">Volumen Mensual (Supuesto Operativo)</Label>
                   <span className="text-primary font-bold">{standardSimulationVolume} uds</span>
                 </div>
                 <Input
@@ -947,6 +954,9 @@ export function CostIntelligenceCockpitPage() {
                   }
                   className="h-8 text-xs font-mono"
                 />
+                <p className="text-[10px] text-muted-foreground">
+                  Supuesto de simulación configurable, independiente de ventas observadas.
+                </p>
               </div>
             </div>
           </PanelCard>
@@ -1006,7 +1016,9 @@ export function CostIntelligenceCockpitPage() {
                   <tbody className="divide-y">
                     {simulationResult.products.map((prod) => {
                       const isBelowThreshold =
-                        prod.isCalculable && prod.simulatedMarginPct < targetMarginThreshold;
+                        prod.isCalculable &&
+                        prod.simulatedMarginPct != null &&
+                        prod.simulatedMarginPct < targetMarginThreshold;
                       const dish = liveDishes.find((d) => d.id === prod.productId);
                       return (
                         <tr key={prod.productId} className="hover:bg-muted/20">
@@ -1043,7 +1055,13 @@ export function CostIntelligenceCockpitPage() {
                             )}
                           </td>
                           <td className="py-3 px-3 text-right font-medium">
-                            {prod.salesPrice > 0 ? formatCurrency(prod.salesPrice) : "—"}
+                            {prod.salesPrice != null && prod.salesPrice > 0 ? (
+                              formatCurrency(prod.salesPrice)
+                            ) : (
+                              <span className="text-muted-foreground/60 italic font-normal">
+                                Sin PVP
+                              </span>
+                            )}
                           </td>
                           <td className="py-3 px-3 text-right">
                             {prod.isCalculable ? (
@@ -1082,7 +1100,7 @@ export function CostIntelligenceCockpitPage() {
                             )}
                           </td>
                           <td className="py-3 px-3 text-right font-mono">
-                            {prod.isCalculable ? (
+                            {prod.isCalculable && prod.simulatedMarginPct != null ? (
                               <span
                                 className={cn(
                                   isBelowThreshold
@@ -1093,7 +1111,11 @@ export function CostIntelligenceCockpitPage() {
                                 {prod.simulatedMarginPct.toFixed(2)} %
                               </span>
                             ) : (
-                              <span className="text-muted-foreground/60">—</span>
+                              <span className="text-muted-foreground/60 italic font-normal">
+                                {prod.salesPrice == null || prod.salesPrice <= 0
+                                  ? "Sin PVP"
+                                  : "No disponible"}
+                              </span>
                             )}
                           </td>
                           <td className="py-3 px-3 text-center">
@@ -1199,7 +1221,11 @@ export function CostIntelligenceCockpitPage() {
                   <div className="flex justify-between border-b pb-1">
                     <span className="text-muted-foreground">PVP:</span>
                     <span className="font-semibold">
-                      {p.salesPrice > 0 ? formatCurrency(p.salesPrice) : "—"}
+                      {p.salesPrice != null && p.salesPrice > 0 ? (
+                        formatCurrency(p.salesPrice)
+                      ) : (
+                        <span className="text-muted-foreground/60 italic font-normal">Sin PVP</span>
+                      )}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -1260,12 +1286,14 @@ export function CostIntelligenceCockpitPage() {
                   <div className="pt-2 border-t font-semibold flex justify-between items-center">
                     <span>Componentes ({p.bomComponents.length}):</span>
                     <span className="text-[11px] font-normal text-muted-foreground">
-                      {p.bomComponents.length > 0
-                        ? p.bomComponents
-                            .map((c) => c.componentName.split(" ")[0])
-                            .slice(0, 3)
-                            .join(", ") + (p.bomComponents.length > 3 ? "..." : "")
-                        : "Sin escandallo"}
+                      {p.costProvenance === "manual_catalog"
+                        ? "Coste manual de ficha (sin ingredientes desglosados)"
+                        : p.bomComponents.length > 0
+                          ? p.bomComponents
+                              .map((c) => c.componentName.split(" ")[0])
+                              .slice(0, 3)
+                              .join(", ") + (p.bomComponents.length > 3 ? "..." : "")
+                          : "Sin escandallo"}
                     </span>
                   </div>
                   <div className="pt-2 flex justify-end">

@@ -29,7 +29,7 @@ export interface FoodIngredientRecord {
 export interface FoodDishRecord {
   id: string;
   name: string;
-  price: number;
+  price: number | null;
   cost?: number | null;
   monthlyVolume?: number;
   laborCost?: number;
@@ -145,10 +145,11 @@ export function buildFoodCostBaselineSnapshot(
       );
 
       const packagingCost = overheads.packagingCost;
-      if (dish.price > 0) {
+      const salesPrice = dish.price;
+      if (salesPrice != null && salesPrice > 0) {
         // D-003: Margen inicial = Precio Venta - (Materia Prima + Packaging)
         grossMarginPct = round(
-          ((dish.price - (rawMaterialsCost + packagingCost)) / dish.price) * 100,
+          ((salesPrice - (rawMaterialsCost + packagingCost)) / salesPrice) * 100,
           2,
         );
       }

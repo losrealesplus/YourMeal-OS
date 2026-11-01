@@ -136,7 +136,7 @@ export type CostProvenanceType =
 export interface BaselineProduct {
   productId: string;
   productName: string;
-  salesPrice: number;
+  salesPrice: number | null;
   monthlyVolume: number;
   bomComponents: BOMComponent[];
   overheads: ProductionOverheadsConfig;
@@ -156,15 +156,15 @@ export interface CostBaselineSnapshot {
 export interface SimulatedProductImpact {
   productId: string;
   productName: string;
-  salesPrice: number;
+  salesPrice: number | null;
   monthlyVolume: number;
   currentCost: number;
   simulatedCost: number;
   costDelta: number;
   costDeltaPct: number;
-  currentMarginPct: number;
-  simulatedMarginPct: number;
-  marginDeltaPct: number;
+  currentMarginPct: number | null;
+  simulatedMarginPct: number | null;
+  marginDeltaPct: number | null;
   currentMonthlyCost: number;
   simulatedMonthlyCost: number;
   monthlyProfitImpact: number;
@@ -207,5 +207,10 @@ export interface ScenarioComparison {
     monthlyProfitImpact: number;
     avgMarginPct: number;
     costDeltaPct: number;
+    totalProductsCount: number;
+    calculableProductsCount: number;
+    excludedProductsCount: number;
+    coveragePct: number;
+    isFullyCalculable: boolean;
   }>;
 }

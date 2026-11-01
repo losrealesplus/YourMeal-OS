@@ -51,9 +51,9 @@ export function simulateScenario(
         simulatedCost: 0,
         costDelta: 0,
         costDeltaPct: 0,
-        currentMarginPct: 0,
-        simulatedMarginPct: 0,
-        marginDeltaPct: 0,
+        currentMarginPct: null,
+        simulatedMarginPct: null,
+        marginDeltaPct: null,
         currentMonthlyCost: 0,
         simulatedMonthlyCost: 0,
         monthlyProfitImpact: 0,
@@ -136,14 +136,19 @@ export function simulateScenario(
     const costDeltaPct = currentCost > 0 ? round((costDelta / currentCost) * 100, 2) : 0;
 
     const currentMarginPct =
-      prod.salesPrice > 0 ? round(((prod.salesPrice - currentCost) / prod.salesPrice) * 100, 2) : 0;
+      prod.salesPrice != null && prod.salesPrice > 0
+        ? round(((prod.salesPrice - currentCost) / prod.salesPrice) * 100, 2)
+        : null;
 
     const simulatedMarginPct =
-      prod.salesPrice > 0
+      prod.salesPrice != null && prod.salesPrice > 0
         ? round(((prod.salesPrice - simulatedCost) / prod.salesPrice) * 100, 2)
-        : 0;
+        : null;
 
-    const marginDeltaPct = round(simulatedMarginPct - currentMarginPct, 2);
+    const marginDeltaPct =
+      currentMarginPct != null && simulatedMarginPct != null
+        ? round(simulatedMarginPct - currentMarginPct, 2)
+        : null;
 
     const monthlyVolume = prod.monthlyVolume ?? 0;
     const currentMonthlyCost = round(currentCost * monthlyVolume);
@@ -202,11 +207,12 @@ export function simulateScenario(
         )
       : 0;
 
+  const impactsWithMarginDelta = calculableImpacts.filter((p) => p.marginDeltaPct != null);
   const avgMarginDeltaPct =
-    calculableImpacts.length > 0
+    impactsWithMarginDelta.length > 0
       ? round(
-          calculableImpacts.reduce((acc, p) => acc + p.marginDeltaPct, 0) /
-            calculableImpacts.length,
+          impactsWithMarginDelta.reduce((acc, p) => acc + (p.marginDeltaPct ?? 0), 0) /
+            impactsWithMarginDelta.length,
           2,
         )
       : 0;
@@ -240,9 +246,16 @@ export function compareScenarios(
   scenarios: ScenarioResult[],
 ): ScenarioComparison {
   const compared = scenarios.map((s) => {
+    const calculableWithMargin = s.products.filter(
+      (p) => p.isCalculable && p.simulatedMarginPct != null,
+    );
     const avgMarginPct =
-      s.products.length > 0
-        ? round(s.products.reduce((acc, p) => acc + p.simulatedMarginPct, 0) / s.products.length, 2)
+      calculableWithMargin.length > 0
+        ? round(
+            calculableWithMargin.reduce((acc, p) => acc + (p.simulatedMarginPct ?? 0), 0) /
+              calculableWithMargin.length,
+            2,
+          )
         : 0;
 
     return {
@@ -252,6 +265,11 @@ export function compareScenarios(
       monthlyProfitImpact: s.summary.totalMonthlyProfitImpact,
       avgMarginPct,
       costDeltaPct: s.summary.avgCostDeltaPct,
+      totalProductsCount: s.summary.totalProductsCount,
+      calculableProductsCount: s.summary.calculableProductsCount,
+      excludedProductsCount: s.summary.excludedProductsCount,
+      coveragePct: s.summary.coveragePct,
+      isFullyCalculable: s.summary.isFullyCalculable,
     };
   });
 

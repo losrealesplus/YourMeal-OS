@@ -20,12 +20,12 @@ function round(val: number, decimals = 4): number {
 export interface DishCostingResult {
   dishId: string;
   dishName: string;
-  salesPrice: number;
+  salesPrice: number | null;
   rawMaterialsCost: number;
   overheadsCost: number;
   totalProductionCost: number;
-  grossMarginAmount: number;
-  grossMarginPct: number;
+  grossMarginAmount: number | null;
+  grossMarginPct: number | null;
   ingredientsBreakdown: Array<{
     ingredientId: string;
     ingredientName: string;
@@ -72,16 +72,15 @@ export class DishCostingService {
       packagingCost: dish.packagingCost ?? 0,
     };
 
-    const bomCost = calculateBOMCost(
-      dish.id,
-      dish.name,
-      bomComponents,
-      overheads,
-    );
+    const bomCost = calculateBOMCost(dish.id, dish.name, bomComponents, overheads);
 
-    const grossMarginAmount = round(dish.price - bomCost.totalProductionCost);
+    const salesPrice = dish.price != null && dish.price > 0 ? dish.price : null;
+    const grossMarginAmount =
+      salesPrice != null ? round(salesPrice - bomCost.totalProductionCost) : null;
     const grossMarginPct =
-      dish.price > 0 ? round((grossMarginAmount / dish.price) * 100, 2) : 0;
+      salesPrice != null && grossMarginAmount != null
+        ? round((grossMarginAmount / salesPrice) * 100, 2)
+        : null;
 
     const ingredientsBreakdown = bomCost.componentBreakdown.map((c, idx) => ({
       ingredientId: c.componentId,

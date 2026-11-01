@@ -211,4 +211,67 @@ describe("FoodCostBaselineAdapter (CR-COST-02)", () => {
     // Sales price is 0 -> gross margin should be null, avoid division by zero
     expect(product.grossMarginPct).toBeNull();
   });
+
+  it("6. Decision D-010: Handles mixed portfolio (recipe, manual_catalog, incomplete, and unpriced) without cross-contamination", () => {
+    const mixedDishes: FoodDishRecord[] = [
+      {
+        id: "DISH-RECIPE",
+        name: "Pollo Bowl",
+        price: 12.0,
+        laborCost: 1.0,
+        packagingCost: 0.5,
+      },
+      {
+        id: "DISH-MANUAL",
+        name: "Postre Casero",
+        price: 5.0,
+        cost: 1.5,
+        packagingCost: 0.2,
+      },
+      {
+        id: "DISH-INCOMPLETE",
+        name: "Plato Sin Datos",
+        price: 10.0,
+        cost: null,
+      },
+      {
+        id: "DISH-NO-PVP",
+        name: "Plato Sin Precio",
+        price: null,
+        cost: 2.0,
+      },
+    ];
+
+    const recipes: FoodRecipeLineRecord[] = [
+      { dishId: "DISH-RECIPE", ingredientId: "ING-POLLO", amount: 0.2 },
+    ];
+
+    const snapshot = buildFoodCostBaselineSnapshot("SNAP-MIXED", mixedDishes, ingredients, recipes);
+
+    expect(snapshot.products.length).toBe(4);
+
+    const recipeProd = snapshot.products.find((p) => p.productId === "DISH-RECIPE")!;
+    expect(recipeProd.costProvenance).toBe("recipe_catalog");
+    expect(recipeProd.isCalculable).toBe(true);
+    expect(recipeProd.grossMarginPct).not.toBeNull();
+
+    const manualProd = snapshot.products.find((p) => p.productId === "DISH-MANUAL")!;
+    expect(manualProd.costProvenance).toBe("manual_catalog");
+    expect(manualProd.isCalculable).toBe(true);
+    expect(manualProd.rawMaterialsCost).toBe(1.5);
+    // Gross Margin: (5.0 - (1.5 + 0.2)) / 5.0 = 3.3 / 5.0 = 66%
+    expect(manualProd.grossMarginPct).toBe(66);
+
+    const incProd = snapshot.products.find((p) => p.productId === "DISH-INCOMPLETE")!;
+    expect(incProd.costProvenance).toBe("incomplete");
+    expect(incProd.isCalculable).toBe(false);
+    expect(incProd.rawMaterialsCost).toBeNull();
+    expect(incProd.grossMarginPct).toBeNull();
+
+    const noPvpProd = snapshot.products.find((p) => p.productId === "DISH-NO-PVP")!;
+    expect(noPvpProd.salesPrice).toBeNull();
+    expect(noPvpProd.costProvenance).toBe("manual_catalog");
+    expect(noPvpProd.isCalculable).toBe(true);
+    expect(noPvpProd.grossMarginPct).toBeNull(); // No price => null margin, never 0%
+  });
 });
