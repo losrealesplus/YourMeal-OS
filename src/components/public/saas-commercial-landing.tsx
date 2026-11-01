@@ -63,20 +63,35 @@ export function SaasCommercialLanding() {
           </Link>
 
           {/* Navegación Desktop */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-muted-foreground">
-            <a href="#producto" className="hover:text-foreground transition py-2">
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-muted-foreground">
+            <a
+              href="#en-accion"
+              className="hover:text-foreground transition py-2 px-1 min-h-[44px] inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+            >
               Producto
             </a>
-            <a href="#soluciones" className="hover:text-foreground transition py-2">
+            <a
+              href="#modulos"
+              className="hover:text-foreground transition py-2 px-1 min-h-[44px] inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+            >
               Soluciones
             </a>
-            <a href="#como-funciona" className="hover:text-foreground transition py-2">
+            <a
+              href="#flujo-operativo"
+              className="hover:text-foreground transition py-2 px-1 min-h-[44px] inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+            >
               Cómo funciona
             </a>
-            <a href={clientPortalUrl} className="hover:text-foreground transition py-2">
+            <a
+              href={clientPortalUrl}
+              className="hover:text-foreground transition py-2 px-1 min-h-[44px] inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+            >
               Clientes
             </a>
-            <a href="#contacto" className="hover:text-foreground transition py-2">
+            <a
+              href="#contacto"
+              className="hover:text-foreground transition py-2 px-1 min-h-[44px] inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+            >
               Contacto
             </a>
           </nav>
@@ -184,7 +199,7 @@ export function SaasCommercialLanding() {
                   <div className="p-5 space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Flame className="size-4 text-primary" />
+                        <Flame className="size-4 text-primary" aria-hidden="true" />
                         <span className="font-display font-bold text-sm">
                           KDS Pantalla de Cocina
                         </span>
@@ -220,7 +235,7 @@ export function SaasCommercialLanding() {
                             <span className="font-display font-bold text-sm text-foreground">
                               Pollo Teriyaki con Arroz Jazmín
                             </span>
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-600 font-bold">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-700 dark:text-amber-400 font-bold">
                               12 sin sésamo
                             </span>
                           </div>
@@ -258,7 +273,7 @@ export function SaasCommercialLanding() {
                   <div className="p-5 space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Truck className="size-4 text-primary" />
+                        <Truck className="size-4 text-primary" aria-hidden="true" />
                         <span className="font-display font-bold text-sm">
                           Control de Rutas & Despacho
                         </span>
@@ -405,25 +420,25 @@ export function SaasCommercialLanding() {
                 </div>
                 <ul className="space-y-3.5 text-xs sm:text-sm text-muted-foreground">
                   <li className="flex items-start gap-2.5">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       Demanda agregada instantánea que calcula raciones e ingredientes necesarios.
                     </span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       KDS táctil en tabletas de cocina con avance de comandas en un solo toque.
                     </span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       Generación automática de etiquetas térmicas con alérgenos y trazabilidad.
                     </span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       Rutas organizadas por chofer con confirmación y liquidación contable directa.
                     </span>
@@ -513,25 +528,25 @@ export function SaasCommercialLanding() {
               {/* Grupo 1: Operación */}
               <div className="p-6 rounded-2xl bg-card border border-border space-y-4">
                 <div className="flex items-center gap-2.5 text-primary font-bold text-sm">
-                  <Flame className="size-5" />
+                  <Flame className="size-5" aria-hidden="true" />
                   <h3 className="font-display">OPERACIÓN & COCINA</h3>
                 </div>
                 <ul className="space-y-2.5 text-xs sm:text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>KDS Cocina Digital:</strong> Pantallas táctiles de 1-toque sin papel.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Producción por Lotes:</strong> Agregación de demanda y turnos de
                       cocción.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Captura de Pedidos:</strong> Entrada multicanal y pedidos manuales
                       rápidos.
@@ -543,25 +558,25 @@ export function SaasCommercialLanding() {
               {/* Grupo 2: Planificación */}
               <div className="p-6 rounded-2xl bg-card border border-border space-y-4">
                 <div className="flex items-center gap-2.5 text-primary font-bold text-sm">
-                  <Calendar className="size-5" />
+                  <Calendar className="size-5" aria-hidden="true" />
                   <h3 className="font-display">PLANIFICACIÓN</h3>
                 </div>
                 <ul className="space-y-2.5 text-xs sm:text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Menús Semanales:</strong> Calendarios y rotación de catálogo de
                       platos.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Escandallos & Recetas:</strong> Gramajes, ingredientes y costes base.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Materias Primas:</strong> Cálculo de compras para producción.
                     </span>
@@ -572,24 +587,24 @@ export function SaasCommercialLanding() {
               {/* Grupo 3: Logística */}
               <div className="p-6 rounded-2xl bg-card border border-border space-y-4">
                 <div className="flex items-center gap-2.5 text-primary font-bold text-sm">
-                  <Truck className="size-5" />
+                  <Truck className="size-5" aria-hidden="true" />
                   <h3 className="font-display">LOGÍSTICA & DESPACHO</h3>
                 </div>
                 <ul className="space-y-2.5 text-xs sm:text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Planificación de Rutas:</strong> Organización por zonas y paradas.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Asignación de Choferes:</strong> Control de entregas en tiempo real.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Gestión de Incidencias:</strong> Registro de fallos y reintentos de
                       ruta.
@@ -601,25 +616,25 @@ export function SaasCommercialLanding() {
               {/* Grupo 4: Control */}
               <div className="p-6 rounded-2xl bg-card border border-border space-y-4">
                 <div className="flex items-center gap-2.5 text-primary font-bold text-sm">
-                  <BarChart3 className="size-5" />
+                  <BarChart3 className="size-5" aria-hidden="true" />
                   <h3 className="font-display">CONTROL & FINANZAS</h3>
                 </div>
                 <ul className="space-y-2.5 text-xs sm:text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Directorio de Clientes:</strong> Dietas, notas de soporte y alérgenos.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Contabilidad & Márgenes:</strong> Costes operativos y balances por
                       lote.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Importación Masiva Excel:</strong> Ingesta segura con validación
                       previa.
@@ -631,33 +646,33 @@ export function SaasCommercialLanding() {
               {/* Grupo 5: Plataforma */}
               <div className="p-6 rounded-2xl bg-card border border-border space-y-4 lg:col-span-2">
                 <div className="flex items-center gap-2.5 text-primary font-bold text-sm">
-                  <Building2 className="size-5" />
+                  <Building2 className="size-5" aria-hidden="true" />
                   <h3 className="font-display">GOBERNANZA & PLATAFORMA</h3>
                 </div>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs sm:text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Multi-Tenant Nativo:</strong> Subdominios dinámicos y marcas
                       independientes.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Aislamiento PostgreSQL RLS:</strong> Seguridad en el motor de base de
                       datos.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Control de Roles (RBAC):</strong> Permisos granulares para cada perfil
                       de empleado.
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <span>
                       <strong>Auditoría Transaccional:</strong> Registro estructurado de eventos
                       administrativos.
@@ -707,7 +722,7 @@ export function SaasCommercialLanding() {
                 <div className="size-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-display font-black text-xs mx-auto">
                   EC
                 </div>
-                <h4 className="font-display font-bold text-xs">eatclean.yourmealos.com</h4>
+                <h3 className="font-display font-bold text-xs">eatclean.yourmealos.com</h3>
                 <p className="text-[11px] text-muted-foreground">
                   EatClean Tenerife <br />
                   <span className="text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
@@ -721,7 +736,7 @@ export function SaasCommercialLanding() {
                 <div className="size-8 rounded-xl bg-orange-600 text-white flex items-center justify-center font-display font-black text-xs mx-auto">
                   SF
                 </div>
-                <h4 className="font-display font-bold text-xs">singular.yourmealos.com</h4>
+                <h3 className="font-display font-bold text-xs">singular.yourmealos.com</h3>
                 <p className="text-[11px] text-muted-foreground">
                   Singular Street Food <br />
                   <span className="text-orange-600 dark:text-orange-400 font-semibold font-mono">
@@ -735,9 +750,9 @@ export function SaasCommercialLanding() {
                 <div className="size-8 rounded-xl bg-muted text-muted-foreground flex items-center justify-center font-display font-black text-xs mx-auto">
                   +
                 </div>
-                <h4 className="font-display font-bold text-xs font-mono">
+                <h3 className="font-display font-bold text-xs font-mono">
                   {"{empresa}"}.yourmealos.com
-                </h4>
+                </h3>
                 <p className="text-[11px] text-muted-foreground">
                   Nueva Empresa Contratante <br />
                   <span className="text-muted-foreground font-mono">Alta en 7 Pasos</span>
@@ -769,7 +784,7 @@ export function SaasCommercialLanding() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="p-6 rounded-2xl bg-card border border-border space-y-3">
                 <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                  <Database className="size-5" />
+                  <Database className="size-5" aria-hidden="true" />
                 </div>
                 <h3 className="font-display font-bold text-base">Row Level Security (RLS)</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
@@ -780,7 +795,7 @@ export function SaasCommercialLanding() {
 
               <div className="p-6 rounded-2xl bg-card border border-border space-y-3">
                 <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                  <Lock className="size-5" />
+                  <Lock className="size-5" aria-hidden="true" />
                 </div>
                 <h3 className="font-display font-bold text-base">Cross-Tenant Guard</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
@@ -791,7 +806,7 @@ export function SaasCommercialLanding() {
 
               <div className="p-6 rounded-2xl bg-card border border-border space-y-3">
                 <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                  <KeyRound className="size-5" />
+                  <KeyRound className="size-5" aria-hidden="true" />
                 </div>
                 <h3 className="font-display font-bold text-base">Control de Acceso por Roles</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
@@ -819,19 +834,19 @@ export function SaasCommercialLanding() {
 
               <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-3 text-xs font-mono">
-                  <CheckCircle2 className="size-4 text-primary shrink-0" />
+                  <CheckCircle2 className="size-4 text-primary shrink-0" aria-hidden="true" />
                   <span>Cloudflare Workers Serverless Edge Runtime</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs font-mono">
-                  <CheckCircle2 className="size-4 text-primary shrink-0" />
+                  <CheckCircle2 className="size-4 text-primary shrink-0" aria-hidden="true" />
                   <span>Renderizado SSR de Alta Velocidad (TanStack Start + Nitro)</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs font-mono">
-                  <CheckCircle2 className="size-4 text-primary shrink-0" />
+                  <CheckCircle2 className="size-4 text-primary shrink-0" aria-hidden="true" />
                   <span>Compilación Nativa Apple iOS con Capacitor SPM</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs font-mono">
-                  <CheckCircle2 className="size-4 text-primary shrink-0" />
+                  <CheckCircle2 className="size-4 text-primary shrink-0" aria-hidden="true" />
                   <span>Importación masiva tolerante a fallos para catálogos y clientes</span>
                 </div>
               </div>
@@ -840,7 +855,9 @@ export function SaasCommercialLanding() {
             <div className="p-6 sm:p-8 rounded-3xl border border-border bg-card shadow-lg space-y-4 font-mono text-xs">
               <div className="flex items-center justify-between border-b border-border/80 pb-3">
                 <span className="text-muted-foreground">stack-overview.json</span>
-                <span className="text-emerald-500 font-bold">OPERATIONAL</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-bold">
+                  OPERATIONAL
+                </span>
               </div>
               <div className="space-y-2 text-[11px] text-muted-foreground">
                 <p>
@@ -869,7 +886,10 @@ export function SaasCommercialLanding() {
         </section>
 
         {/* 12. FINAL CTA SECTION */}
-        <section className="py-20 sm:py-28 px-4 sm:px-6 text-center max-w-4xl mx-auto space-y-8">
+        <section
+          id="contacto"
+          className="py-20 sm:py-28 px-4 sm:px-6 text-center max-w-4xl mx-auto space-y-8"
+        >
           <div className="flex justify-center">
             <YourMealMark size={52} />
           </div>
@@ -911,23 +931,41 @@ export function SaasCommercialLanding() {
             <YourMealLogo size={28} />
           </Link>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 font-medium">
-            <a href="#en-accion" className="hover:text-foreground transition">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 font-medium">
+            <a
+              href="#en-accion"
+              className="hover:text-foreground transition py-2.5 px-2 min-h-[44px] inline-flex items-center"
+            >
               En Acción
             </a>
-            <a href="#flujo-operativo" className="hover:text-foreground transition">
+            <a
+              href="#flujo-operativo"
+              className="hover:text-foreground transition py-2.5 px-2 min-h-[44px] inline-flex items-center"
+            >
               Flujo Operativo
             </a>
-            <a href="#ecosistema" className="hover:text-foreground transition">
+            <a
+              href="#ecosistema"
+              className="hover:text-foreground transition py-2.5 px-2 min-h-[44px] inline-flex items-center"
+            >
               Ecosistema
             </a>
-            <a href="#modulos" className="hover:text-foreground transition">
+            <a
+              href="#modulos"
+              className="hover:text-foreground transition py-2.5 px-2 min-h-[44px] inline-flex items-center"
+            >
               Módulos
             </a>
-            <Link to="/auth/admin" className="hover:text-foreground transition">
+            <Link
+              to="/auth/admin"
+              className="hover:text-foreground transition py-2.5 px-2 min-h-[44px] inline-flex items-center"
+            >
               Acceso Empresas
             </Link>
-            <Link to="/saas" className="hover:text-foreground transition">
+            <Link
+              to="/saas"
+              className="hover:text-foreground transition py-2.5 px-2 min-h-[44px] inline-flex items-center"
+            >
               Consola SaaS
             </Link>
           </div>

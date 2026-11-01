@@ -60,15 +60,15 @@ export function OperationalContext() {
             <div className="space-y-3">
               <div className="flex items-center gap-2.5 text-primary">
                 <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Icon className="size-5" />
+                  <Icon className="size-5" aria-hidden="true" />
                 </div>
                 <span className="font-mono text-xs font-bold uppercase tracking-wider">
                   {card.area}
                 </span>
               </div>
-              <h4 className="font-display font-bold text-lg sm:text-xl text-foreground leading-snug">
+              <h3 className="font-display font-bold text-lg sm:text-xl text-foreground leading-snug">
                 {card.tagline}
-              </h4>
+              </h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 {card.description}
               </p>
@@ -77,7 +77,7 @@ export function OperationalContext() {
             <div className="space-y-2 pt-3 border-t border-border/70">
               {card.points.map((pt, i) => (
                 <div key={i} className="flex items-start gap-2 text-xs text-foreground/85">
-                  <Check className="size-3.5 text-primary shrink-0 mt-0.5" />
+                  <Check className="size-3.5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                   <span>{pt}</span>
                 </div>
               ))}

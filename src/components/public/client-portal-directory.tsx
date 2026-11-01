@@ -91,7 +91,7 @@ export function ClientPortalDirectory() {
                       </div>
                       <div className="flex items-center gap-2">
                         {isDemo ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
                             <Star className="size-3 fill-current" aria-hidden="true" />
                             <span>{client.label}</span>
                           </span>
