@@ -1,12 +1,6 @@
 import fs from "node:fs";
-import {
-  demand,
-  hash,
-  SHA,
-  DIGEST,
-  assertContext,
-  classifyPaths,
-} from "./release-contract.mjs";
+import path from "node:path";
+import { demand, hash, SHA, DIGEST, assertContext, classifyPaths } from "./release-contract.mjs";
 import { canonical } from "./release-exact-interval.mjs";
 import { parseReleaseJson, jsonObject } from "./release-json.mjs";
 
@@ -19,7 +13,14 @@ const freeze = (v) => {
 };
 
 export const EATCLEAN_1A_563 = freeze(
-  JSON.parse(fs.readFileSync(new URL("./release-eatclean-1a-flow04-563.json", import.meta.url))),
+  JSON.parse(
+    fs.readFileSync(
+      process.env.TEST_EATCLEAN_1A_563_CONFIG
+        ? path.resolve(process.env.TEST_EATCLEAN_1A_563_CONFIG)
+        : new URL("./release-eatclean-1a-flow04-563.json", import.meta.url),
+      "utf8",
+    ),
+  ),
 );
 
 const same = (a, b) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
@@ -52,8 +53,7 @@ export function eatclean1A563Payload(s, policy, releaseConfig = EATCLEAN_1A_563)
   );
   demand(same(s.baseline, r.baseline), "EatClean 1A FLOW-04 baseline mismatch");
   demand(
-    SHA.test(s.targetSha ?? "") &&
-      s.targetSha === s.currentMainSha,
+    SHA.test(s.targetSha ?? "") && s.targetSha === s.currentMainSha,
     "EatClean 1A FLOW-04 final source stale",
   );
   demand(
@@ -79,10 +79,7 @@ export function eatclean1A563Payload(s, policy, releaseConfig = EATCLEAN_1A_563)
     "EatClean 1A FLOW-04 candidate PR 563 lineage/content mismatch",
   );
   if (r.candidateSha !== null && r.candidateSha !== undefined) {
-    demand(
-      SHA.test(r.candidateSha),
-      "EatClean 1A FLOW-04 candidateSha format invalid",
-    );
+    demand(SHA.test(r.candidateSha), "EatClean 1A FLOW-04 candidateSha format invalid");
     demand(
       candidateCommit.sha === r.candidateSha,
       "EatClean 1A FLOW-04 candidate commit SHA mismatch with pinned release",
@@ -134,7 +131,10 @@ export function eatclean1A563Payload(s, policy, releaseConfig = EATCLEAN_1A_563)
       ...r.candidatePr.files.map((f) => f.path),
     ]),
   ].sort();
-  demand(productPaths.length === 55, "EatClean 1A FLOW-04 must cover exactly 55 reviewed product files");
+  demand(
+    productPaths.length === 55,
+    "EatClean 1A FLOW-04 must cover exactly 55 reviewed product files",
+  );
 
   const totalPaths = [...new Set([...productPaths, ...r.governancePaths])].sort();
   demand(
@@ -168,7 +168,14 @@ export function eatclean1A563Payload(s, policy, releaseConfig = EATCLEAN_1A_563)
   });
 }
 
-export function authorizeEatClean1A563(s, inputs, ctx, run, policy, releaseConfig = EATCLEAN_1A_563) {
+export function authorizeEatClean1A563(
+  s,
+  inputs,
+  ctx,
+  run,
+  policy,
+  releaseConfig = EATCLEAN_1A_563,
+) {
   assertContext(ctx, policy);
   demand(
     inputs.mode === "exact_interval" && ctx.event === "workflow_dispatch",
