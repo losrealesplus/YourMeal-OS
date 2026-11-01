@@ -1086,7 +1086,26 @@ test("EatClean 1A FLOW-04 regression: removing assertEatClean1A563Manifest cause
       },
     });
 
-    // When the specific assertEatClean1A563Manifest check is omitted, the publisher does NOT reject with the FLOW-04 specific error
+    const reportPath = path.join(dir, "artifacts/release-report.json");
+    const report = fs.existsSync(reportPath)
+      ? JSON.parse(fs.readFileSync(reportPath, "utf8"))
+      : null;
+    const calls = fs.readFileSync(path.join(dir, "calls"), "utf8");
+
+    // Unequivocal evidence of protection loss:
+    // When assertEatClean1A563Manifest is omitted in this temporary copy, the tampered manifest
+    // (candidatePr = 999) is NOT intercepted, and execution successfully proceeds past the manifest
+    // checkpoint all the way through deployment (wrangler upload and deploy recorded).
+    // Any prior setup, configuration or API failure would fail status 0 and calls assertion.
+    assert.equal(
+      result.status,
+      0,
+      `Expected status 0 (proceeded past missing guard) but got ${result.status} with stderr: ${result.stderr}`,
+    );
+    assert.equal(report?.state, "DEPLOYED");
+    assert.equal(report?.mutationStarted, true);
+    assert.match(calls, /wrangler@4\.86\.0 versions upload/);
+    assert.match(calls, /wrangler@4\.86\.0 versions deploy/);
     assert.doesNotMatch(
       result.stderr,
       /EatClean 1A FLOW-04 #563 preparation\/publication scope changed/,
