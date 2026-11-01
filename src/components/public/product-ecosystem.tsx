@@ -87,7 +87,8 @@ export function ProductEcosystem() {
           </p>
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed">
-          El núcleo unificado que sincroniza datos entre cocina, choferes, comensales y administración.
+          El núcleo unificado que sincroniza datos entre cocina, choferes, comensales y
+          administración.
         </p>
       </div>
 
@@ -103,18 +104,14 @@ export function ProductEcosystem() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="size-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                    <Icon className="size-4.5" />
+                    <Icon className="size-4.5" aria-hidden="true" />
                   </div>
-                  <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase">
+                  <span className="text-[11px] font-mono font-bold text-muted-foreground uppercase">
                     {node.role}
                   </span>
                 </div>
-                <h4 className="font-display font-bold text-sm text-foreground">
-                  {node.title}
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {node.description}
-                </p>
+                <h4 className="font-display font-bold text-sm text-foreground">{node.title}</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">{node.description}</p>
               </div>
             </div>
           );

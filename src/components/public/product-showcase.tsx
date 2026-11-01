@@ -63,7 +63,8 @@ const SHOWCASE_TABS: ShowcaseTab[] = [
     badge: "03 · KDS EN TIEMPO REAL",
     tabLabel: "03. Cocina KDS",
     title: "Cocina en tiempo real.",
-    subtitle: "Las comandas llegan a cocina con estados, prioridades, personalizaciones y alertas críticas.",
+    subtitle:
+      "Las comandas llegan a cocina con estados, prioridades, personalizaciones y alertas críticas.",
     description:
       "Pantalla de cocina táctil diseñada para entornos de calor y ritmo alto. Los cocineros avanzan comandas en un toque y visualizan claramente exclusiones de ingredientes.",
     points: [
@@ -156,7 +157,7 @@ export function ProductShowcase() {
           <div className="space-y-2.5 pt-2">
             {activeTab.points.map((pt, i) => (
               <div key={i} className="flex items-start gap-2.5 text-xs text-foreground/80">
-                <CheckCircle2 className="size-4 text-primary shrink-0 mt-0.5" />
+                <CheckCircle2 className="size-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                 <span>{pt}</span>
               </div>
             ))}
@@ -225,7 +226,9 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
               <div className="p-3 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
                 <div>
                   <p className="font-bold text-foreground">Pedido #1042 — Roberto M.</p>
-                  <p className="text-muted-foreground text-[11px]">5 platos · Entrega: Lunes Mañana · Santa Cruz</p>
+                  <p className="text-muted-foreground text-[11px]">
+                    5 platos · Entrega: Lunes Mañana · Santa Cruz
+                  </p>
                 </div>
                 <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 font-bold text-[10px]">
                   Confirmado
@@ -234,7 +237,9 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
               <div className="p-3 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
                 <div>
                   <p className="font-bold text-foreground">Pedido #1043 — Clínica Norte</p>
-                  <p className="text-muted-foreground text-[11px]">18 platos · Menú Corporativo · La Laguna</p>
+                  <p className="text-muted-foreground text-[11px]">
+                    18 platos · Menú Corporativo · La Laguna
+                  </p>
                 </div>
                 <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-bold text-[10px]">
                   En Producción
@@ -243,9 +248,11 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
               <div className="p-3 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
                 <div>
                   <p className="font-bold text-foreground">Pedido #1044 — Laura G.</p>
-                  <p className="text-muted-foreground text-[11px]">3 platos · Dieta Celíaca · Adeje</p>
+                  <p className="text-muted-foreground text-[11px]">
+                    3 platos · Dieta Celíaca · Adeje
+                  </p>
                 </div>
-                <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 font-bold text-[10px]">
+                <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 font-bold text-[10px]">
                   Alérgeno: Sin Gluten
                 </span>
               </div>
@@ -256,28 +263,40 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
         {workspaceType === "production" && (
           <div className="space-y-3 font-mono text-xs">
             <div className="flex items-center justify-between pb-2 border-b border-border">
-              <span className="font-bold text-foreground">Hoja de Producción & Demanda Agregada</span>
+              <span className="font-bold text-foreground">
+                Hoja de Producción & Demanda Agregada
+              </span>
               <span className="text-muted-foreground text-[11px]">Lote #402</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div className="p-3 rounded-xl bg-muted/40 border border-border space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase">Plato Principal A</span>
+                <span className="text-[10px] text-muted-foreground uppercase">
+                  Plato Principal A
+                </span>
                 <p className="font-bold text-foreground">Salmón al Horno con Verduras</p>
                 <p className="text-primary font-bold text-xs">84 raciones requeridas</p>
               </div>
               <div className="p-3 rounded-xl bg-muted/40 border border-border space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase">Plato Principal B</span>
+                <span className="text-[10px] text-muted-foreground uppercase">
+                  Plato Principal B
+                </span>
                 <p className="font-bold text-foreground">Pollo Teriyaki con Arroz Jazmín</p>
                 <p className="text-primary font-bold text-xs">62 raciones requeridas</p>
               </div>
               <div className="p-3 rounded-xl bg-muted/40 border border-border space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase">Plato Vegetariano</span>
+                <span className="text-[10px] text-muted-foreground uppercase">
+                  Plato Vegetariano
+                </span>
                 <p className="font-bold text-foreground">Pasta Boloñesa de Lentejas</p>
                 <p className="text-primary font-bold text-xs">47 raciones requeridas</p>
               </div>
               <div className="p-3 rounded-xl bg-muted/40 border border-border space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase">Total Raciones Lote</span>
-                <p className="font-bold text-emerald-600 dark:text-emerald-400">193 raciones calculadas</p>
+                <span className="text-[10px] text-muted-foreground uppercase">
+                  Total Raciones Lote
+                </span>
+                <p className="font-bold text-emerald-600 dark:text-emerald-400">
+                  193 raciones calculadas
+                </p>
                 <p className="text-muted-foreground text-[10px]">Escandallos y compras listos</p>
               </div>
             </div>
@@ -288,13 +307,17 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
           <div className="space-y-3 font-mono text-xs">
             <div className="flex items-center justify-between pb-2 border-b border-border">
               <span className="font-bold text-foreground">KDS Pantalla Táctil de Cocina</span>
-              <span className="text-emerald-500 font-bold text-[11px]">● Conectado en Tiempo Real</span>
+              <span className="text-emerald-700 dark:text-emerald-400 font-bold text-[11px]">
+                ● Conectado en Tiempo Real
+              </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <div className="p-3 rounded-xl bg-primary/10 border border-primary/30 space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-primary">TANDA 01</span>
-                  <span className="px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[9px] font-bold">PREP</span>
+                  <span className="px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[9px] font-bold">
+                    PREP
+                  </span>
                 </div>
                 <p className="font-bold text-foreground text-xs">Salmón al Horno</p>
                 <p className="text-[10px] text-muted-foreground">14 bandejas · Horno 1</p>
@@ -302,7 +325,9 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
               <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-emerald-600">TANDA 02</span>
-                  <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-bold">LISTO</span>
+                  <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-bold">
+                    LISTO
+                  </span>
                 </div>
                 <p className="font-bold text-foreground text-xs">Pollo Teriyaki</p>
                 <p className="text-[10px] text-muted-foreground">En estación de empaque</p>
@@ -310,7 +335,9 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
               <div className="p-3 rounded-xl bg-muted/40 border border-border space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-muted-foreground">TANDA 03</span>
-                  <span className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground text-[9px] font-bold">COLA</span>
+                  <span className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground text-[9px] font-bold">
+                    COLA
+                  </span>
                 </div>
                 <p className="font-bold text-foreground text-xs">Pasta Boloñesa</p>
                 <p className="text-[10px] text-muted-foreground">Inicio estimado: 11:30</p>
@@ -328,15 +355,25 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
             <div className="space-y-2">
               <div className="p-3 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-foreground">Ruta 01 — Santa Cruz Centro (Carlos M.)</p>
-                  <p className="text-muted-foreground text-[11px]">38 entregas · 12 paradas completadas</p>
+                  <p className="font-bold text-foreground">
+                    Ruta 01 — Santa Cruz Centro (Carlos M.)
+                  </p>
+                  <p className="text-muted-foreground text-[11px]">
+                    38 entregas · 12 paradas completadas
+                  </p>
                 </div>
-                <span className="text-emerald-500 font-bold text-[11px]">100% a tiempo</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-bold text-[11px]">
+                  100% a tiempo
+                </span>
               </div>
               <div className="p-3 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-foreground">Ruta 02 — La Laguna / Norte (Elena R.)</p>
-                  <p className="text-muted-foreground text-[11px]">27 entregas · En reparto activo</p>
+                  <p className="font-bold text-foreground">
+                    Ruta 02 — La Laguna / Norte (Elena R.)
+                  </p>
+                  <p className="text-muted-foreground text-[11px]">
+                    27 entregas · En reparto activo
+                  </p>
                 </div>
                 <span className="text-primary font-bold text-[11px]">En curso</span>
               </div>
@@ -348,7 +385,9 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
           <div className="space-y-3 font-mono text-xs">
             <div className="flex items-center justify-between pb-2 border-b border-border">
               <span className="font-bold text-foreground">Márgenes y Balance de Operación</span>
-              <span className="text-emerald-500 font-bold text-[11px]">Liquidación Consolidada</span>
+              <span className="text-emerald-700 dark:text-emerald-400 font-bold text-[11px]">
+                Liquidación Consolidada
+              </span>
             </div>
             <div className="grid grid-cols-2 gap-2.5">
               <div className="p-3 rounded-xl bg-muted/40 border border-border">
@@ -361,7 +400,9 @@ export function ProductScreenshot({ workspaceType, imageSrc }: ProductScreenshot
               </div>
               <div className="p-3 rounded-xl bg-muted/40 border border-border">
                 <span className="text-[10px] text-muted-foreground">Rendimiento de Producción</span>
-                <p className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mt-1">Óptimo sin mermas</p>
+                <p className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mt-1">
+                  Óptimo sin mermas
+                </p>
               </div>
               <div className="p-3 rounded-xl bg-muted/40 border border-border">
                 <span className="text-[10px] text-muted-foreground">Trazabilidad</span>

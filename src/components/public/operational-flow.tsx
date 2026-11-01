@@ -25,7 +25,8 @@ const FLOW_STEPS: FlowStep[] = [
     step: "01",
     name: "PEDIDOS",
     title: "Entrada & Registro",
-    description: "Captura multicanal vía App móvil, tienda web, carga masiva Excel o pedidos directos.",
+    description:
+      "Captura multicanal vía App móvil, tienda web, carga masiva Excel o pedidos directos.",
     stateBadge: "Confirmado",
     icon: ShoppingBag,
     passesTo: "Demanda Agregada",
@@ -34,7 +35,8 @@ const FLOW_STEPS: FlowStep[] = [
     step: "02",
     name: "PRODUCCIÓN",
     title: "Planificación & Lotes",
-    description: "Cálculo de raciones totales, materias primas requeridas y escandallos por lote de cocción.",
+    description:
+      "Cálculo de raciones totales, materias primas requeridas y escandallos por lote de cocción.",
     stateBadge: "Planificado",
     icon: Layers,
     passesTo: "Comandas KDS",
@@ -43,7 +45,8 @@ const FLOW_STEPS: FlowStep[] = [
     step: "03",
     name: "COCINA KDS",
     title: "Ejecución en Tiempo Real",
-    description: "Tabletas de cocina sin papel. Avance de tanda, tiempos de cocción y alertas de alérgenos.",
+    description:
+      "Tabletas de cocina sin papel. Avance de tanda, tiempos de cocción y alertas de alérgenos.",
     stateBadge: "En Preparación",
     icon: Flame,
     passesTo: "Estación de Empaque",
@@ -52,7 +55,8 @@ const FLOW_STEPS: FlowStep[] = [
     step: "04",
     name: "EMPAQUETADO",
     title: "Etiquetado Térmico",
-    description: "Generación de etiquetas con fecha, ingredientes y código de lote para cada ración.",
+    description:
+      "Generación de etiquetas con fecha, ingredientes y código de lote para cada ración.",
     stateBadge: "Etiquetado",
     icon: PackageCheck,
     passesTo: "Muelle de Despacho",
@@ -70,7 +74,8 @@ const FLOW_STEPS: FlowStep[] = [
     step: "06",
     name: "ENTREGA",
     title: "Recepción por Cliente",
-    description: "Confirmación de entrega en mano, resolución de incidencias en ruta y soporte directo.",
+    description:
+      "Confirmación de entrega en mano, resolución de incidencias en ruta y soporte directo.",
     stateBadge: "Entregado",
     icon: UserCheck,
     passesTo: "Cierre Operativo",
@@ -90,7 +95,7 @@ export function OperationalFlow() {
   return (
     <div className="space-y-10">
       {/* Desktop / Tablet Timeline Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4 relative">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4 relative">
         {FLOW_STEPS.map((step, idx) => {
           const Icon = step.icon;
           return (
@@ -103,7 +108,7 @@ export function OperationalFlow() {
                 <span className="font-mono text-xs font-bold text-primary px-2 py-0.5 rounded bg-primary/10">
                   {step.step}
                 </span>
-                <span className="text-[10px] font-mono text-muted-foreground font-semibold">
+                <span className="text-[11px] font-mono text-muted-foreground font-semibold">
                   {step.stateBadge}
                 </span>
               </div>
@@ -111,11 +116,11 @@ export function OperationalFlow() {
               {/* Icon + Title */}
               <div className="space-y-1.5 pt-1">
                 <div className="size-8 rounded-lg bg-muted flex items-center justify-center text-foreground group-hover:bg-primary group-hover:text-primary-foreground transition">
-                  <Icon className="size-4" />
+                  <Icon className="size-4" aria-hidden="true" />
                 </div>
-                <h4 className="font-display font-bold text-xs uppercase tracking-wider text-foreground">
+                <h3 className="font-display font-bold text-xs uppercase tracking-wider text-foreground">
                   {step.name}
-                </h4>
+                </h3>
                 <p className="font-semibold text-xs text-foreground/90 leading-tight">
                   {step.title}
                 </p>
@@ -125,7 +130,7 @@ export function OperationalFlow() {
               </div>
 
               {/* Next Step Footnote */}
-              <div className="pt-2 border-t border-border/60 text-[10px] font-mono text-primary flex items-center gap-1">
+              <div className="pt-2 border-t border-border/60 text-[11px] font-mono text-primary flex items-center gap-1">
                 <span>Pasa a: {step.passesTo}</span>
               </div>
             </div>
