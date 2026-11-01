@@ -1,0 +1,497 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "fcc7801548fe60c3994f08fa18dc5f11431c6138",
+    "versionId": "07ece6be-721b-40b5-a747-acb43bee3142",
+    "deploymentId": 7300101642
+  },
+  "candidateSha": null,
+  "productCommits": [
+    {
+      "sha": "28d1396f028a636279166aa60447c6383aef1a78",
+      "parent": "fcc7801548fe60c3994f08fa18dc5f11431c6138",
+      "headSha": "a58a86d61aad1323a2706d0d09207f2181ee28fd",
+      "pr": 553,
+      "files": [
+        {
+          "path": "docs/99-internal/development-journal/2026-10-24-cost-1a-receipt-hardening.md",
+          "before": null,
+          "after": "c0441455a137a32cd29d0ffeb1626646d4c13989ce8c872753aa087113cb746f"
+        },
+        {
+          "path": "scripts/receipt553-local-lab.py",
+          "before": null,
+          "after": "8ba622aa72536380dbb216ed9e7487a3111d618f9ccebe96c2e7d9072d79c122"
+        },
+        {
+          "path": "src/modules/cost-intelligence/application/procurement-cost-service.spec.ts",
+          "before": "c7733946cb84661f5f6f049fd8f3d90c2dbe5b4af088b7b2ed38e4c398dc8e3a",
+          "after": "627d928c14d72756e3d3cad598dda2881bc38ef035f6470e46b2e51e4cd3f0ce"
+        },
+        {
+          "path": "src/modules/cost-intelligence/application/procurement-cost-service.ts",
+          "before": "003fd05fee553b5c7ddbbfbbe5761a99dba087005bcd9891f2af607ac0ac34b0",
+          "after": "48825674dd27a1b67b9a3fd6294bcad465b7f0c4688f4c0ca32cf788ac04616c"
+        },
+        {
+          "path": "src/modules/cost-intelligence/domain/procurement-types.ts",
+          "before": "f1bbe066a59ed405a8cdc58861510518d4056fa993b4b6606d4a5802f2017f0e",
+          "after": "aaeca57e769e8ab18b39ade79e4f21b479c13a0c9b101821d9e10d73a823fd8c"
+        },
+        {
+          "path": "src/modules/cost-intelligence/infrastructure/cr-cost-1a-ddl-contract.spec.ts",
+          "before": null,
+          "after": "e6d2dcca732a94267555effe30fbd6fcebe043acaf2509e798640d3511aaa6ab"
+        },
+        {
+          "path": "src/modules/cost-intelligence/infrastructure/cr-cost-1a-postgres-integration.spec.ts",
+          "before": null,
+          "after": "8a38762f033bae04005e8a7111f087028a979e6d7ed96dc702531ee00ecebabe"
+        },
+        {
+          "path": "src/modules/cost-intelligence/infrastructure/procurement-cost-repository.receipt.spec.ts",
+          "before": null,
+          "after": "69c72af9cfb2948a0b2a917a54ee014984369ce72bf296fe908975c87a6d3801"
+        },
+        {
+          "path": "src/modules/cost-intelligence/infrastructure/procurement-cost-repository.ts",
+          "before": "320d4333ad32ea3f74dc614bed6693e5715315e0474329ebeab00f103dcd6fc9",
+          "after": "50bf09c52b9da90098dc036bd832f05617f0a4431134afd577c6244f3d41573c"
+        },
+        {
+          "path": "src/prototypes/purchases-expenses/domain-types.ts",
+          "before": null,
+          "after": "e49c546dc702033c60200d614069a4cf3845a90c35193fa1ea5567c1a61fd0a6"
+        },
+        {
+          "path": "src/prototypes/purchases-expenses/extraction-service.ts",
+          "before": null,
+          "after": "4e7e69a787043f2190ad52c902c3418de13917c60a9ed79a1550c0c410d74722"
+        },
+        {
+          "path": "src/prototypes/purchases-expenses/receipt-engine.spec.ts",
+          "before": null,
+          "after": "521ebed7b075ccfdb0ac3f158d9e1cb174aef73e7253070c63e5d6d6684a80c2"
+        },
+        {
+          "path": "src/prototypes/purchases-expenses/receipt-engine.ts",
+          "before": null,
+          "after": "3f395443d2bf2da411eb150fe7a1bf6cea8ba31408514c5cf160b24bc1ea6727"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.purchasing.tsx",
+          "before": "48f8b277c1ab8ad3a9758551f109a0933ef287e2030a8b476f1e1b3585b42573",
+          "after": "a386fc3b7ea6a5b19c083529e281fb6704c39f0bebacb22ea0ae3a40ed4be4a2"
+        },
+        {
+          "path": "supabase/migrations/20261024180000_cr_cost_1a_atomic_purchase_receipt.sql",
+          "before": null,
+          "after": "878658e4320f015ffde1bf68764f8e0d39ee39bcaed2dd4171cd4f305061175b"
+        },
+        {
+          "path": "supabase/migrations/rollback/20261024180000_cr_cost_1a_atomic_purchase_receipt_down.sql",
+          "before": null,
+          "after": "a53dd1cb9e45da0cf678fa8f93bf0b2910971fe6c7cfdb1afcdb9cd1a5a24e48"
+        }
+      ]
+    },
+    {
+      "sha": "4b4d5aa797718111efe5a7da9b2110cd411df9be",
+      "parent": "28d1396f028a636279166aa60447c6383aef1a78",
+      "headSha": "9a5a2bcb799e08eaa65fe81e03db9e1dcb253b5b",
+      "pr": 554,
+      "files": [
+        {
+          "path": "docs/99-internal/development-journal/2026-10-25-flow04-t1-source-integrity.md",
+          "before": null,
+          "after": "c44f76e48ddad23e35d95dc5fb1194125b51c0e8f05c0b9df0998fc68d85759a"
+        },
+        {
+          "path": "src/modules/inventory/application/inventory-service.ts",
+          "before": "4495d4b5eaf33f96ad540577631b66dcc8caa4ab71100e5c17317b339feef2ce",
+          "after": "6f7d14f01b279f46f07a8146757ffd33a9a73ebdddaa3b542929907507fa5697"
+        },
+        {
+          "path": "src/modules/inventory/infrastructure/flow04-ddl-contract.spec.ts",
+          "before": null,
+          "after": "70bc665eb94358873098826e004dbc1263548b529087759232bdc1e489140937"
+        },
+        {
+          "path": "src/modules/inventory/infrastructure/flow04-postgres-integration.spec.ts",
+          "before": null,
+          "after": "884e73f617839efd19623b5736bed589c735c4fca6cf21f61aec2a6a75e88fc3"
+        },
+        {
+          "path": "src/modules/inventory/infrastructure/inventory-repository.ts",
+          "before": "2c6e3622e0dc5a4649f565f3a0d963c2cbee50636b71a7737800e3793ec5e8f6",
+          "after": "c9d20e626e1b11274bfe802fead3c0a259c6c5640c92d1cfe7b1c81a3de4dbfd"
+        },
+        {
+          "path": "supabase/migrations/20261024190000_flow04_inventory_consumption_persistence.sql",
+          "before": null,
+          "after": "72bebe319e282d7de135cca14194a796a945b94fa569cdb76a58cd03f383c849"
+        },
+        {
+          "path": "supabase/migrations/rollback/20261024190000_flow04_inventory_consumption_persistence_down.sql",
+          "before": null,
+          "after": "fb5b748e0489a6fcf65a08993c8ddcd83d6f9ed5e338d17be0eba606dacffbb7"
+        }
+      ]
+    },
+    {
+      "sha": "c90eb833398477c027511c53b380e8960c5a346a",
+      "parent": "4b4d5aa797718111efe5a7da9b2110cd411df9be",
+      "headSha": "5aa4bd0a94f9d749e716dc2e58cb98964357775f",
+      "pr": 555,
+      "files": [
+        {
+          "path": "scripts/preflight-increment-1a.sql",
+          "before": null,
+          "after": "5a650d75f8360a7269576790facfb1e2983bb9595491afc72d11ff81b423c9bf"
+        }
+      ]
+    },
+    {
+      "sha": "79fb67837bc0cd623e1b12b62c889f651a8e013b",
+      "parent": "c90eb833398477c027511c53b380e8960c5a346a",
+      "headSha": "1a4af5505b90610dd28002228ee01da0c495c664",
+      "pr": 556,
+      "files": [
+        {
+          "path": "package.json",
+          "before": "9f9a5956f4c809d40cae312f06fb802904cf44d29b087d21ba32dd022000f0a6",
+          "after": "566ffd67737723e20162c5e32bc5a4c2c25cca39da8e98eedd8074caa24da9a7"
+        },
+        {
+          "path": "scripts/preflight-increment-1a.sql",
+          "before": "5a650d75f8360a7269576790facfb1e2983bb9595491afc72d11ff81b423c9bf",
+          "after": "cf7420d8a52e47e07f350790a09a0eb5818c0d7a8c0a6135d2aed1715f0cb03d"
+        },
+        {
+          "path": "scripts/test-cr-order-identity-bridge.mjs",
+          "before": null,
+          "after": "d789bb5077fb1f186f8244202c7b6df1350ebe44c9772699d0a22c205b2fad2d"
+        },
+        {
+          "path": "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql",
+          "before": null,
+          "after": "59c8939289934af482af8f4b263bd253935a83fd178566f775eaedff1f4511a5"
+        }
+      ]
+    },
+    {
+      "sha": "627e1f90b5554b85e1651ad14806a50d369834d7",
+      "parent": "79fb67837bc0cd623e1b12b62c889f651a8e013b",
+      "headSha": "de7ea6c783f40125e732dc890b53585152701775",
+      "pr": 557,
+      "files": [
+        {
+          "path": "package.json",
+          "before": "566ffd67737723e20162c5e32bc5a4c2c25cca39da8e98eedd8074caa24da9a7",
+          "after": "38a60c8cb743ae185ee56f5bc28a62af3cf07954bf0bf0fb0b1c9c3d04ec333e"
+        },
+        {
+          "path": "scripts/identity-bridge-selective-migration-live.sh",
+          "before": null,
+          "after": "65dcea53509dd4e1b6df4332c8218a03914c79517521bc01a2b74ef628d4f90f"
+        },
+        {
+          "path": "scripts/identity-bridge-selective-migration.spec.mjs",
+          "before": null,
+          "after": "965a41a1fa7a140c72f5a9179aa60f5f41e63d28357e130fd4ad66ce23c05e6f"
+        },
+        {
+          "path": "scripts/test-cr-order-identity-bridge.mjs",
+          "before": "d789bb5077fb1f186f8244202c7b6df1350ebe44c9772699d0a22c205b2fad2d",
+          "after": "3c77c5cedbaa5187bf38322d881178b598e2be57a92d411193e314cc37efc151"
+        }
+      ]
+    },
+    {
+      "sha": "900a1eaa9485865ec6cda938d19103224dcfe9f4",
+      "parent": "627e1f90b5554b85e1651ad14806a50d369834d7",
+      "headSha": "68c8b3ada67aaaa7801b8a4ef796f5fbbb317560",
+      "pr": 558,
+      "files": [
+        {
+          "path": "scripts/identity-bridge-selective-migration-live.sh",
+          "before": "65dcea53509dd4e1b6df4332c8218a03914c79517521bc01a2b74ef628d4f90f",
+          "after": "b4ddc2126e991e47ab718f6746dc6fd56f56185bbad5d7d1118d345572ae311d"
+        },
+        {
+          "path": "scripts/identity-bridge-selective-migration.spec.mjs",
+          "before": "965a41a1fa7a140c72f5a9179aa60f5f41e63d28357e130fd4ad66ce23c05e6f",
+          "after": "5b64f9c8fd590ee368ebcc37624782cf3d18be3c3415381e8548b80ad12deaae"
+        },
+        {
+          "path": "scripts/test-cr-order-identity-bridge.mjs",
+          "before": "3c77c5cedbaa5187bf38322d881178b598e2be57a92d411193e314cc37efc151",
+          "after": "b9e33406a14c1f968f994cfb8d9bb3c565bb3a9d1119865dde18cbf784e029bd"
+        },
+        {
+          "path": "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql",
+          "before": "59c8939289934af482af8f4b263bd253935a83fd178566f775eaedff1f4511a5",
+          "after": "fb773e233a2ca6f89c16bccfc1aa7eb10da90d2d7cfe3b7498bd3d93bf2c8e30"
+        }
+      ]
+    },
+    {
+      "sha": "183d32f1975e5d94cfd7e24d0f6c69a3a18aa768",
+      "parent": "900a1eaa9485865ec6cda938d19103224dcfe9f4",
+      "headSha": "edcff276db2468ed0695894ea2bd667133d88159",
+      "pr": 559,
+      "files": [
+        {
+          "path": "scripts/identity-bridge-selective-executor.mjs",
+          "before": null,
+          "after": "da430931286cef7cd74753131668b5bcdab6df7a0affc13874242d36ecf6678d"
+        },
+        {
+          "path": "scripts/identity-bridge-selective-migration-live.sh",
+          "before": "b4ddc2126e991e47ab718f6746dc6fd56f56185bbad5d7d1118d345572ae311d",
+          "after": "81af024b6a5226ad8da281ba8f052865fbdb84140f3b6961049889c319865e4b"
+        },
+        {
+          "path": "scripts/identity-bridge-selective-migration.spec.mjs",
+          "before": "5b64f9c8fd590ee368ebcc37624782cf3d18be3c3415381e8548b80ad12deaae",
+          "after": "7ddee3ae89576c239f1f0224bd3dbf67995a0d4e38b9722adacf5d1716bca4c7"
+        },
+        {
+          "path": "scripts/test-cr-order-identity-bridge.mjs",
+          "before": "b9e33406a14c1f968f994cfb8d9bb3c565bb3a9d1119865dde18cbf784e029bd",
+          "after": "1f334962272bf5a1603d603ce756fe95e98b7391c160a20002200a894c3418a3"
+        }
+      ]
+    },
+    {
+      "sha": "f7ec4e7d59f70c0b9467aceb9e89711f0352605d",
+      "parent": "183d32f1975e5d94cfd7e24d0f6c69a3a18aa768",
+      "headSha": "56e631efd0b4bdb944692f12d4a64593a34aa73e",
+      "pr": 560,
+      "files": [
+        {
+          "path": "scripts/flow04-inventory-consumption-selective-executor.mjs",
+          "before": null,
+          "after": "b7dfa510858c6168c9b34a9ef1496ec53b0e88b10b46ca3abbc5133860ba72f0"
+        },
+        {
+          "path": "scripts/flow04-inventory-consumption-selective-migration-live.sh",
+          "before": null,
+          "after": "522e7eb98318ad8033ccf0df9565101f5bde90366be0345e187cd3fdb90d7aa8"
+        },
+        {
+          "path": "scripts/flow04-inventory-consumption-selective-migration.spec.mjs",
+          "before": null,
+          "after": "73413ac9d7ba38d70392a12c9969c6e70b473327e0b9e8624f5138cb671f1e37"
+        }
+      ]
+    },
+    {
+      "sha": "b3f6fb08ea49ec1b971de703f3f3d316aeabac6d",
+      "parent": "f7ec4e7d59f70c0b9467aceb9e89711f0352605d",
+      "headSha": "014b3d5aa09765d0fc2ef74d0eb9858d35ddafa4",
+      "pr": 561,
+      "files": [
+        {
+          "path": "scripts/verify-eatclean-1a-hotfix-p0.mjs",
+          "before": null,
+          "after": "a093228e75f50bd0aed383d4ab5be69d195fca9495c59ed0184dc126ef3576d8"
+        },
+        {
+          "path": "src/integrations/supabase/client.ts",
+          "before": "c35027699ed546fb6a1de767e41d8e7ab0b91cb3a4f6b4fda73795ee46c924f2",
+          "after": "0a7bf879d0a22ded6a3b0e09504c86c70ae6cdb7f233a612d1132b1cd79bc632"
+        },
+        {
+          "path": "src/lib/instance-runtime-boundary.ts",
+          "before": "42ffb1d7ef00a54c5179951a93b6d7a27cabc5fb1587736bbd251e5a586a444f",
+          "after": "b568224d8ea5932369254017375268aa386683b70267d9dc8d49e9c4641acea7"
+        },
+        {
+          "path": "src/modules/cost-intelligence/application/procurement-cost-service.spec.ts",
+          "before": "627d928c14d72756e3d3cad598dda2881bc38ef035f6470e46b2e51e4cd3f0ce",
+          "after": "c84fbdb862ce8f8b2454a1dad08421748c2cbbdcff4e446caa1d86574cddb2a4"
+        },
+        {
+          "path": "src/modules/cost-intelligence/domain/purchase-invoice-calculator.spec.ts",
+          "before": "31d8c4171b4cf00dbddd54e7ab5e0ba8c31f078aa7f2b565b07c78986080fc85",
+          "after": "162dac62b20d975f9b3dd7147d6bc8458a0a7a740e22f55925b0d7eb08bb8326"
+        },
+        {
+          "path": "src/modules/cost-intelligence/domain/purchase-invoice-calculator.ts",
+          "before": "403990f30449e905517d0c045aa292f0dfa2c8d7219101aec4f2209363aeb6c9",
+          "after": "c9fc878cbbcf75c02f12fea8e80f0d02381bad22609c8dc39c2cebce08ea22a0"
+        },
+        {
+          "path": "src/modules/cost-intelligence/e2e-runtime-proof.spec.ts",
+          "before": "cc71b571bd0c94f5f86fa8f57a5b9a3f8f800ab33e8ab5637c02a4585bc5dc90",
+          "after": "3c217e3b3c5074f309b91b7b57cd5eeb2968e4503508dc13c09cb5cb5730bd81"
+        },
+        {
+          "path": "src/modules/cost-intelligence/infrastructure/procurement-cost-repository.receipt.spec.ts",
+          "before": "69c72af9cfb2948a0b2a917a54ee014984369ce72bf296fe908975c87a6d3801",
+          "after": "44afebfe92495ca02d7afd22b14b908ea3b58d96be75cae3269c1c1f378fef5f"
+        },
+        {
+          "path": "src/modules/cost-intelligence/infrastructure/procurement-cost-repository.ts",
+          "before": "50bf09c52b9da90098dc036bd832f05617f0a4431134afd577c6244f3d41573c",
+          "after": "86ad63f0cc52206651eb5d230355a8811bae2f26550a64f81dfb4b825b124680"
+        },
+        {
+          "path": "src/modules/inventory/infrastructure/inventory-repository-client-detection.spec.ts",
+          "before": null,
+          "after": "9e5bbba33f007a43ed9320fef5abdeb30a7796101d305283af38338c6804a4c3"
+        },
+        {
+          "path": "src/modules/inventory/infrastructure/inventory-repository.ts",
+          "before": "c9d20e626e1b11274bfe802fead3c0a259c6c5640c92d1cfe7b1c81a3de4dbfd",
+          "after": "84b9727fde743097063e1c69d4431995f88ff5070894e81be62eda5b60d8c003"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.purchasing.spec.ts",
+          "before": "45257f7c5fce51f3f00e2e85a33398dadd8ece8d44513e8dc81b642615d7f778",
+          "after": "553e9d0ce2952f126ba670ba7421f6324a97614e22d14cb0ec361d082de2f272"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.purchasing.tsx",
+          "before": "a386fc3b7ea6a5b19c083529e281fb6704c39f0bebacb22ea0ae3a40ed4be4a2",
+          "after": "d4d2b7abe703b7b034a1e5960afc71ef165a33f3dcf269a03fff01d4e4a5ece0"
+        }
+      ]
+    },
+    {
+      "sha": "ffff9d14019e4e71f76de126a5fccfa78b43aff7",
+      "parent": "b3f6fb08ea49ec1b971de703f3f3d316aeabac6d",
+      "headSha": "b9892a678af0870627263883294e6234f15a6d11",
+      "pr": 562,
+      "files": [
+        {
+          "path": "scripts/verify-eatclean-1a-inventory-ui.mjs",
+          "before": null,
+          "after": "6b8e4ecf0031c15f47572038dcf9fb851a5f82026ddc7dc2e843dcf2a20b89fb"
+        },
+        {
+          "path": "src/modules/inventory/application/inventory-queries.spec.ts",
+          "before": null,
+          "after": "126c3d37bd34737eddc1386446d51a14219fda127c5ff0bcfebca89b6535c19e"
+        },
+        {
+          "path": "src/modules/inventory/application/inventory-service.ts",
+          "before": "6f7d14f01b279f46f07a8146757ffd33a9a73ebdddaa3b542929907507fa5697",
+          "after": "eae30e9566bb134ab4b50fe91c45d9127a89408312aa8de418791665f84aa9df"
+        },
+        {
+          "path": "src/modules/inventory/domain/inventory-types.ts",
+          "before": null,
+          "after": "44fbeaa29126f992f7d0198d081732b9086b660320458d3435994db539cb3ce2"
+        },
+        {
+          "path": "src/modules/inventory/infrastructure/inventory-repository.ts",
+          "before": "84b9727fde743097063e1c69d4431995f88ff5070894e81be62eda5b60d8c003",
+          "after": "a17c694d84048617772afc89e9ac6063164fdc91c13d3d84f45a0c26bba6dfbf"
+        },
+        {
+          "path": "src/routeTree.gen.ts",
+          "before": "3dffce6f1761a572de90628fd07a0ecdc78a6e35a08a395640988de21b2ad833",
+          "after": "c72003aed3e07fb42376bb61482da58195061cd082a96b719b12b3588865916f"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.inventory.spec.ts",
+          "before": null,
+          "after": "1ea1b92f94ea854d3fd8fa9d021c54d5c910c9a5a61776ee9acaa2185f4e42e9"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.inventory.tsx",
+          "before": "1e2d6a321e145c363ec0eaa8f8a54532d22f4120e10aaf296d64556cb691481a",
+          "after": "e8b2a9934300f142ea4a4d9756cc6b883c4f7c52a5e8d7d32d400933d053b782"
+        }
+      ]
+    }
+  ],
+  "candidatePr": {
+    "number": 563,
+    "title": "feat(kitchen): connect kitchen execution with FLOW-04 inventory consumption UI",
+    "headSha": "2ab3c2bc28ed7670067ee50ca11208b56aa9d117",
+    "baseSha": "ffff9d14019e4e71f76de126a5fccfa78b43aff7",
+    "files": [
+      {
+        "path": "scripts/verify-eatclean-1a-kitchen-flow04-ui.mjs",
+        "before": null,
+        "after": "ad62699a86ca3c60d9abe2e72eb18e65af3a99c43a0add1b59c902e9a00b612f"
+      },
+      {
+        "path": "src/modules/inventory/application/flow04-concurrency.spec.ts",
+        "before": null,
+        "after": "6abad79cde8ff229c0231f87fc9245977b35c4c03052c9c797ff4e73b6b383d3"
+      },
+      {
+        "path": "src/modules/inventory/application/flow04-evidence.ts",
+        "before": "9e68393ce1255b0a56aeddbed44c3457eee575e8814a89b57e23363ffa6f0d27",
+        "after": "b6ef899a9ce68ac9a12a20ca780384a98ae962daee65f8f2ffda176fb7ff690e"
+      },
+      {
+        "path": "src/modules/inventory/application/inventory-service.flow04-session-recovery.spec.ts",
+        "before": null,
+        "after": "3715f572fc874ea2d37ae0d51b7a485bb8782d72da28d6fed42f27456f06ca40"
+      },
+      {
+        "path": "src/modules/inventory/application/inventory-service.ts",
+        "before": "eae30e9566bb134ab4b50fe91c45d9127a89408312aa8de418791665f84aa9df",
+        "after": "39ce0b1430245e5f33e672acd21ecb8048e5c707d130285f8a35b23fd3518c80"
+      },
+      {
+        "path": "src/modules/inventory/domain/unit-conversion.spec.ts",
+        "before": null,
+        "after": "c26c5175e1354983b33ecbe23d8482ae6b51db9dd2074b601c29936f15e7d38c"
+      },
+      {
+        "path": "src/modules/inventory/domain/unit-conversion.ts",
+        "before": null,
+        "after": "b4546757050cb13e8ac841ef624d74fe1fc22b01a25a673ac4ea90949330f05c"
+      },
+      {
+        "path": "src/routes/_authenticated/admin.kitchen-execution.spec.tsx",
+        "before": null,
+        "after": "db88c3a2a230a261cf61b177bc2a1e28004fa36d275e18fb387c5007fb3674d9"
+      },
+      {
+        "path": "src/routes/_authenticated/admin.kitchen-execution.tsx",
+        "before": "2506204e1abe6ecc4d8d61f2cd39ec160e554117f848aa537d9e9518b4305d33",
+        "after": "f3625992f3dc03ad0670547a3f148486beda017b3da3309701057ce7624e0a39"
+      }
+    ]
+  },
+  "productPrs": [
+    553,
+    554,
+    555,
+    556,
+    557,
+    558,
+    559,
+    560,
+    561,
+    562,
+    563
+  ],
+  "governanceBranch": "feat/gate7-eatclean-1a-flow04-reconciliation",
+  "governancePaths": [
+    ".github/workflows/deploy-production.yml",
+    "scripts/governance/release-eatclean-1a-flow04-563.json",
+    "scripts/governance/release-eatclean-1a-flow04-563.mjs",
+    "scripts/governance/release-eatclean-1a-flow04-563.spec.mjs",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-rollback-v1.spec.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "kitchenFlow04Operate": true
+  }
+}

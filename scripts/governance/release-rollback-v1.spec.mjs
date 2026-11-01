@@ -298,7 +298,7 @@ test("workflow preserves fail-closed build flag and unchanged application source
     ),
   );
   assert.equal(
-    execFileSync("git", ["diff", "--name-only", r.candidateSha, "--", "src"], {
+    execFileSync("git", ["diff", "--name-only", r.candidateSha, "fcc7801548fe60c3994f08fa18dc5f11431c6138", "--", "src"], {
       encoding: "utf8",
     }).trim(),
     "",

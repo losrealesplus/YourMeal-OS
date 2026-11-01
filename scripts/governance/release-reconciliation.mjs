@@ -1,3 +1,4 @@
+import { assertEatClean1A563Manifest } from "./release-eatclean-1a-flow04-563.mjs";
 import { assertRollbackV1Manifest } from "./release-rollback-v1.mjs";
 import { assertStaff523Manifest } from "./release-staff-orders-523.mjs";
 import { assertP1Orders532Manifest } from "./release-p1-orders-532.mjs";
@@ -326,6 +327,7 @@ export function assertReconciliationManifest(manifest, fresh) {
     assertB2cHardening543Manifest(manifest, fresh);
     assertOperations545Manifest(manifest, fresh);
     assertRollbackV1Manifest(manifest, fresh);
+    assertEatClean1A563Manifest(manifest, fresh);
     if (fresh.reconciliation.payload?.reconciliationType === "A4B_CLOSED_RELEASE") {
       demand(
         [manifest.reconciliation, manifest.plan.reconciliation].every(
