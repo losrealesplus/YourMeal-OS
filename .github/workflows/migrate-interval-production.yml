@@ -1,0 +1,125 @@
+name: "Gate 6: Interval Database Migration (#553–#567)"
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [preflight, install, backfill]
+        default: preflight
+        required: true
+      expected_source_sha:
+        description: "Exact reviewed main SHA (must match repository HEAD on main, descending from base candidate ddc473f6451b82b3d36d0366eb8c90814f31547a)"
+        required: true
+        type: string
+      expected_manifest_sha256:
+        description: "Reviewed digest from release-interval-567-manifest.json"
+        required: true
+        type: string
+      confirmation_token:
+        description: "Required for install (INSTALL_INTERVAL_567_ON_nhirlpkuvonggctdzzad) or backfill (EXECUTE_GATE_B1_BACKFILL_ON_nhirlpkuvonggctdzzad)"
+        required: false
+        type: string
+      preflight_run_id:
+        description: "Install only: GitHub Actions run ID of approved preflight run"
+        required: false
+        type: string
+      preflight_artifact_id:
+        description: "Install only (optional): GitHub Actions artifact ID of preflight report"
+        required: false
+        type: string
+      preflight_report_sha256:
+        description: "Install only: SHA-256 digest of approved preflight report artifact"
+        required: false
+        type: string
+      install_run_id:
+        description: "Backfill only: GitHub Actions run ID of verified install run"
+        required: false
+        type: string
+      install_artifact_id:
+        description: "Backfill only (optional): GitHub Actions artifact ID of install report"
+        required: false
+        type: string
+      install_report_sha256:
+        description: "Backfill only: SHA-256 digest of verified install report artifact"
+        required: false
+        type: string
+      approved_window:
+        description: "Backfill only: Explicit approval token/description of operational window"
+        required: false
+        type: string
+      reason:
+        description: "Human reason for this exact operation (not a blanket authorization)"
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+  deployments: read
+concurrency:
+  group: eatclean-production-interval-migration
+  cancel-in-progress: false
+env:
+  EXPECTED_SOURCE_SHA: ${{ inputs.expected_source_sha }}
+  EXPECTED_MANIFEST_SHA256: ${{ inputs.expected_manifest_sha256 }}
+  MIGRATION_OPERATION: ${{ inputs.operation }}
+  CONFIRMATION_TOKEN: ${{ inputs.confirmation_token }}
+  PREFLIGHT_RUN_ID: ${{ inputs.preflight_run_id }}
+  PREFLIGHT_ARTIFACT_ID: ${{ inputs.preflight_artifact_id }}
+  PREFLIGHT_REPORT_SHA256: ${{ inputs.preflight_report_sha256 }}
+  INSTALL_RUN_ID: ${{ inputs.install_run_id }}
+  INSTALL_ARTIFACT_ID: ${{ inputs.install_artifact_id }}
+  INSTALL_REPORT_SHA256: ${{ inputs.install_report_sha256 }}
+  APPROVED_WINDOW: ${{ inputs.approved_window }}
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Offline safety tests
+        run: node --test scripts/governance/interval-migration.spec.mjs
+      - name: Verify scope, manifest, source and environment authority without database credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/governance/interval-migration.mjs validate
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: interval-migration-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/interval-migration-*.json
+          if-no-files-found: ignore
+  migrate:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production-db
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Ensure PostgreSQL client is available
+        run: sudo apt-get update && sudo apt-get install --yes postgresql-client
+      - name: Execute preflight, install or backfill for interval migrations
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUPABASE_DB_URL_PROD: ${{ secrets.SUPABASE_DB_URL_PROD }}
+        run: node scripts/governance/interval-migration.mjs execute
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: interval-${{ inputs.operation }}-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/interval-migration-*.json
+          if-no-files-found: warn
+          retention-days: 90

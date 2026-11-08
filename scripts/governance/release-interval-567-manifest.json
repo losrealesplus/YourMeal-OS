@@ -1,0 +1,76 @@
+{
+  "$schema": "./release-interval-manifest.schema.json",
+  "name": "gate6-interval-567",
+  "title": "Gate 6: Interval Database Migration (#553–#567)",
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-db",
+  "project": "nhirlpkuvonggctdzzad",
+  "published_base_sha": "fcc7801548fe60c3994f08fa18dc5f11431c6138",
+  "base_candidate_sha": "ddc473f6451b82b3d36d0366eb8c90814f31547a",
+  "governance_branch": "feat/gate6-interval-567-executor",
+  "reviewer_id": 292604102,
+  "required_predecessor": "20261023065216",
+  "expected_ca_sha256": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
+  "allowed_governance_files": [
+    ".github/workflows/migrate-interval-production.yml",
+    "docs/05-architecture/GATE_6_B1_SPATIAL_567_EXECUTION_RUNBOOK.md",
+    "scripts/governance/interval-migration.mjs",
+    "scripts/governance/interval-migration.spec.mjs",
+    "scripts/governance/release-interval-567-manifest.json"
+  ],
+  "constraints": {
+    "no_worker_publication": true,
+    "separate_backfill": true,
+    "lock_timeout_ms": 5000,
+    "statement_timeout_ms": 30000,
+    "preflight_statement_timeout_ms": 15000
+  },
+  "authorization_tokens": {
+    "install": "INSTALL_INTERVAL_567_ON_nhirlpkuvonggctdzzad",
+    "backfill": "EXECUTE_GATE_B1_BACKFILL_ON_nhirlpkuvonggctdzzad"
+  },
+  "migrations": [
+    {
+      "sequence": 1,
+      "version": "20261024175900",
+      "name": "cr_order_writer_identity_bridge_hardening",
+      "path": "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql",
+      "sha256": "fb773e233a2ca6f89c16bccfc1aa7eb10da90d2d7cfe3b7498bd3d93bf2c8e30"
+    },
+    {
+      "sequence": 2,
+      "version": "20261024180000",
+      "name": "cr_cost_1a_atomic_purchase_receipt",
+      "path": "supabase/migrations/20261024180000_cr_cost_1a_atomic_purchase_receipt.sql",
+      "sha256": "878658e4320f015ffde1bf68764f8e0d39ee39bcaed2dd4171cd4f305061175b"
+    },
+    {
+      "sequence": 3,
+      "version": "20261024190000",
+      "name": "flow04_inventory_consumption_persistence",
+      "path": "supabase/migrations/20261024190000_flow04_inventory_consumption_persistence.sql",
+      "sha256": "72bebe319e282d7de135cca14194a796a945b94fa569cdb76a58cd03f383c849"
+    },
+    {
+      "sequence": 4,
+      "version": "20261107210000",
+      "name": "gate_b1_spatial_topology_and_inventory_balances",
+      "path": "supabase/migrations/20261107210000_gate_b1_spatial_topology_and_inventory_balances.sql",
+      "sha256": "61e56075db598247b6073388802371e207a21a88e9cfbcd7aee7c0ab26f26044"
+    },
+    {
+      "sequence": 5,
+      "version": "20261107210100",
+      "name": "gate_b1_inventory_backfill_procedure",
+      "path": "supabase/migrations/20261107210100_gate_b1_inventory_backfill_procedure.sql",
+      "sha256": "ec9f5ca62edc74f74e36fbe6d5c11b37a4a9b5e917fd32c270243bc9101f4fdb"
+    },
+    {
+      "sequence": 6,
+      "version": "20261107210200",
+      "name": "gate_b1_spatial_transactional_bridge",
+      "path": "supabase/migrations/20261107210200_gate_b1_spatial_transactional_bridge.sql",
+      "sha256": "fcc8bb1e218122502666a3162c21d87f0a53e5b83522b803cb41919d85fd692a"
+    }
+  ]
+}
