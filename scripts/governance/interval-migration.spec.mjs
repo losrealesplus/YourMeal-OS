@@ -187,57 +187,122 @@ test('Context: exact manual remote dispatch, manifest checksum, and operation re
   assert.equal(backfillCtx.sha, sha);
 });
 
-test('Blocker 1: Dynamic governance commit reconciliation and lineage validation', () => {
+test('Blocker 1: Dynamic governance commit reconciliation and multi-hop lineage validation', () => {
   // 1. Direct candidate commit validation
   const candidateResult = validateGovernanceCommit(policy.baseCandidateSha, policy.baseCandidateSha);
   assert.equal(candidateResult.candidate, true);
   assert.equal(candidateResult.governanceCommit, policy.baseCandidateSha);
 
-  // 2. Child commit on main after PR merge
-  const mergedSha = 'e'.repeat(40);
+  // 2. Single-hop child commit on main after first PR merge
+  const mergedSha1 = 'e'.repeat(40);
   const validDiffFiles = [
     '.github/workflows/migrate-interval-production.yml',
     'scripts/governance/interval-migration.mjs',
   ];
-  const mergedResult = validateGovernanceCommit(
-    mergedSha,
-    mergedSha,
+  const singleHopResult = validateGovernanceCommit(
+    mergedSha1,
+    mergedSha1,
     () => validDiffFiles,
-    () => policy.baseCandidateSha
+    () => true,
+    () => [mergedSha1],
+    () => validDiffFiles
   );
-  assert.equal(mergedResult.candidate, false);
-  assert.equal(mergedResult.governanceCommit, mergedSha);
-  assert.equal(mergedResult.parentSha, policy.baseCandidateSha);
-  assert.deepEqual(mergedResult.changedFiles, validDiffFiles);
+  assert.equal(singleHopResult.candidate, false);
+  assert.equal(singleHopResult.governanceCommit, mergedSha1);
+  assert.deepEqual(singleHopResult.commits, [mergedSha1]);
+  assert.deepEqual(singleHopResult.changedFiles, validDiffFiles);
 
-  // 3. Rejection: Target SHA does not match current main HEAD
+  // 3. Multi-hop governance lineage (subsequent governance PR merges on top of previous ones)
+  const mergedSha2 = 'f'.repeat(40);
+  const commit2Diff = ['scripts/governance/interval-migration.spec.mjs'];
+  const cumulativeDiff = [...validDiffFiles, ...commit2Diff];
+  const multiHopResult = validateGovernanceCommit(
+    mergedSha2,
+    mergedSha2,
+    () => cumulativeDiff,
+    () => true,
+    () => [mergedSha1, mergedSha2],
+    (c) => (c === mergedSha1 ? validDiffFiles : commit2Diff)
+  );
+  assert.equal(multiHopResult.candidate, false);
+  assert.equal(multiHopResult.governanceCommit, mergedSha2);
+  assert.deepEqual(multiHopResult.commits, [mergedSha1, mergedSha2]);
+  assert.deepEqual(multiHopResult.changedFiles, cumulativeDiff);
+
+  // 4. Rejection: Target SHA does not match current main HEAD
   assert.throws(
-    () => validateGovernanceCommit(mergedSha, 'f'.repeat(40), () => validDiffFiles, () => policy.baseCandidateSha),
+    () => validateGovernanceCommit(mergedSha1, '0'.repeat(40), () => validDiffFiles, () => true, () => [mergedSha1], () => validDiffFiles),
     /Target SHA does not match current main branch HEAD/
   );
 
-  // 4. Rejection: Lineage violation (parent is not baseCandidateSha)
-  assert.throws(
-    () => validateGovernanceCommit(mergedSha, mergedSha, () => validDiffFiles, () => '0'.repeat(40)),
-    /Governance commit lineage violation/
-  );
-
-  // 5. Rejection: Disallowed files modified in governance commit
+  // 5. Rejection: Lineage violation (baseCandidateSha is not an ancestor)
   assert.throws(
     () =>
       validateGovernanceCommit(
-        mergedSha,
-        mergedSha,
-        () => [...validDiffFiles, 'src/unauthorized.ts'],
-        () => policy.baseCandidateSha
+        mergedSha1,
+        mergedSha1,
+        () => validDiffFiles,
+        () => false,
+        () => [mergedSha1],
+        () => validDiffFiles
       ),
-    /Disallowed file in Gate 6 governance diff: src\/unauthorized\.ts/
+    /Governance commit lineage violation.*not an ancestor/
   );
 
-  // 6. Rejection: Empty diff
+  // 6. Rejection: Disallowed file in an intermediate governance commit
   assert.throws(
-    () => validateGovernanceCommit(mergedSha, mergedSha, () => [], () => policy.baseCandidateSha),
-    /Governance commit diff is empty/
+    () =>
+      validateGovernanceCommit(
+        mergedSha2,
+        mergedSha2,
+        () => cumulativeDiff,
+        () => true,
+        () => [mergedSha1, mergedSha2],
+        (c) => (c === mergedSha1 ? validDiffFiles : [...commit2Diff, 'src/unauthorized.ts'])
+      ),
+    /Disallowed file in governance commit .*: src\/unauthorized\.ts/
+  );
+
+  // 7. Rejection: Disallowed file in cumulative diff
+  assert.throws(
+    () =>
+      validateGovernanceCommit(
+        mergedSha1,
+        mergedSha1,
+        () => [...validDiffFiles, 'config/database.json'],
+        () => true,
+        () => [mergedSha1],
+        () => validDiffFiles
+      ),
+    /Disallowed file in Gate 6 cumulative governance diff: config\/database\.json/
+  );
+
+  // 8. Rejection: Empty commit list
+  assert.throws(
+    () =>
+      validateGovernanceCommit(
+        mergedSha1,
+        mergedSha1,
+        () => validDiffFiles,
+        () => true,
+        () => [],
+        () => validDiffFiles
+      ),
+    /No governance commits found between candidate base/
+  );
+
+  // 9. Rejection: Empty cumulative diff
+  assert.throws(
+    () =>
+      validateGovernanceCommit(
+        mergedSha1,
+        mergedSha1,
+        () => [],
+        () => true,
+        () => [mergedSha1],
+        () => validDiffFiles
+      ),
+    /Governance commit cumulative diff is empty/
   );
 });
 

@@ -20,13 +20,14 @@
    `RPC espacial → inventory_balances → proyección forward agregada a ingredients.stock`.  
    No existe trigger inverso sobre `ingredients`. Cualquier mutación directa no pasará a los saldos espaciales.
 
-3. **Reconciliación Dinámica de Gobernanza:**  
-   El ejecutor no presupone un SHA rígido de `main`. En su lugar, verifica que el commit en ejecución descienda directamente del commit base candidato (`ddc473f6451b82b3d36d0366eb8c90814f31547a`), proceda de la rama `feat/gate6-interval-567-executor` y contenga una diferencia que afecte **exclusivamente a los cinco archivos de gobernanza aprobados**:
+3. **Reconciliación Dinámica de Gobernanza y Linaje:**  
+   El ejecutor no presupone un SHA rígido de `main`. En su lugar, verifica que el commit en ejecución descienda del commit base candidato inmutable (`ddc473f6451b82b3d36d0366eb8c90814f31547a`), que todos los commits en la secuencia intermedia contengan exclusivamente cambios sobre los cinco archivos de gobernanza aprobados, y que el diff acumulado entre la base candidata y el HEAD de `main` afecte **exclusivamente a los cinco archivos de gobernanza aprobados**:
    - `.github/workflows/migrate-interval-production.yml`
    - `docs/05-architecture/GATE_6_B1_SPATIAL_567_EXECUTION_RUNBOOK.md`
    - `scripts/governance/interval-migration.mjs`
    - `scripts/governance/interval-migration.spec.mjs`
-   - `scripts/governance/release-interval-567-manifest.json`
+   - `scripts/governance/release-interval-567-manifest.json`  
+   Para asegurar la verificación confiable de este linaje en runners de CI, el workflow de migración descarga el historial completo de Git (`fetch-depth: 0`) en ambos jobs.
 
 4. **Cadena Criptográfica de Artefactos entre Ejecuciones:**  
    Debido a que cada ejecución de GitHub Actions corre en un entorno efímero aislado, el flujo no asume archivos locales entre ejecuciones. Cada fase descarga y valida criptográficamente el artefacto de la fase anterior:
