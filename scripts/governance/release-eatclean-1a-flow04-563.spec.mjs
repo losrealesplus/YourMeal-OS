@@ -399,6 +399,7 @@ test("EatClean 1A FLOW-04 publisher integrated: valid control succeeds and tampe
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gate7-eatclean-integrated-"));
   try {
     execFileSync("git", ["clone", "--shared", "--quiet", repoRoot, dir]);
+    execFileSync("git", ["checkout", "--quiet", "6159c437caf6903f2d1854021eb77071ad1cee50"], { cwd: dir });
 
     const candCommit = execFileSync(
       "git",
@@ -765,6 +766,7 @@ test("EatClean 1A FLOW-04 regression: removing assertEatClean1A563Manifest cause
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gate7-eatclean-regression-"));
   try {
     execFileSync("git", ["clone", "--shared", "--quiet", repoRoot, dir]);
+    execFileSync("git", ["checkout", "--quiet", "6159c437caf6903f2d1854021eb77071ad1cee50"], { cwd: dir });
 
     const candCommit = execFileSync(
       "git",

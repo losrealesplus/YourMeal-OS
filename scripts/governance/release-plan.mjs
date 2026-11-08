@@ -1,4 +1,10 @@
 import {
+  B1_SPATIAL_567,
+  b1Spatial567Payload,
+  b1Spatial567ScopeId,
+  authorizeB1Spatial567,
+} from "./release-b1-spatial-567.mjs";
+import {
   EATCLEAN_1A_563,
   eatclean1A563Payload,
   eatclean1A563ScopeId,
@@ -460,6 +466,50 @@ export function rollbackV1Snapshot(ctx, base, diff, prs, currentMainSha) {
   }
   return { ...s, diff };
 }
+export function b1Spatial567Snapshot(ctx, base, diff, prs, currentMainSha) {
+  const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
+  s.productPrs = [553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567].map((n) =>
+    api(`pulls/${n}`),
+  );
+  s.candidatePr = api("pulls/567");
+  s.commits = s.commits.map((c) => {
+    let parent;
+    try {
+      parent = git("rev-parse", `${c.sha}^1`).trim();
+    } catch {
+      parent = null;
+    }
+    let headSha;
+    try {
+      headSha = git("rev-parse", `${c.sha}^2`).trim();
+    } catch {
+      try {
+        headSha = api(`pulls/${c.pr}`).head.sha;
+      } catch {
+        headSha = null;
+      }
+    }
+    return {
+      sha: c.sha,
+      parent,
+      headSha,
+      pr: c.pr,
+      files: c.paths.map((p) => {
+        const fileHash = (rev) => {
+          const entry = git("ls-tree", rev, "--", p);
+          if (!entry) return null;
+          const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+          demand(blob, "B1 Spatial 567 requires regular Git blobs");
+          return hash(
+            execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+          );
+        };
+        return { path: p, before: fileHash(`${c.sha}^1`), after: fileHash(c.sha) };
+      }),
+    };
+  });
+  return { ...s, diff };
+}
 export function eatclean1A563Snapshot(ctx, base, diff, prs, currentMainSha) {
   const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
   s.productPrs = [553, 554, 555, 556, 557, 558, 559, 560, 561, 562].map((n) => api(`pulls/${n}`));
@@ -695,6 +745,112 @@ export function p1Orders532Snapshot(ctx, base, diff, prs, currentMainSha) {
   });
   return { ...s, diff };
 }
+export function routeExactInterval(ctx, base, diff, prs, currentMain, inputs, run, policy) {
+  const prNumber = (p) => (typeof p === "number" ? p : p?.number);
+  if (base.sha === B1_SPATIAL_567.baseline.sha) {
+    const isB1Candidate =
+      diff.commits.includes(B1_SPATIAL_567.candidateSha) &&
+      prs.some((p) => prNumber(p) === B1_SPATIAL_567.candidatePr);
+    const isEatcleanCandidate =
+      !diff.commits.includes(B1_SPATIAL_567.candidateSha) &&
+      prs.some((p) => prNumber(p) === EATCLEAN_1A_563.candidatePr.number) &&
+      !prs.some((p) => prNumber(p) > 564);
+
+    if (isB1Candidate) {
+      return authorizeB1Spatial567(
+        b1Spatial567Snapshot(ctx, base, diff, prs, currentMain),
+        inputs,
+        ctx,
+        run,
+        policy,
+      );
+    }
+    if (isEatcleanCandidate) {
+      return authorizeEatClean1A563(
+        eatclean1A563Snapshot(ctx, base, diff, prs, currentMain),
+        inputs,
+        ctx,
+        run,
+        policy,
+      );
+    }
+    demand(
+      false,
+      "Exact interval for baseline fcc78015 matches neither EatClean 1A FLOW-04 nor B1 Spatial 567 reconciliation",
+    );
+  }
+  if (base.sha === ROLLBACK_V1.baseline.sha) {
+    return authorizeRollbackV1(
+      rollbackV1Snapshot(ctx, base, diff, prs, currentMain),
+      inputs,
+      ctx,
+      run,
+      policy,
+    );
+  }
+  if (base.sha === OPERATIONS_545.baseline.sha) {
+    return authorizeOperations545(
+      operations545Snapshot(ctx, base, diff, prs, currentMain),
+      inputs,
+      ctx,
+      run,
+      policy,
+    );
+  }
+  if (base.sha === B2C_543.baseline.sha) {
+    return authorizeB2cHardening543(
+      b2cHardening543Snapshot(ctx, base, diff, prs, currentMain),
+      inputs,
+      ctx,
+      run,
+      policy,
+    );
+  }
+  if (base.sha === P0_538.baseline.sha) {
+    return authorizeP0Orders538(
+      p0Orders538Snapshot(ctx, base, diff, prs, currentMain),
+      inputs,
+      ctx,
+      run,
+      policy,
+    );
+  }
+  if (base.sha === CX_536.baseline.sha) {
+    return authorizeCx536(
+      cx536Snapshot(ctx, base, diff, prs, currentMain),
+      inputs,
+      ctx,
+      run,
+      policy,
+    );
+  }
+  if (base.sha === P1_532.baseline.sha) {
+    return authorizeP1Orders532(
+      p1Orders532Snapshot(ctx, base, diff, prs, currentMain),
+      inputs,
+      ctx,
+      run,
+      policy,
+    );
+  }
+  if (base.sha === STAFF_523.baseline.sha) {
+    return authorizeStaff523(
+      staff523Snapshot(ctx, base, diff, prs, currentMain),
+      inputs,
+      ctx,
+      run,
+      policy,
+    );
+  }
+  return authorizeExactInterval(
+    exactIntervalSnapshot(ctx, base, diff, prs),
+    inputs,
+    ctx,
+    run,
+    policy,
+  );
+}
+
 export function prepare(ctx, publishing = false) {
   assertContext(ctx, policy);
   assertEnvironment(api(`environments/${policy.environment}`), policy);
@@ -729,75 +885,16 @@ export function prepare(ctx, publishing = false) {
       classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION",
       "Exact interval cannot authorize a different classification",
     );
-    reconciliation =
-      base.sha === EATCLEAN_1A_563.baseline.sha
-        ? authorizeEatClean1A563(
-            eatclean1A563Snapshot(ctx, base, diff, prs, currentMain),
-            inputs,
-            ctx,
-            api(`actions/runs/${ctx.runId}`),
-            policy,
-          )
-        : base.sha === ROLLBACK_V1.baseline.sha
-        ? authorizeRollbackV1(
-            rollbackV1Snapshot(ctx, base, diff, prs, currentMain), inputs, ctx,
-            api(`actions/runs/${ctx.runId}`), policy,
-          )
-        : base.sha === OPERATIONS_545.baseline.sha
-        ? authorizeOperations545(
-            operations545Snapshot(ctx, base, diff, prs, currentMain),
-            inputs,
-            ctx,
-            api(`actions/runs/${ctx.runId}`),
-            policy,
-          )
-        : base.sha === B2C_543.baseline.sha
-        ? authorizeB2cHardening543(
-            b2cHardening543Snapshot(ctx, base, diff, prs, currentMain),
-            inputs,
-            ctx,
-            api(`actions/runs/${ctx.runId}`),
-            policy,
-          )
-        : base.sha === P0_538.baseline.sha
-        ? authorizeP0Orders538(
-            p0Orders538Snapshot(ctx, base, diff, prs, currentMain),
-            inputs,
-            ctx,
-            api(`actions/runs/${ctx.runId}`),
-            policy,
-          )
-        : base.sha === CX_536.baseline.sha
-        ? authorizeCx536(
-            cx536Snapshot(ctx, base, diff, prs, currentMain),
-            inputs,
-            ctx,
-            api(`actions/runs/${ctx.runId}`),
-            policy,
-          )
-        : base.sha === P1_532.baseline.sha
-        ? authorizeP1Orders532(
-            p1Orders532Snapshot(ctx, base, diff, prs, currentMain),
-            inputs,
-            ctx,
-            api(`actions/runs/${ctx.runId}`),
-            policy,
-          )
-        : base.sha === STAFF_523.baseline.sha
-          ? authorizeStaff523(
-              staff523Snapshot(ctx, base, diff, prs, currentMain),
-              inputs,
-              ctx,
-              api(`actions/runs/${ctx.runId}`),
-              policy,
-            )
-          : authorizeExactInterval(
-              exactIntervalSnapshot(ctx, base, diff, prs),
-              inputs,
-              ctx,
-              api(`actions/runs/${ctx.runId}`),
-              policy,
-            );
+    reconciliation = routeExactInterval(
+      ctx,
+      base,
+      diff,
+      prs,
+      currentMain,
+      inputs,
+      api(`actions/runs/${ctx.runId}`),
+      policy,
+    );
   }
   if (!initial && !exact && classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION") {
     if (base.sha === TRACK_B_RECONCILIATION.baselineSha) {
@@ -1137,6 +1234,27 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         `${JSON.stringify({ payload, authorizationId: hash(JSON.stringify(payload)) }, null, 2)}\n`,
       );
       process.exit(0); // Read-only reconciliation, never artifact/ledger or authorization.
+    }
+    if (process.argv[2] === "--b1-567-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((c) => assertMergedCommit(pages(`commits/${c}/pulls`), c));
+      const payload = b1Spatial567Payload(b1Spatial567Snapshot(ctx, base, diff, prs, sha), policy);
+      fs.writeSync(
+        1,
+        JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: b1Spatial567ScopeId(payload),
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+      process.exit(0); // Read-only proposal; never dispatch or production authority.
     }
     const plan = prepare(context());
     fs.mkdirSync("artifacts", { recursive: true });

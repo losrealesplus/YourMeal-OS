@@ -78,6 +78,8 @@ test("CLI policy, event and API diagnostics emit no raw payload or secrets", () 
       "release-operational-evolution-545.json",
       "release-eatclean-1a-flow04-563.mjs",
       "release-eatclean-1a-flow04-563.json",
+      "release-b1-spatial-567.mjs",
+      "release-b1-spatial-567.json",
       "release-contract.mjs",
       "release-activation.mjs",
       "release-reconciliation.mjs",
