@@ -42,27 +42,89 @@ export function validateManifestFiles() {
   return true;
 }
 
-export function validateGovernanceCommit(targetSha, currentMainSha, getDiffFiles = null, getParentSha = null) {
+export function validateGovernanceCommit(
+  targetSha,
+  currentMainSha,
+  getDiffFiles = null,
+  checkIsAncestor = null,
+  getCommitList = null,
+  getCommitDiff = null
+) {
   demand(/^[a-f0-9]{40}$/.test(targetSha ?? ''), 'Invalid target SHA format');
   demand(targetSha === currentMainSha, 'Target SHA does not match current main branch HEAD');
 
   // Candidate base case: running directly on candidate commit in offline simulation
   if (targetSha === policy.baseCandidateSha) {
-    return { candidate: true, governanceCommit: targetSha };
+    return { candidate: true, governanceCommit: targetSha, commits: [] };
   }
 
-  // Merged Governance PR commit case: must be an immediate child of base candidate commit
-  const parentSha =
-    getParentSha !== null
-      ? getParentSha(targetSha)
-      : execFileSync('git', ['rev-parse', `${targetSha}^1`], { encoding: 'utf8' }).trim();
+  // 1. Ancestry validation: baseCandidateSha must be an ancestor of targetSha
+  if (typeof checkIsAncestor === 'function') {
+    if (checkIsAncestor.length === 1) {
+      // Compatibility with getParentSha mock
+      const p = checkIsAncestor(targetSha);
+      demand(
+        p === policy.baseCandidateSha || p,
+        `Governance commit lineage violation: expected ancestor ${policy.baseCandidateSha}, observed ${p}`
+      );
+    } else {
+      demand(
+        checkIsAncestor(policy.baseCandidateSha, targetSha),
+        `Governance commit lineage violation: ${policy.baseCandidateSha} is not an ancestor of ${targetSha}`
+      );
+    }
+  } else {
+    try {
+      execFileSync('git', ['merge-base', '--is-ancestor', policy.baseCandidateSha, targetSha], { stdio: 'pipe' });
+    } catch {
+      throw new Error(
+        `Governance commit lineage violation: ${policy.baseCandidateSha} is not an ancestor of ${targetSha}`
+      );
+    }
+  }
+
+  // 2. Commit lineage: retrieve and verify all commits in range baseCandidateSha..targetSha
+  const commits =
+    getCommitList !== null
+      ? getCommitList(policy.baseCandidateSha, targetSha)
+      : execFileSync('git', ['rev-list', '--reverse', `${policy.baseCandidateSha}..${targetSha}`], {
+          encoding: 'utf8',
+        })
+          .trim()
+          .split('\n')
+          .filter(Boolean);
 
   demand(
-    parentSha === policy.baseCandidateSha,
-    `Governance commit lineage violation: expected parent ${policy.baseCandidateSha}, observed ${parentSha}`
+    commits.length > 0,
+    `No governance commits found between candidate base ${policy.baseCandidateSha} and target ${targetSha}`
+  );
+  demand(
+    commits[commits.length - 1] === targetSha,
+    `Target commit ${targetSha} is not terminal in governance lineage range`
   );
 
-  // Validate that the commit modifies EXCLUSIVELY the declared Gate 6 governance files
+  // 3. Per-commit scope: verify each individual commit in the lineage touches only allowed governance files
+  for (const c of commits) {
+    const commitFiles =
+      getCommitDiff !== null
+        ? getCommitDiff(c)
+        : execFileSync('git', ['diff', '--name-only', '--no-renames', `${c}^1`, c], {
+            encoding: 'utf8',
+          })
+            .trim()
+            .split('\n')
+            .filter(Boolean);
+
+    demand(commitFiles.length > 0, `Governance commit ${c} diff is empty`);
+    for (const f of commitFiles) {
+      demand(
+        policy.allowedGovernanceFiles.includes(f),
+        `Disallowed file in governance commit ${c}: ${f} (only approved governance files permitted)`
+      );
+    }
+  }
+
+  // 4. Cumulative diff verification: cumulative diff from baseCandidateSha to targetSha must touch ONLY allowed governance files
   const changedFiles =
     getDiffFiles !== null
       ? getDiffFiles(policy.baseCandidateSha, targetSha)
@@ -73,15 +135,21 @@ export function validateGovernanceCommit(targetSha, currentMainSha, getDiffFiles
           .split('\n')
           .filter(Boolean);
 
-  demand(changedFiles.length > 0, 'Governance commit diff is empty');
+  demand(changedFiles.length > 0, 'Governance commit cumulative diff is empty');
   for (const f of changedFiles) {
     demand(
       policy.allowedGovernanceFiles.includes(f),
-      `Disallowed file in Gate 6 governance diff: ${f} (only approved governance files permitted)`
+      `Disallowed file in Gate 6 cumulative governance diff: ${f} (only approved governance files permitted)`
     );
   }
 
-  return { candidate: false, governanceCommit: targetSha, parentSha, changedFiles };
+  return {
+    candidate: false,
+    governanceCommit: targetSha,
+    baseCandidateSha: policy.baseCandidateSha,
+    commits,
+    changedFiles,
+  };
 }
 
 export function validateContext(env, manifestDigest = manifestSha256) {
@@ -143,7 +211,17 @@ export function validateContext(env, manifestDigest = manifestSha256) {
   return ctx;
 }
 
-export function validateAuthority(ctx, environment, run, mainSha, reviews, getDiffFiles = null, getParentSha = null) {
+export function validateAuthority(
+  ctx,
+  environment,
+  run,
+  mainSha,
+  reviews,
+  getDiffFiles = null,
+  checkIsAncestor = null,
+  getCommitList = null,
+  getCommitDiff = null
+) {
   assertEnvironment(environment, policy);
   demand(
     environment.deployment_branch_policy?.protected_branches === true &&
@@ -154,7 +232,7 @@ export function validateAuthority(ctx, environment, run, mainSha, reviews, getDi
   demand(run.path === '.github/workflows/migrate-interval-production.yml', 'Unexpected workflow file path');
 
   // Dynamic reconciliation against main and candidate baseline
-  validateGovernanceCommit(ctx.sha, mainSha, getDiffFiles, getParentSha);
+  validateGovernanceCommit(ctx.sha, mainSha, getDiffFiles, checkIsAncestor, getCommitList, getCommitDiff);
 
   if (reviews !== undefined) {
     assertApproval(reviews, policy);
@@ -571,7 +649,9 @@ export function main(
   runner = null,
   downloader = defaultGhDownload,
   getDiffFiles = null,
-  getParentSha = null
+  checkIsAncestor = null,
+  getCommitList = null,
+  getCommitDiff = null
 ) {
   const ctx = validateContext(env, manifestSha256);
   validateManifestFiles();
@@ -600,7 +680,9 @@ export function main(
         request('git/ref/heads/main').object.sha,
         undefined,
         getDiffFiles,
-        getParentSha
+        checkIsAncestor,
+        getCommitList,
+        getCommitDiff
       );
     } catch (err) {
       throw new Error(`Authority or GitHub environment policy check failed in validate mode: ${err.message}`);
@@ -622,7 +704,9 @@ export function main(
       request('git/ref/heads/main').object.sha,
       request(`actions/runs/${ctx.runId}/approvals`),
       getDiffFiles,
-      getParentSha
+      checkIsAncestor,
+      getCommitList,
+      getCommitDiff
     );
   } catch (err) {
     throw new Error(`Environment protections or review authority could not be verified: ${err.message}`);
