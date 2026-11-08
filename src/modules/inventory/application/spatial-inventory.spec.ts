@@ -29,6 +29,10 @@ describe("Gate B · PR B1: Spatial Inventory Topology, Composite Integrity & Bac
     process.cwd(),
     "supabase/migrations/20261107210100_gate_b1_inventory_backfill_procedure.sql",
   );
+  const migration3Path = path.resolve(
+    process.cwd(),
+    "supabase/migrations/20261107210200_gate_b1_spatial_transactional_bridge.sql",
+  );
   const rollback1Path = path.resolve(
     process.cwd(),
     "supabase/migrations/rollback/20261107210000_gate_b1_spatial_topology_and_inventory_balances_down.sql",
@@ -37,18 +41,27 @@ describe("Gate B · PR B1: Spatial Inventory Topology, Composite Integrity & Bac
     process.cwd(),
     "supabase/migrations/rollback/20261107210100_gate_b1_inventory_backfill_procedure_down.sql",
   );
+  const rollback3Path = path.resolve(
+    process.cwd(),
+    "supabase/migrations/rollback/20261107210200_gate_b1_spatial_transactional_bridge_down.sql",
+  );
 
   it("verifies migration and rollback SQL files exist and are strictly ordered before 20261108", () => {
     expect(fs.existsSync(migration1Path)).toBe(true);
     expect(fs.existsSync(migration2Path)).toBe(true);
+    expect(fs.existsSync(migration3Path)).toBe(true);
     expect(fs.existsSync(rollback1Path)).toBe(true);
     expect(fs.existsSync(rollback2Path)).toBe(true);
+    expect(fs.existsSync(rollback3Path)).toBe(true);
 
     const m1Name = path.basename(migration1Path);
     const m2Name = path.basename(migration2Path);
+    const m3Name = path.basename(migration3Path);
     expect(m1Name.startsWith("20261107")).toBe(true);
     expect(m2Name.startsWith("20261107")).toBe(true);
+    expect(m3Name.startsWith("20261107")).toBe(true);
     expect(m1Name < m2Name).toBe(true);
+    expect(m2Name < m3Name).toBe(true);
   });
 
   it("domain helper enforces physical non-negativity constraint", () => {
@@ -429,5 +442,161 @@ describe("Gate B · PR B1: Spatial Inventory Topology, Composite Integrity & Bac
       expect(err.message || "").toContain("permission denied for table inventory_balances");
     }
     expect(insertDenied).toBe(true);
+  });
+
+  // ==========================================================================
+  // Test B1-T09: Transactional Bridge (Receipt -> Consumption -> View),
+  // Absent Row Handling, Multi-Center Fail-Closed & Anti-Spoofing
+  // ==========================================================================
+  it("B1-T09: maintains zero divergence across purchase receipt, FLOW-04 consumption, and v_ingredient_stocks with fail-closed safeguards", () => {
+    const res = runPsql(`
+      BEGIN;
+      INSERT INTO public.tenants (id, name, slug) VALUES 
+        ('ba090000-0000-0000-0000-000000000001', 'Tenant B1-T09 Suite', 'tenant-b1-t09');
+
+      INSERT INTO auth.users (id, email) VALUES 
+        ('fa090000-0000-0000-0000-000000000001', 'b1-t09-op1@test.com'),
+        ('fa090000-0000-0000-0000-000000000002', 'b1-t09-op2@test.com')
+      ON CONFLICT DO NOTHING;
+
+      INSERT INTO public.tenant_members (user_id, tenant_id, status) VALUES 
+        ('fa090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-000000000001', 'approved'),
+        ('fa090000-0000-0000-0000-000000000002', 'ba090000-0000-0000-0000-000000000001', 'approved')
+      ON CONFLICT DO NOTHING;
+
+      INSERT INTO public.user_roles (user_id, tenant_id, role) VALUES 
+        ('fa090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-000000000001', 'kitchen'::public.app_role),
+        ('fa090000-0000-0000-0000-000000000002', 'ba090000-0000-0000-0000-000000000001', 'kitchen'::public.app_role)
+      ON CONFLICT DO NOTHING;
+
+      INSERT INTO public.production_centers (id, tenant_id, code, name, is_active) VALUES
+        ('ca090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-000000000001', 'CTR-09-A', 'Center 09 A', true);
+
+      INSERT INTO public.warehouses (id, tenant_id, center_id, code, name, is_active) VALUES
+        ('da090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-000000000001', 'ca090000-0000-0000-0000-000000000001', 'WH-09-A', 'Warehouse 09 A', true);
+
+      INSERT INTO public.inventory_locations (id, tenant_id, center_id, warehouse_id, code, name, is_default, is_active) VALUES
+        ('ea090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-000000000001', 'ca090000-0000-0000-0000-000000000001', 'da090000-0000-0000-0000-000000000001', 'LOC-09-A', 'Location 09 A', true, true);
+
+      INSERT INTO public.user_center_assignments (id, tenant_id, user_id, center_id) VALUES
+        (gen_random_uuid(), 'ba090000-0000-0000-0000-000000000001', 'fa090000-0000-0000-0000-000000000001', 'ca090000-0000-0000-0000-000000000001');
+
+      INSERT INTO public.suppliers (id, tenant_id, name) VALUES
+        ('ba090000-0000-0000-0000-0000000000a1', 'ba090000-0000-0000-0000-000000000001', 'Supplier 09');
+
+      INSERT INTO public.ingredients (id, tenant_id, name, unit, cost, stock) VALUES
+        ('ba090000-0000-0000-0000-0000000000b1', 'ba090000-0000-0000-0000-000000000001', 'Aceite Oliva T09', 'kg', 10.0000, 0.000);
+
+      -- Check 1: Initial absent row
+      SELECT count(*) INTO TEMPORARY TABLE t09_initial_absent
+      FROM public.inventory_balances
+      WHERE tenant_id = 'ba090000-0000-0000-0000-000000000001' AND ingredient_id = 'ba090000-0000-0000-0000-0000000000b1';
+
+      -- Check 2: Execute Purchase Receipt (+8.000 kg)
+      INSERT INTO public.purchase_invoices (id, tenant_id, supplier_id, invoice_number, invoice_date, status, total_amount) VALUES
+        ('ba090000-0000-0000-0000-0000000000f1', 'ba090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-0000000000a1', 'INV-09-01', CURRENT_DATE, 'draft', 80.00);
+
+      INSERT INTO public.purchase_invoice_items (
+        id, purchase_invoice_id, tenant_id, item_nature, item_id, item_name, quantity, unit, unit_price, effective_unit_cost, line_total, received_quantity
+      ) VALUES (
+        'ba090000-0000-0000-0000-0000000000f2', 'ba090000-0000-0000-0000-0000000000f1', 'ba090000-0000-0000-0000-000000000001', 'INVENTORYABLE', 'ba090000-0000-0000-0000-0000000000b1', 'Aceite Oliva T09', 8.000, 'kg', 10.0000, 10.0000, 80.0000, 0.000
+      );
+
+      -- Emulate authenticated user 1 session claims
+      SELECT set_config('request.jwt.claim.sub', 'fa090000-0000-0000-0000-000000000001', true);
+      SELECT set_config('request.jwt.claim.role', 'authenticated', true);
+
+      SELECT public.receive_purchase_invoice_v1('ba090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-0000000000f1') INTO TEMPORARY TABLE t09_receipt_res;
+
+      SELECT 
+        (SELECT stock FROM public.ingredients WHERE id = 'ba090000-0000-0000-0000-0000000000b1') AS legacy_post_receipt,
+        (SELECT stock_quantity FROM public.inventory_balances WHERE ingredient_id = 'ba090000-0000-0000-0000-0000000000b1') AS spatial_post_receipt,
+        (SELECT total_physical_stock FROM public.v_ingredient_stocks WHERE ingredient_id = 'ba090000-0000-0000-0000-0000000000b1') AS view_post_receipt
+      INTO TEMPORARY TABLE t09_post_receipt;
+
+      -- Check 3: Execute Kitchen Consumption (-3.000 kg)
+      INSERT INTO public.inventory_consumptions (id, tenant_id, status, delivery_date) VALUES
+        ('ba090000-0000-0000-0000-0000000000c1', 'ba090000-0000-0000-0000-000000000001', 'planned', CURRENT_DATE);
+
+      INSERT INTO public.inventory_consumption_lines (id, consumption_id, tenant_id, ingredient_id, ingredient_name, quantity, unit) VALUES
+        ('ba090000-0000-0000-0000-0000000000c2', 'ba090000-0000-0000-0000-0000000000c1', 'ba090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-0000000000b1', 'Aceite Oliva T09', 3.000, 'kg');
+
+      SELECT public.apply_inventory_consumption_v1('ba090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-0000000000c1') INTO TEMPORARY TABLE t09_cons_res;
+
+      SELECT 
+        (SELECT stock FROM public.ingredients WHERE id = 'ba090000-0000-0000-0000-0000000000b1') AS legacy_post_cons,
+        (SELECT stock_quantity FROM public.inventory_balances WHERE ingredient_id = 'ba090000-0000-0000-0000-0000000000b1') AS spatial_post_cons,
+        (SELECT total_physical_stock FROM public.v_ingredient_stocks WHERE ingredient_id = 'ba090000-0000-0000-0000-0000000000b1') AS view_post_cons
+      INTO TEMPORARY TABLE t09_post_consumption;
+
+      -- Check 4: Multi-Center Fail-Closed Check
+      INSERT INTO public.production_centers (id, tenant_id, code, name, is_active) VALUES
+        ('ca090000-0000-0000-0000-000000000002', 'ba090000-0000-0000-0000-000000000001', 'CTR-09-B', 'Center 09 B', true);
+
+      INSERT INTO public.warehouses (id, tenant_id, center_id, code, name, is_active) VALUES
+        ('da090000-0000-0000-0000-000000000002', 'ba090000-0000-0000-0000-000000000001', 'ca090000-0000-0000-0000-000000000002', 'WH-09-B', 'Warehouse 09 B', true);
+
+      INSERT INTO public.inventory_locations (id, tenant_id, center_id, warehouse_id, code, name, is_default, is_active) VALUES
+        ('ea090000-0000-0000-0000-000000000002', 'ba090000-0000-0000-0000-000000000001', 'ca090000-0000-0000-0000-000000000002', 'da090000-0000-0000-0000-000000000002', 'LOC-09-B', 'Location 09 B', true, true);
+
+      INSERT INTO public.inventory_consumptions (id, tenant_id, status, delivery_date) VALUES
+        ('ba090000-0000-0000-0000-0000000000c3', 'ba090000-0000-0000-0000-000000000001', 'planned', CURRENT_DATE + 1);
+
+      INSERT INTO public.inventory_consumption_lines (id, consumption_id, tenant_id, ingredient_id, ingredient_name, quantity, unit) VALUES
+        ('ba090000-0000-0000-0000-0000000000c4', 'ba090000-0000-0000-0000-0000000000c3', 'ba090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-0000000000b1', 'Aceite Oliva T09', 1.000, 'kg');
+
+      DO $block$
+      BEGIN
+        PERFORM public.apply_inventory_consumption_v1('ba090000-0000-0000-0000-000000000001', 'ba090000-0000-0000-0000-0000000000c3');
+        RAISE EXCEPTION 'SHOULD_HAVE_FAILED_MULTI_CENTER';
+      EXCEPTION
+        WHEN SQLSTATE '22023' THEN
+          CREATE TEMPORARY TABLE t09_multi_center_fail_closed (caught boolean);
+          INSERT INTO t09_multi_center_fail_closed VALUES (true);
+      END;
+      $block$;
+
+      -- Check 5: Anti-Spoofing check
+      DO $block$
+      BEGIN
+        PERFORM * FROM public.resolve_inventory_location_v1('ba090000-0000-0000-0000-000000000001', NULL, NULL, 'fa090000-0000-0000-0000-000000000002');
+        RAISE EXCEPTION 'SHOULD_HAVE_BLOCKED_SPOOFING';
+      EXCEPTION
+        WHEN SQLSTATE '42501' THEN
+          CREATE TEMPORARY TABLE t09_spoofing_blocked (caught boolean);
+          INSERT INTO t09_spoofing_blocked VALUES (true);
+      END;
+      $block$;
+
+      SELECT json_build_object(
+        'initial_absent_count', (SELECT count FROM t09_initial_absent),
+        'post_receipt', (SELECT row_to_json(r) FROM t09_post_receipt r),
+        'post_consumption', (SELECT row_to_json(c) FROM t09_post_consumption c),
+        'multi_center_fail_closed', (SELECT caught FROM t09_multi_center_fail_closed),
+        'final_stock_after_fail', (SELECT stock FROM public.ingredients WHERE id = 'ba090000-0000-0000-0000-0000000000b1'),
+        'spoofing_blocked', (SELECT caught FROM t09_spoofing_blocked)
+      );
+      ROLLBACK;
+    `);
+
+    const parsed = extractLastJson(res);
+    expect(parsed.initial_absent_count).toBe(0);
+
+    // Post receipt: 8.000 across all 3 layers (divergence = 0)
+    expect(Number(parsed.post_receipt.legacy_post_receipt)).toBe(8.0);
+    expect(Number(parsed.post_receipt.spatial_post_receipt)).toBe(8.0);
+    expect(Number(parsed.post_receipt.view_post_receipt)).toBe(8.0);
+
+    // Post consumption: 5.000 across all 3 layers (divergence = 0)
+    expect(Number(parsed.post_consumption.legacy_post_cons)).toBe(5.0);
+    expect(Number(parsed.post_consumption.spatial_post_cons)).toBe(5.0);
+    expect(Number(parsed.post_consumption.view_post_cons)).toBe(5.0);
+
+    // Multi-center fail-closed & 0 deduction
+    expect(parsed.multi_center_fail_closed).toBe(true);
+    expect(Number(parsed.final_stock_after_fail)).toBe(5.0);
+
+    // Anti-spoofing
+    expect(parsed.spoofing_blocked).toBe(true);
   });
 });
