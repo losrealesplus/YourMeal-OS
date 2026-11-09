@@ -24,6 +24,39 @@ import {
 const sha = 'ddc473f6451b82b3d36d0366eb8c90814f31547a';
 const validPreflightDigest = 'a'.repeat(64);
 const validInstallDigest = 'b'.repeat(64);
+const verifiedPrerequisiteNames = [
+  'ledger_20261024175900',
+  'ledger_20261024180000',
+  'ledger_20261024190000',
+  'ledger_head',
+  'identity_bridge_function',
+  'identity_bridge_schema_acl',
+  'writer_functions_do_not_call_auth_uid',
+  'purchase_and_consumption_tables_rls',
+  'purchase_receipt_columns',
+  'prerequisite_functions_security',
+];
+const b1AbsenceNames = [
+  'warehouse_type_absent',
+  'ingredient_unique_constraint_absent',
+  'production_centers_absent',
+  'warehouses_absent',
+  'inventory_locations_absent',
+  'inventory_balances_absent',
+  'user_center_assignments_absent',
+  'inventory_backfill_discrepancies_absent',
+  'inventory_backfill_executions_absent',
+  'v_ingredient_stocks_absent',
+  'public_has_center_access_uuid_uuid_uuid_absent',
+  'public_provision_initial_tenant_center_v1_uuid_text_absent',
+  'public_get_ingredient_balances_v1_uuid_uuid_uuid_absent',
+  'public_assign_user_to_center_v1_uuid_uuid_uuid_absent',
+  'public_execute_gate_b1_backfill_v1_absent',
+  'public_rollback_gate_b1_backfill_v1_uuid_absent',
+  'public_resolve_inventory_location_v1_uuid_uuid_uuid_uuid_absent',
+];
+const trueChecks = (names) => Object.fromEntries(names.map((name) => [name, true]));
+const prerequisiteLedger = ['20261020000000', '20261023065216', '20261024175900', '20261024180000', '20261024190000'];
 
 const baseContextEnv = {
   GITHUB_ACTIONS: 'true',
@@ -69,10 +102,22 @@ test('Manifest: structure, hashes, sequence and immutable constraints', () => {
   assert.equal(manifest.published_base_sha, 'fcc7801548fe60c3994f08fa18dc5f11431c6138');
   assert.equal(manifest.base_candidate_sha, sha);
   assert.equal(manifest.governance_branch, 'feat/gate6-interval-567-executor');
-  assert.equal(manifest.required_predecessor, '20261023065216');
+  assert.equal(manifest.prior_interval_predecessor, '20261023065216');
+  assert.equal(manifest.required_predecessor, '20261024190000');
+  assert.equal(manifest.verified_prerequisites.length, 3);
+  assert.deepEqual(manifest.verified_prerequisites.map((migration) => migration.version), [
+    '20261024175900',
+    '20261024180000',
+    '20261024190000',
+  ]);
   assert.equal(manifest.constraints.no_worker_publication, true);
   assert.equal(manifest.constraints.separate_backfill, true);
-  assert.equal(manifest.migrations.length, 6);
+  assert.equal(manifest.migrations.length, 3);
+  assert.deepEqual(manifest.migrations.map((migration) => migration.version), [
+    '20261107210000',
+    '20261107210100',
+    '20261107210200',
+  ]);
   assert.deepEqual(manifest.allowed_governance_files, [
     '.github/workflows/migrate-interval-production.yml',
     'docs/05-architecture/GATE_6_B1_SPATIAL_567_EXECUTION_RUNBOOK.md',
@@ -498,21 +543,40 @@ test('Preconditions: ledger lineage, absence set, table existence and lock check
   const validObserved = {
     projectVerified: true,
     tenantVerified: true,
-    ledgerVersions: ['20261020000000', '20261023065216'],
-    terminalPredecessor: '20261023065216',
+    ledgerVersions: prerequisiteLedger,
+    terminalPredecessor: '20261024190000',
+    verifiedPrerequisites: trueChecks(verifiedPrerequisiteNames),
+    b1ObjectsAbsent: trueChecks(b1AbsenceNames),
     tablesPresent: { ingredients: true, orders: true, purchase_invoices: true },
     activeLocksCount: 0,
   };
 
   assert.ok(validatePreconditions(validObserved));
 
-  // Rejection: target migration already present
+  // Rejection: a target B1 migration is already present
   assert.throws(() =>
     validatePreconditions({
       ...validObserved,
-      ledgerVersions: ['20261020000000', '20261023065216', '20261024175900'],
+      ledgerVersions: [...prerequisiteLedger, '20261107210000'],
     })
   );
+
+  assert.throws(() =>
+    validatePreconditions({
+      ...validObserved,
+      verifiedPrerequisites: { ...validObserved.verifiedPrerequisites, ledger_20261024180000: false },
+    })
+  );
+  assert.throws(() =>
+    validatePreconditions({
+      ...validObserved,
+      b1ObjectsAbsent: { ...validObserved.b1ObjectsAbsent, inventory_balances_absent: false },
+    })
+  );
+  assert.throws(() => validatePreconditions({ ...validObserved, verifiedPrerequisites: undefined }));
+  assert.throws(() => validatePreconditions({ ...validObserved, verifiedPrerequisites: {} }));
+  assert.throws(() => validatePreconditions({ ...validObserved, b1ObjectsAbsent: undefined }));
+  assert.throws(() => validatePreconditions({ ...validObserved, b1ObjectsAbsent: {} }));
 
   // Rejection: wrong terminal predecessor
   assert.throws(() =>
@@ -543,6 +607,19 @@ test('Preconditions: ledger lineage, absence set, table existence and lock check
   assert.throws(() => validatePreconditions({ ...validObserved, tenantVerified: false }));
 });
 
+test('Preflight SQL: read-only checks cover verified prerequisites and B1 absence', () => {
+  const sql = preflightSql();
+  assert.ok(sql.startsWith('BEGIN TRANSACTION READ ONLY;'));
+  assert.ok(sql.includes("'20261024175900'"));
+  assert.ok(sql.includes("'20261024190000'"));
+  assert.ok(sql.includes("'verifiedPrerequisites', jsonb_build_object("));
+  assert.ok(sql.includes("'b1ObjectsAbsent', jsonb_build_object("));
+  assert.ok(sql.includes("to_regprocedure('public.resolve_inventory_location_v1(uuid,uuid,uuid,uuid)') IS NULL"));
+  assert.ok(sql.includes("to_regclass('public.inventory_balances') IS NULL"));
+  assert.ok(sql.includes('COALESCE(('));
+  assert.ok(sql.trim().endsWith('COMMIT;'));
+});
+
 test('Database Env: verify-full TLS, pinned CA and protection against demo/external leakage', () => {
   const validUrl = 'postgresql://postgres.nhirlpkuvonggctdzzad:secret@aws-0-eu-central-1.pooler.supabase.com:5432/postgres';
   const env = databaseEnv({ SUPABASE_DB_URL_PROD: validUrl, PGHOST: 'evil.com', PGUSER: 'evil' });
@@ -562,8 +639,10 @@ test('Database Env: verify-full TLS, pinned CA and protection against demo/exter
 
 test('Blocker 4: installationSql enforces full ledger drift comparison under lock', () => {
   const mockPfReport = {
-    observedLedgerHead: '20261023065216',
-    ledgerVersions: ['20261020000000', '20261023065216'],
+    observedLedgerHead: '20261024190000',
+    ledgerVersions: prerequisiteLedger,
+    verifiedPrerequisites: trueChecks(verifiedPrerequisiteNames),
+    b1ObjectsAbsent: trueChecks(b1AbsenceNames),
   };
   const inst = installationSql(mockPfReport);
   assert.ok(inst.startsWith('BEGIN;'));
@@ -573,10 +652,16 @@ test('Blocker 4: installationSql enforces full ledger drift comparison under loc
   assert.ok(inst.includes('LOCK TABLE supabase_migrations.schema_migrations IN EXCLUSIVE MODE;'));
 
   // Blocker 4: Full array comparison using IS DISTINCT FROM
-  assert.ok(inst.includes("IF v_observed IS DISTINCT FROM '[\"20261020000000\",\"20261023065216\"]'::jsonb THEN"));
+  assert.ok(inst.includes(`IF v_observed IS DISTINCT FROM '${JSON.stringify(prerequisiteLedger)}'::jsonb THEN`));
   assert.ok(inst.includes("RAISE EXCEPTION 'Ledger state drift detected: live ledger does not match approved preflight ledger versions';"));
+  assert.ok(inst.includes("RAISE EXCEPTION 'Verified prerequisite state drifted or is incomplete';"));
+  assert.ok(inst.includes("RAISE EXCEPTION 'One or more Gate B1 target objects already exist';"));
+  assert.ok(inst.includes("has_schema_privilege('authenticated', 'cr_order_private', 'USAGE')"));
+  assert.ok(inst.includes("n.nspowner = 'postgres'::regrole"));
+  assert.ok(inst.includes("c.relname IN ('stock_movements', 'purchase_receipt_executions', 'inventory_consumptions', 'inventory_consumption_lines')"));
 
-  // Check that all 6 migrations are embedded exactly once in DDL and once in ledger insert
+  // Only the three pending B1 migrations are embedded for installation.
+  assert.equal(policy.migrations.length, 3);
   for (const m of policy.migrations) {
     assert.ok(inst.includes(`MIGRATION ${m.version}: ${m.name}`));
     assert.ok(inst.includes(`VALUES('${m.version}', '${m.name}'`));
@@ -587,8 +672,16 @@ test('Blocker 4: installationSql enforces full ledger drift comparison under loc
   assert.ok(inst.trim().endsWith('COMMIT;'));
 
   // Rejection when ledgerVersions is invalid
-  assert.throws(() => installationSql({ observedLedgerHead: '20261023065216' }), /Preflight report missing ledgerVersions array/);
+  assert.throws(() => installationSql({ observedLedgerHead: '20261024190000' }), /Preflight report missing ledgerVersions array/);
   assert.throws(() => installationSql({ ledgerVersions: [] }), /Preflight report predecessor mismatch/);
+  assert.throws(
+    () => installationSql({ ...mockPfReport, b1ObjectsAbsent: undefined }),
+    /Preflight report is missing B1 object absence evidence/
+  );
+  assert.throws(
+    () => installationSql({ ...mockPfReport, verifiedPrerequisites: {} }),
+    /Preflight report is missing verified prerequisite evidence/
+  );
 });
 
 test('Blocker 5: backfillSql invokes execute_gate_b1_backfill_v1 exactly once via temp table', () => {
@@ -659,8 +752,10 @@ test('Full offline simulation: validate -> preflight -> install -> backfill (no 
   const validPreflightDbResponse = JSON.stringify({
     projectVerified: true,
     tenantVerified: true,
-    ledgerVersions: ['20261020000000', '20261023065216'],
-    terminalPredecessor: '20261023065216',
+    ledgerVersions: prerequisiteLedger,
+    terminalPredecessor: '20261024190000',
+    verifiedPrerequisites: trueChecks(verifiedPrerequisiteNames),
+    b1ObjectsAbsent: trueChecks(b1AbsenceNames),
     tablesPresent: { ingredients: true, orders: true, purchase_invoices: true },
     identityBridgePreexisting: true,
     dynamicStats: { ingredientsCount: 150, purchaseInvoicesCount: 42 },
@@ -709,7 +804,7 @@ test('Full offline simulation: validate -> preflight -> install -> backfill (no 
   // 2. Preflight Mode
   const pfResult = main('execute', { ...baseContextEnv, ...fakePgEnv, MIGRATION_OPERATION: 'preflight' }, fakeApi, mockRunner);
   assert.equal(pfResult.state, 'READ_ONLY_PREFLIGHT_PASS');
-  assert.equal(pfResult.observedLedgerHead, '20261023065216');
+  assert.equal(pfResult.observedLedgerHead, '20261024190000');
   assert.ok(typeof pfResult.preflightReportSha256 === 'string' && pfResult.preflightReportSha256.length === 64);
   assert.equal(pfResult.manifestSha256, manifestSha256);
 
@@ -733,7 +828,7 @@ test('Full offline simulation: validate -> preflight -> install -> backfill (no 
   };
   const instResult = main('execute', installEnv, fakeApi, mockRunner, mockDownloader);
   assert.equal(instResult.state, 'INSTALLED_AND_VERIFIED');
-  assert.equal(instResult.installedMigrationsCount, 6);
+  assert.equal(instResult.installedMigrationsCount, 3);
   assert.equal(instResult.privilegedSchemaPostchecks.schemaPostcheck3_identityBridgeFunctionCallablePrivileged, true);
   assert.ok(instResult.privilegedPostchecksDisclaimer.includes('DOES NOT test RLS'));
   assert.ok(typeof instResult.installReportSha256 === 'string' && instResult.installReportSha256.length === 64);

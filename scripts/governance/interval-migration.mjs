@@ -24,16 +24,142 @@ export const policy = Object.freeze({
   allowedGovernanceFiles: Object.freeze([...manifest.allowed_governance_files]),
   installToken: manifest.authorization_tokens.install,
   backfillToken: manifest.authorization_tokens.backfill,
+  verifiedPrerequisites: manifest.verified_prerequisites,
   migrations: manifest.migrations,
   constraints: manifest.constraints,
 });
 
 const literal = (value) => "'" + String(value).replaceAll("'", "''") + "'";
+const prerequisiteVersions = policy.verifiedPrerequisites.map((m) => m.version);
+const b1TablesAndViews = [
+  'production_centers',
+  'warehouses',
+  'inventory_locations',
+  'inventory_balances',
+  'user_center_assignments',
+  'inventory_backfill_discrepancies',
+  'inventory_backfill_executions',
+  'v_ingredient_stocks',
+];
+const b1Functions = [
+  'public.has_center_access(uuid,uuid,uuid)',
+  'public.provision_initial_tenant_center_v1(uuid,text)',
+  'public.get_ingredient_balances_v1(uuid,uuid,uuid)',
+  'public.assign_user_to_center_v1(uuid,uuid,uuid)',
+  'public.execute_gate_b1_backfill_v1()',
+  'public.rollback_gate_b1_backfill_v1(uuid)',
+  'public.resolve_inventory_location_v1(uuid,uuid,uuid,uuid)',
+];
+const verifiedPrerequisiteChecks = [
+  ...prerequisiteVersions.map((version) => [
+    `ledger_${version}`,
+    `EXISTS (SELECT 1 FROM supabase_migrations.schema_migrations WHERE version = ${literal(version)})`,
+  ]),
+  [
+    'ledger_head',
+    `((SELECT version FROM supabase_migrations.schema_migrations ORDER BY version DESC LIMIT 1) = ${literal(policy.requiredPredecessor)})`,
+  ],
+  [
+    'identity_bridge_function',
+    `EXISTS (
+      SELECT 1 FROM pg_proc p
+      WHERE p.oid = to_regprocedure('cr_order_private.session_uid_bridge()')
+        AND p.prosecdef
+        AND p.proowner = 'postgres'::regrole
+    )`,
+  ],
+  [
+    'identity_bridge_schema_acl',
+    `EXISTS (
+      SELECT 1 FROM pg_namespace n
+      WHERE n.nspname = 'cr_order_private'
+        AND n.nspowner = 'postgres'::regrole
+        AND has_schema_privilege('authenticated', 'cr_order_private', 'USAGE')
+        AND NOT has_schema_privilege('anon', 'cr_order_private', 'USAGE')
+    )`,
+  ],
+  [
+    'writer_functions_do_not_call_auth_uid',
+    `NOT EXISTS (
+      SELECT 1 FROM pg_proc p
+      WHERE p.proowner = (SELECT oid FROM pg_roles WHERE rolname = 'cr_order_writer')
+        AND lower(pg_get_functiondef(p.oid)) ~ 'auth[.]uid[[:space:]]*[(]'
+    )`,
+  ],
+  [
+    'purchase_and_consumption_tables_rls',
+    `(
+      SELECT count(*) = 4
+      FROM pg_class c
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'public'
+        AND c.relname IN ('stock_movements', 'purchase_receipt_executions', 'inventory_consumptions', 'inventory_consumption_lines')
+        AND c.relkind = 'r'
+        AND c.relrowsecurity
+    )`,
+  ],
+  [
+    'purchase_receipt_columns',
+    `(
+      SELECT count(*) = 4
+      FROM information_schema.columns
+      WHERE (table_schema, table_name, column_name) IN (
+        ('public', 'purchase_invoices', 'received_at'),
+        ('public', 'purchase_invoices', 'received_by'),
+        ('public', 'purchase_invoice_items', 'item_nature'),
+        ('public', 'purchase_invoice_items', 'received_quantity')
+      )
+    )`,
+  ],
+  [
+    'prerequisite_functions_security',
+    `(
+      SELECT count(*) = 4
+      FROM pg_proc p
+      WHERE p.oid IN (
+        to_regprocedure('public.receive_purchase_invoice_v1(uuid,uuid,uuid,jsonb,uuid)'),
+        to_regprocedure('public.create_inventory_consumption_plan_v1(uuid,date,jsonb,uuid)'),
+        to_regprocedure('public.apply_inventory_consumption_v1(uuid,uuid,uuid)'),
+        to_regprocedure('public.seal_inventory_consumption_v1(uuid,uuid,uuid)')
+      )
+        AND p.prosecdef
+        AND p.proowner = 'postgres'::regrole
+    )`,
+  ],
+];
+const b1AbsenceChecks = [
+  ['warehouse_type_absent', "to_regtype('public.warehouse_type') IS NULL"],
+  [
+    'ingredient_unique_constraint_absent',
+    `NOT EXISTS (
+      SELECT 1 FROM pg_constraint
+      WHERE conname = 'uq_ingredients_tenant_id'
+        AND conrelid = 'public.ingredients'::regclass
+    )`,
+  ],
+  ...b1TablesAndViews.map((name) => [`${name}_absent`, `to_regclass(${literal(`public.${name}`)}) IS NULL`]),
+  ...b1Functions.map((signature) => [
+    `${signature.replaceAll(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '')}_absent`,
+    `to_regprocedure(${literal(signature)}) IS NULL`,
+  ]),
+];
+const jsonbChecksSql = (checks) =>
+  checks.map(([name, predicate]) => `${literal(name)}, COALESCE((${predicate}), false)`).join(',\n    ');
+const allChecksSql = (checks) =>
+  checks.map(([, predicate]) => `COALESCE((${predicate}), false)`).join('\n    AND ');
+const checksPass = (observed, checks) =>
+  observed &&
+  typeof observed === 'object' &&
+  !Array.isArray(observed) &&
+  Object.keys(observed).length === checks.length &&
+  checks.every(([name]) => observed[name] === true);
+const failedCheckNames = (observed, checks) =>
+  checks.filter(([name]) => observed?.[name] !== true).map(([name]) => name);
 const api = (resource) =>
   JSON.parse(execFileSync('gh', ['api', `repos/${policy.repository}/${resource}`], { encoding: 'utf8' }));
 
 export function validateManifestFiles() {
-  for (const m of policy.migrations) {
+  for (const m of [...policy.verifiedPrerequisites, ...policy.migrations]) {
     demand(fs.existsSync(m.path), `Migration file not found: ${m.path}`);
     const bytes = fs.readFileSync(m.path);
     const digest = hash(bytes);
@@ -251,6 +377,15 @@ export function validatePreconditions(observed) {
   demand(observed.tenantVerified === true, 'Tenant EatClean (8bba00ba-331b-42c8-9283-4e3836ffb870) not verified');
   demand(Array.isArray(observed.ledgerVersions), 'Observed ledger versions must be an array');
 
+  demand(
+    checksPass(observed.verifiedPrerequisites, verifiedPrerequisiteChecks),
+    `Verified prerequisites missing or invalid: ${failedCheckNames(observed.verifiedPrerequisites, verifiedPrerequisiteChecks).join(', ') || 'unexpected check set'}`
+  );
+  demand(
+    checksPass(observed.b1ObjectsAbsent, b1AbsenceChecks),
+    `B1 objects already exist or absence checks missing: ${failedCheckNames(observed.b1ObjectsAbsent, b1AbsenceChecks).join(', ') || 'unexpected check set'}`
+  );
+
   // 1. Invariante de Ausencia: Ninguna migración del intervalo debe estar registrada aún
   const targetVersions = policy.migrations.map((m) => m.version);
   for (const v of targetVersions) {
@@ -301,6 +436,12 @@ SELECT jsonb_build_object(
     ORDER BY version DESC
     LIMIT 1
   ),
+  'verifiedPrerequisites', jsonb_build_object(
+    ${jsonbChecksSql(verifiedPrerequisiteChecks)}
+  ),
+  'b1ObjectsAbsent', jsonb_build_object(
+    ${jsonbChecksSql(b1AbsenceChecks)}
+  ),
   'tablesPresent', jsonb_build_object(
     'ingredients', EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'ingredients'),
     'orders', EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'orders'),
@@ -327,6 +468,14 @@ COMMIT;`;
 export function installationSql(preflightReport) {
   demand(Array.isArray(preflightReport?.ledgerVersions), 'Preflight report missing ledgerVersions array');
   demand(preflightReport?.observedLedgerHead === policy.requiredPredecessor, 'Preflight report predecessor mismatch');
+  demand(
+    checksPass(preflightReport?.verifiedPrerequisites, verifiedPrerequisiteChecks),
+    'Preflight report is missing verified prerequisite evidence'
+  );
+  demand(
+    checksPass(preflightReport?.b1ObjectsAbsent, b1AbsenceChecks),
+    'Preflight report is missing B1 object absence evidence'
+  );
 
   const targetVersions = policy.migrations.map((m) => m.version);
   const targetVersionsArray = `ARRAY[${targetVersions.map((v) => literal(v)).join(',')}]`;
@@ -352,7 +501,7 @@ SET LOCAL statement_timeout = '${policy.constraints.statement_timeout_ms}ms';
 SELECT pg_advisory_xact_lock(hashtextextended('eatclean-interval-567-install', 0));
 LOCK TABLE supabase_migrations.schema_migrations IN EXCLUSIVE MODE;
 
--- Pre-execution dynamic guard: verify ENTIRE ledger versions array has not drifted since preflight
+-- Pre-execution dynamic guard: recheck ledger, verified prerequisites, and B1 absence under lock
 DO $interval_guard$
 DECLARE
   v_observed jsonb;
@@ -372,6 +521,14 @@ BEGIN
 
   IF v_conflict THEN
     RAISE EXCEPTION 'One or more target interval migrations already present in schema_migrations';
+  END IF;
+
+  IF NOT (${allChecksSql(verifiedPrerequisiteChecks)}) THEN
+    RAISE EXCEPTION 'Verified prerequisite state drifted or is incomplete';
+  END IF;
+
+  IF NOT (${allChecksSql(b1AbsenceChecks)}) THEN
+    RAISE EXCEPTION 'One or more Gate B1 target objects already exist';
   END IF;
 END $interval_guard$;
 
@@ -413,7 +570,7 @@ BEGIN
     RAISE EXCEPTION 'Postcheck failed: execute_gate_b1_backfill_v1 missing or not SECURITY DEFINER';
   END IF;
 
-  -- 4. Verify all 6 migrations recorded in ledger and exact resulting ledger matches
+  -- 4. Verify the three pending B1 migrations and exact resulting ledger
   SELECT jsonb_agg(version ORDER BY version) INTO v_observed
   FROM supabase_migrations.schema_migrations;
 
@@ -744,6 +901,8 @@ export function main(
       observedLedgerCount: observed.ledgerVersions.length,
       ledgerVersions: observed.ledgerVersions,
       ledgerDigest: hash(Buffer.from(JSON.stringify(observed.ledgerVersions))),
+      verifiedPrerequisites: observed.verifiedPrerequisites,
+      b1ObjectsAbsent: observed.b1ObjectsAbsent,
       identityBridgePreexisting: observed.identityBridgePreexisting,
       dynamicStats: observed.dynamicStats,
       timestamp: new Date().toISOString(),

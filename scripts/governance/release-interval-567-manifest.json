@@ -9,7 +9,8 @@
   "base_candidate_sha": "ddc473f6451b82b3d36d0366eb8c90814f31547a",
   "governance_branch": "feat/gate6-interval-567-executor",
   "reviewer_id": 292604102,
-  "required_predecessor": "20261023065216",
+  "prior_interval_predecessor": "20261023065216",
+  "required_predecessor": "20261024190000",
   "expected_ca_sha256": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
   "allowed_governance_files": [
     ".github/workflows/migrate-interval-production.yml",
@@ -29,7 +30,7 @@
     "install": "INSTALL_INTERVAL_567_ON_nhirlpkuvonggctdzzad",
     "backfill": "EXECUTE_GATE_B1_BACKFILL_ON_nhirlpkuvonggctdzzad"
   },
-  "migrations": [
+  "verified_prerequisites": [
     {
       "sequence": 1,
       "version": "20261024175900",
@@ -50,23 +51,25 @@
       "name": "flow04_inventory_consumption_persistence",
       "path": "supabase/migrations/20261024190000_flow04_inventory_consumption_persistence.sql",
       "sha256": "72bebe319e282d7de135cca14194a796a945b94fa569cdb76a58cd03f383c849"
-    },
+    }
+  ],
+  "migrations": [
     {
-      "sequence": 4,
+      "sequence": 1,
       "version": "20261107210000",
       "name": "gate_b1_spatial_topology_and_inventory_balances",
       "path": "supabase/migrations/20261107210000_gate_b1_spatial_topology_and_inventory_balances.sql",
       "sha256": "61e56075db598247b6073388802371e207a21a88e9cfbcd7aee7c0ab26f26044"
     },
     {
-      "sequence": 5,
+      "sequence": 2,
       "version": "20261107210100",
       "name": "gate_b1_inventory_backfill_procedure",
       "path": "supabase/migrations/20261107210100_gate_b1_inventory_backfill_procedure.sql",
       "sha256": "ec9f5ca62edc74f74e36fbe6d5c11b37a4a9b5e917fd32c270243bc9101f4fdb"
     },
     {
-      "sequence": 6,
+      "sequence": 3,
       "version": "20261107210200",
       "name": "gate_b1_spatial_transactional_bridge",
       "path": "supabase/migrations/20261107210200_gate_b1_spatial_transactional_bridge.sql",
