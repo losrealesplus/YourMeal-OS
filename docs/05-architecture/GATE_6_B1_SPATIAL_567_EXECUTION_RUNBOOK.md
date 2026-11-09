@@ -1,6 +1,6 @@
 # Runbook Operativo: Gate 6 Intervalo Post-PR #567 (#553–#567)
 
-**Subtema:** Procedimiento de ejecución reproducible para las seis migraciones de base de datos en `production-db`  
+**Subtema:** Procedimiento de ejecución reproducible para las tres migraciones espaciales B1 en `production-db`
 **Proyecto:** EatClean Production Dedicated Supabase (`nhirlpkuvonggctdzzad`)  
 **Workflow oficial:** `.github/workflows/migrate-interval-production.yml`  
 **Manifiesto sellado:** `scripts/governance/release-interval-567-manifest.json`  
@@ -11,6 +11,8 @@
 ---
 
 ## 1. Principios Operativos y Límites Inquebrantables
+
+**Prerrequisitos verificados y lote pendiente:** Las versiones `20261024175900`, `20261024180000` y `20261024190000` ya constan en el ledger de producción y sus invariantes estructurales se verifican en vivo. Son `verified_prerequisites`, no DDL pendiente de este run. `20261023065216` queda como predecesor histórico del intervalo anterior; la cabeza requerida para Gate 6 es `20261024190000`. El lote instalable contiene únicamente `20261107210000`, `20261107210100` y `20261107210200`.
 
 1. **STRICT STOP sobre mutaciones de datos legacy:**  
    Durante todo el proceso de Gate 6 y hasta el cierre formal del backfill, queda **congelada cualquier mutación manual, script de importación o acceso administrativo directo** que escriba sobre `public.ingredients.stock`.
@@ -61,7 +63,7 @@
                                     │ Aprobación Humana con Run ID y Hash Anclado
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ PASO 2: Instalación DDL Atómica (Migraciones 1 a 6)                   │
+│ PASO 2: Instalación DDL Atómica (las 3 migraciones espaciales B1)    │
 │ - Operation: install                                                   │
 │ - Token: INSTALL_INTERVAL_567_ON_nhirlpkuvonggctdzzad                  │
 │ - Inputs: PREFLIGHT_RUN_ID, PREFLIGHT_REPORT_SHA256                    │
@@ -104,8 +106,8 @@ Cualquiera de las siguientes condiciones aborta inmediatamente la operación y p
 |---|---|---|
 | **Todas** | `expected_manifest_sha256` no coincide con el digest SHA-256 de `release-interval-567-manifest.json`. | Abortar inmediatamente (fallo cerrado). |
 | **Todas** | El commit en ejecución no desciende directamente de `ddc473f6...` o modifica archivos fuera de gobernanza. | Abortar. Violación de linaje o alcance. |
-| **Preflight** | El terminal del ledger no es exactamente `20261023065216`. | Abortar. Investigar discrepancia de ledger. |
-| **Preflight** | Alguna de las 6 migraciones objetivo ya existe en `schema_migrations`. | Abortar. Estado híbrido detectado. |
+| **Preflight** | Falta una versión prerrequisito, la cabeza no es `20261024190000` o falla una comprobación estructural de identidad, compra o consumo. | Abortar. Reconciliar el estado real antes de continuar. |
+| **Preflight** | Alguna migración B1 pendiente ya existe en `schema_migrations` o aparece cualquier objeto B1 que debía estar ausente. | Abortar. Estado híbrido detectado. |
 | **Preflight** | Se detectan bloqueos exclusivos activos (`AccessExclusiveLock`) en tablas clave. | Abortar. Esperar liberación de conexiones. |
 | **Install** | Falla la descarga o la validación del artefacto remoto de preflight (`preflight_run_id`). | Abortar. Artefacto no verificable. |
 | **Install** | El hash del reporte de preflight descargado no coincide con `preflight_report_sha256`. | Abortar. Posible discrepancia o reporte no aprobado. |
@@ -159,7 +161,7 @@ El ejecutor ejecuta de forma integrada cuatro consultas de solo lectura:
 1. **Si falla el Preflight:**  
    Cero efectos en la base de datos (se ejecuta estrictamente en transacción `READ ONLY`).
 2. **Si falla la Instalación DDL:**  
-   Todo el lote de 6 migraciones se ejecuta en una única transacción atómica protegida por `SET LOCAL lock_timeout = '5s'`. Un error provoca `ROLLBACK` total. El ledger y el esquema permanecen en su estado previo idéntico.
+   Las 3 migraciones B1 se ejecutan en una única transacción atómica protegida por `SET LOCAL lock_timeout = '5s'`. Bajo el bloqueo exclusivo del ledger, se repiten las comprobaciones de prerrequisitos y ausencia B1. Un error provoca `ROLLBACK` total. El ledger y el esquema permanecen en su estado previo idéntico.
 3. **Si se detecta anomalía tras la Instalación DDL:**  
    **NO ejecutar `DROP TABLE CASCADE` ni borrar estructuras.** Como el Worker actual no utiliza las nuevas tablas ni RPCs, la presencia aditiva de las estructuras no afecta a la operativa. Si fuera necesario inhabilitar puntos de entrada, se revocan permisos de ejecución de las RPCs vía los scripts `_down.sql` correspondientes sin tocar datos.
 4. **Si falla el Backfill:**  
