@@ -29,7 +29,7 @@ const policy = {
 
 const final = "1".repeat(40);
 const head = "2".repeat(40);
-const govPr = 572;
+const govPr = 573;
 
 const humanPr = (number, sha, headSha, ref) => ({
   number,
@@ -237,16 +237,16 @@ test("B1 Spatial 567: static configuration invariants", () => {
   assert.equal(r.productPrs.length, 15);
   assert.equal(r.productCommits.length, 15);
   assert.equal(productPaths.length, 93);
-  assert.equal(r.priorGovernanceHeadSha, "5bedc79d5c5009da4c26f2cbbe7c71ee9e5c4137");
-  assert.deepEqual(r.priorGovernancePrs, [568, 569, 570, 571]);
-  assert.equal(r.priorGovernanceCommits.length, 4);
-  assert.equal(r.gate6Evidence.sourceSha, r.priorGovernanceHeadSha);
+  assert.equal(r.priorGovernanceHeadSha, "5b29cd1d9d6ccedb0f14e84ccd65422f1a8ee3b0");
+  assert.deepEqual(r.priorGovernancePrs, [568, 569, 570, 571, 572]);
+  assert.equal(r.priorGovernanceCommits.length, 5);
+  assert.equal(r.gate6Evidence.sourceSha, "5bedc79d5c5009da4c26f2cbbe7c71ee9e5c4137");
   assert.equal(r.gate6Evidence.project, "nhirlpkuvonggctdzzad");
   assert.equal(
     r.gate6Evidence.manifestSha256,
     "514084c03011c436781dfbed62a1acbc1279d070f50fcf6ae9bcfac2bff9d009",
   );
-  assert.equal(r.governanceBranch, "fix/gate7-b1-spatial-post-gate6-reconciliation");
+  assert.equal(r.governanceBranch, "codex/gate7-ci-test-git-identity");
   assert.equal(r.governancePaths.length, 4);
   assert.deepEqual(r.governancePaths, [...r.governancePaths].sort());
   const union = [...new Set([...productPaths, ...priorGovPaths, ...r.governancePaths])].sort();
@@ -296,7 +296,10 @@ test("B1 Spatial 567: sealed hashes and first-parent sequence match real reviewe
 
 test("B1 Spatial 567: valid control snapshot produces canonical payload within dispatch limit", () => {
   const s = snapshot();
-  assert.equal(verifyB1Gate6Evidence(s.gate6Evidence, policy).sourceSha, r.priorGovernanceHeadSha);
+  assert.equal(
+    verifyB1Gate6Evidence(s.gate6Evidence, policy).sourceSha,
+    r.priorGovernanceCommits[3].sha,
+  );
 
   const payload = b1Spatial567Payload(s, policy);
   assert.equal(payload.schema, 1);
@@ -304,7 +307,7 @@ test("B1 Spatial 567: valid control snapshot produces canonical payload within d
   assert.equal(payload.candidateSha, r.candidateSha);
   assert.equal(payload.candidatePr, 567);
   assert.equal(payload.priorGovernanceHeadSha, r.priorGovernanceHeadSha);
-  assert.deepEqual(payload.priorGovernancePrs, [568, 569, 570, 571]);
+  assert.deepEqual(payload.priorGovernancePrs, [568, 569, 570, 571, 572]);
   assert.equal(payload.governancePr, govPr);
   assert.equal(payload.finalSourceSha, final);
   assert.equal(payload.productPrs.length, 15);
@@ -348,7 +351,7 @@ test("B1 Spatial 567: rejects stale targetSha and priorGovernanceHeadSha self-re
 test("B1 Spatial 567: rejects commit count mismatch", () => {
   const s = snapshot();
   s.commits.pop();
-  assert.throws(() => b1Spatial567Payload(s, policy), /exact 20-commit interval required/);
+  assert.throws(() => b1Spatial567Payload(s, policy), /exact 21-commit interval required/);
 });
 
 test("B1 Spatial 567: rejects tampered product or prior governance commit", () => {
@@ -377,13 +380,13 @@ test("B1 Spatial 567: rejects non-human PR merge or wrong prior governance branc
 
 test("B1 Spatial 567: rejects terminal governance parent not equal to priorGovernanceHeadSha", () => {
   const s = snapshot();
-  s.commits[19].parent = r.candidateSha;
+  s.commits[20].parent = r.candidateSha;
   assert.throws(() => b1Spatial567Payload(s, policy), /governance lineage mismatch/);
 });
 
 test("B1 Spatial 567: rejects governance PR number <= priorGovernancePrs.at(-1)", () => {
   const s = snapshot();
-  s.commits[19].pr = 571;
+  s.commits[20].pr = 572;
   assert.throws(() => b1Spatial567Payload(s, policy), /governance lineage mismatch/);
 });
 
@@ -392,7 +395,7 @@ test("B1 Spatial 567: rejects governance branch mismatch", () => {
   s.remediation.head.ref = "wrong-branch";
   assert.throws(
     () => b1Spatial567Payload(s, policy),
-    /Governance PR #572 canonical human PR provenance mismatch/,
+    /Governance PR #573 canonical human PR provenance mismatch/,
   );
 });
 
@@ -685,6 +688,8 @@ test("B1 Spatial 567 integrated: --b1-567-payload and prepare() reconcile post-G
   const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "gate7-b1-integrated-")));
   try {
     execFileSync("git", ["clone", "--shared", "--quiet", repoRoot, dir]);
+    execFileSync("git", ["config", "user.name", "Gate 7 test"], { cwd: dir });
+    execFileSync("git", ["config", "user.email", "gate7-test@example.invalid"], { cwd: dir });
     execFileSync("git", ["checkout", "--quiet", r.priorGovernanceHeadSha], { cwd: dir });
 
     const ge = gate6EvidenceSnapshot();
@@ -706,6 +711,7 @@ test("B1 Spatial 567 integrated: --b1-567-payload and prepare() reconcile post-G
     for (const rel of [
       "scripts/governance/release-b1-spatial-567.mjs",
       "scripts/governance/release-b1-spatial-567.spec.mjs",
+      "scripts/governance/release-eatclean-1a-flow04-563.spec.mjs",
       "scripts/governance/release-plan.mjs",
     ]) {
       fs.copyFileSync(path.join(repoRoot, rel), path.join(dir, rel));

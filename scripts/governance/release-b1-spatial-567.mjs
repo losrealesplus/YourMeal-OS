@@ -160,10 +160,10 @@ export function b1Spatial567Payload(s, policy, releaseConfig = B1_SPATIAL_567) {
   demand(
     SHA.test(r.priorGovernanceHeadSha ?? "") &&
       Array.isArray(r.priorGovernancePrs) &&
-      r.priorGovernancePrs.length === 4 &&
+      r.priorGovernancePrs.length === 5 &&
       Array.isArray(r.priorGovernanceCommits) &&
-      r.priorGovernanceCommits.length === 4 &&
-      r.priorGovernanceCommits[3].sha === r.priorGovernanceHeadSha,
+      r.priorGovernanceCommits.length === 5 &&
+      r.priorGovernanceCommits[4].sha === r.priorGovernanceHeadSha,
     "B1 Spatial 567 prior governance interval config invalid",
   );
   demand(same(s.baseline, r.baseline), "B1 Spatial 567 baseline mismatch");
@@ -175,8 +175,8 @@ export function b1Spatial567Payload(s, policy, releaseConfig = B1_SPATIAL_567) {
     "B1 Spatial 567 final source stale",
   );
   demand(
-    s.commits?.length === 20,
-    "B1 Spatial 567 exact 20-commit interval required (15 product + 4 prior governance + 1 governance PR)",
+    s.commits?.length === 21,
+    "B1 Spatial 567 exact 21-commit interval required (15 product + 5 prior governance + 1 governance PR)",
   );
 
   // Commits 0..14 are the 15 pinned product commits on main (PR #553 - #567)
@@ -191,13 +191,13 @@ export function b1Spatial567Payload(s, policy, releaseConfig = B1_SPATIAL_567) {
     "B1 Spatial 567 candidate commit mismatch",
   );
 
-  // Commits 15..18 are the 4 pinned prior governance commits on main (PR #568 - #571)
+  // Commits 15..19 are the 5 pinned prior governance commits on main (PR #568 - #572)
   demand(
-    same(s.commits.slice(15, 19), r.priorGovernanceCommits),
+    same(s.commits.slice(15, 20), r.priorGovernanceCommits),
     "B1 Spatial 567 prior governance commits mismatch",
   );
   demand(
-    s.priorGovernancePrs?.length === 4,
+    s.priorGovernancePrs?.length === 5,
     "B1 Spatial 567 prior governance PRs missing or truncated",
   );
   r.priorGovernanceCommits.forEach((c, n) => {
@@ -228,8 +228,8 @@ export function b1Spatial567Payload(s, policy, releaseConfig = B1_SPATIAL_567) {
   );
   const gate6Evidence = verifyB1Gate6Evidence(s.gate6Evidence, policy, r);
 
-  // Commit 19 is the terminal Gate 7 governance PR
-  const gov = s.commits[19];
+  // Commit 20 is the terminal Gate 7 governance PR
+  const gov = s.commits[20];
   demand(
     gov.sha === s.targetSha &&
       gov.parent === r.priorGovernanceHeadSha &&

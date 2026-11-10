@@ -692,13 +692,14 @@
       ]
     }
   ],
-  "priorGovernanceHeadSha": "5bedc79d5c5009da4c26f2cbbe7c71ee9e5c4137",
-  "priorGovernancePrs": [568, 569, 570, 571],
+  "priorGovernanceHeadSha": "5b29cd1d9d6ccedb0f14e84ccd65422f1a8ee3b0",
+  "priorGovernancePrs": [568, 569, 570, 571, 572],
   "priorGovernanceBranches": {
     "568": "feat/gate7-b1-spatial-reconciliation",
     "569": "feat/gate6-interval-567-executor",
     "570": "fix/gate6-lineage-and-checkout-depth",
-    "571": "cursor/gate6-verified-prerequisites"
+    "571": "cursor/gate6-verified-prerequisites",
+    "572": "fix/gate7-b1-spatial-post-gate6-reconciliation"
   },
   "priorGovernanceCommits": [
     {
@@ -837,6 +838,34 @@
           "after": "514084c03011c436781dfbed62a1acbc1279d070f50fcf6ae9bcfac2bff9d009"
         }
       ]
+    },
+    {
+      "sha": "5b29cd1d9d6ccedb0f14e84ccd65422f1a8ee3b0",
+      "parent": "5bedc79d5c5009da4c26f2cbbe7c71ee9e5c4137",
+      "headSha": "1949f3cfe5f0a4ef1099b9d13a30104380029b43",
+      "pr": 572,
+      "files": [
+        {
+          "path": "scripts/governance/release-b1-spatial-567.json",
+          "before": "22fe45a2c2b03a0b7344d96009828291bc5cb9a351db70fef49941efb9e584b5",
+          "after": "33ed8fe07ecff3e61e15e7379af3657de0cbd9cdf8371a7a394727c182f336ff"
+        },
+        {
+          "path": "scripts/governance/release-b1-spatial-567.mjs",
+          "before": "9f628631e00dd01fb9d6dcfc2147ec3e37714bb30bba9ddc0c50a168a83f0f9b",
+          "after": "edec237b0ab5cac0bf8026cadac244f5b3593bbe3087bdff4044fe141e2c748f"
+        },
+        {
+          "path": "scripts/governance/release-b1-spatial-567.spec.mjs",
+          "before": "524c2b08938a1617305b8e71d084b1b6b1531740aed90a78bbf097a94a3e2451",
+          "after": "91637e4f6d29b9766b9051b5e59b38da45292a20cbcb3f151a504a32ffeea529"
+        },
+        {
+          "path": "scripts/governance/release-plan.mjs",
+          "before": "a5bd269fe8a9f3d33f08669f49b9c1fac488d6f3d8ee76572c509c4f757d5560",
+          "after": "974922647b93c155a8951f890730b7c09b87c5bc8454a35bc78fd40690bb5f5d"
+        }
+      ]
     }
   ],
   "gate6Evidence": {
@@ -886,12 +915,12 @@
       "expectedInstallReportSha256": "6c3c33d2761a540b1ae708f54c5abc672b741c9a0449320a48b869544d96a762"
     }
   },
-  "governanceBranch": "fix/gate7-b1-spatial-post-gate6-reconciliation",
+  "governanceBranch": "codex/gate7-ci-test-git-identity",
   "governancePaths": [
     "scripts/governance/release-b1-spatial-567.json",
     "scripts/governance/release-b1-spatial-567.mjs",
     "scripts/governance/release-b1-spatial-567.spec.mjs",
-    "scripts/governance/release-plan.mjs"
+    "scripts/governance/release-eatclean-1a-flow04-563.spec.mjs"
   ],
   "constraints": {
     "productionSqlAuthorized": false,
