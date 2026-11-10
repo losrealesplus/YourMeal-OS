@@ -468,10 +468,9 @@ export function rollbackV1Snapshot(ctx, base, diff, prs, currentMainSha) {
 }
 export function b1Spatial567Snapshot(ctx, base, diff, prs, currentMainSha) {
   const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
-  s.productPrs = [553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567].map((n) =>
-    api(`pulls/${n}`),
-  );
-  s.candidatePr = api("pulls/567");
+  s.productPrs = B1_SPATIAL_567.productPrs.map((n) => api(`pulls/${n}`));
+  s.priorGovernancePrs = B1_SPATIAL_567.priorGovernancePrs.map((n) => api(`pulls/${n}`));
+  s.candidatePr = api(`pulls/${B1_SPATIAL_567.candidatePr}`);
   s.commits = s.commits.map((c) => {
     let parent;
     try {
@@ -481,7 +480,10 @@ export function b1Spatial567Snapshot(ctx, base, diff, prs, currentMainSha) {
     }
     let headSha;
     try {
-      headSha = git("rev-parse", `${c.sha}^2`).trim();
+      headSha = execFileSync("git", ["rev-parse", `${c.sha}^2`], {
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "ignore"],
+      }).trim();
     } catch {
       try {
         headSha = api(`pulls/${c.pr}`).head.sha;
@@ -508,6 +510,62 @@ export function b1Spatial567Snapshot(ctx, base, diff, prs, currentMainSha) {
       }),
     };
   });
+  const ge = B1_SPATIAL_567.gate6Evidence;
+  const readGate6Stage = (stage) => {
+    const g = ge[stage];
+    const run = api(`actions/runs/${g.runId}`);
+    const artifacts = api(`actions/runs/${g.runId}/artifacts?per_page=100`);
+    demand(
+      artifacts.total_count === artifacts.artifacts?.length && artifacts.total_count <= 100,
+      `B1 Spatial 567 Gate 6 ${stage} artifacts truncated`,
+    );
+    const matches = artifacts.artifacts.filter(
+      (a) => a.id === g.artifactId && a.name === g.artifactName,
+    );
+    demand(
+      matches.length === 1 && !matches[0].expired && matches[0].digest === g.artifactDigest,
+      `B1 Spatial 567 Gate 6 ${stage} artifact unavailable or changed`,
+    );
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), `gate7-b1-gate6-${stage}-`));
+    try {
+      execFileSync(
+        "gh",
+        [
+          "run",
+          "download",
+          String(g.runId),
+          "--repo",
+          policy.repository,
+          "--name",
+          g.artifactName,
+          "--dir",
+          dir,
+        ],
+        { stdio: "pipe" },
+      );
+      const bytes = fs.readFileSync(path.join(dir, g.reportFile));
+      return {
+        run,
+        artifact: matches[0],
+        reportSha256: hash(bytes),
+        report: parseReleaseJson(
+          bytes.toString("utf8"),
+          "RELEASE_REPORT_INVALID",
+          "release_report",
+          "json-object",
+          jsonObject,
+        ),
+        reviews: api(`actions/runs/${g.runId}/approvals`),
+      };
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  };
+  s.gate6Evidence = {
+    preflight: readGate6Stage("preflight"),
+    install: readGate6Stage("install"),
+    backfill: readGate6Stage("backfill"),
+  };
   return { ...s, diff };
 }
 export function eatclean1A563Snapshot(ctx, base, diff, prs, currentMainSha) {

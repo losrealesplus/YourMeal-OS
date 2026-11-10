@@ -14,23 +14,7 @@
     "planSha256": "8a9937dda0bfe295dfb4b9d43dd098b886de2ec821e0eaf153e050689b7e010f",
     "runId": "42472593536"
   },
-  "productPrs": [
-    553,
-    554,
-    555,
-    556,
-    557,
-    558,
-    559,
-    560,
-    561,
-    562,
-    563,
-    564,
-    565,
-    566,
-    567
-  ],
+  "productPrs": [553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567],
   "productCommits": [
     {
       "sha": "28d1396f028a636279166aa60447c6383aef1a78",
@@ -708,16 +692,206 @@
       ]
     }
   ],
-  "governanceBranch": "feat/gate7-b1-spatial-reconciliation",
+  "priorGovernanceHeadSha": "5bedc79d5c5009da4c26f2cbbe7c71ee9e5c4137",
+  "priorGovernancePrs": [568, 569, 570, 571],
+  "priorGovernanceBranches": {
+    "568": "feat/gate7-b1-spatial-reconciliation",
+    "569": "feat/gate6-interval-567-executor",
+    "570": "fix/gate6-lineage-and-checkout-depth",
+    "571": "cursor/gate6-verified-prerequisites"
+  },
+  "priorGovernanceCommits": [
+    {
+      "sha": "ddc473f6451b82b3d36d0366eb8c90814f31547a",
+      "parent": "e30bf0dc151375fd0c8d2343c7e2710b806225ce",
+      "headSha": "fa37ecccf6b3b2a30330641bc815f646e4b97298",
+      "pr": 568,
+      "files": [
+        {
+          "path": ".github/workflows/deploy-production.yml",
+          "before": "ed059401a4ee506ccdf8f5cfe6f99c6ae2261ecf05f712ca90e2efdd704a3848",
+          "after": "0a0a72dc8cf01803412c4755533fe2d16d39af5a25a65cc9c6a93393c26e9c2d"
+        },
+        {
+          "path": "scripts/governance/release-b1-spatial-567.json",
+          "before": null,
+          "after": "22fe45a2c2b03a0b7344d96009828291bc5cb9a351db70fef49941efb9e584b5"
+        },
+        {
+          "path": "scripts/governance/release-b1-spatial-567.mjs",
+          "before": null,
+          "after": "9f628631e00dd01fb9d6dcfc2147ec3e37714bb30bba9ddc0c50a168a83f0f9b"
+        },
+        {
+          "path": "scripts/governance/release-b1-spatial-567.spec.mjs",
+          "before": null,
+          "after": "524c2b08938a1617305b8e71d084b1b6b1531740aed90a78bbf097a94a3e2451"
+        },
+        {
+          "path": "scripts/governance/release-eatclean-1a-flow04-563.spec.mjs",
+          "before": "9b22f8182702c3944b6a3c73e9fe3c496f9d5535fd859cc49152ea84e464d671",
+          "after": "7cb24e3e889dfc7b2fcedfe9622530c04615105526d0b1bcdf720188cb6b5f76"
+        },
+        {
+          "path": "scripts/governance/release-json.spec.mjs",
+          "before": "124761566600f3466c20226d2a9b33b48f2a569b35bfad830f97c12100807c38",
+          "after": "0eea6a7f235c6d95b23075d397f49c274753cd7366c17f156115b3935a9889d4"
+        },
+        {
+          "path": "scripts/governance/release-plan.mjs",
+          "before": "2fb07818c30223ec476af61cf71764bd72e4b8f69774668d9cac44828f60f8b4",
+          "after": "a5bd269fe8a9f3d33f08669f49b9c1fac488d6f3d8ee76572c509c4f757d5560"
+        },
+        {
+          "path": "scripts/governance/release-reconciliation.mjs",
+          "before": "4951f9749e13b4a8ec9b61741d90c31fa76a254cd488942c241b519b087724df",
+          "after": "95136d1bde48257083d2ce3b712fed206ab86783de63f198c0b2e3294cba9d2e"
+        }
+      ]
+    },
+    {
+      "sha": "e05101240d44060691dfb4e95a03d00662e92495",
+      "parent": "ddc473f6451b82b3d36d0366eb8c90814f31547a",
+      "headSha": "eb6e56dc99a2e749a608f2c4ce81f5573ba15793",
+      "pr": 569,
+      "files": [
+        {
+          "path": ".github/workflows/migrate-interval-production.yml",
+          "before": null,
+          "after": "d2da5b97fc287c76fa36e34a2bcb33b260caaceb47d74dc942cc8dddbd068436"
+        },
+        {
+          "path": "docs/05-architecture/GATE_6_B1_SPATIAL_567_EXECUTION_RUNBOOK.md",
+          "before": null,
+          "after": "f107d98980ea5281131ca60218228e6451e1d536d52d4b30f0989807bfd4f21f"
+        },
+        {
+          "path": "scripts/governance/interval-migration.mjs",
+          "before": null,
+          "after": "08205e94eb61146dde4ebcf812759cc2bab1e25c5a1a6ba338f817294f469821"
+        },
+        {
+          "path": "scripts/governance/interval-migration.spec.mjs",
+          "before": null,
+          "after": "f943834e2594efd6a366e8f28b09df4d46b9588ba38b985c2316ed32ca6d83aa"
+        },
+        {
+          "path": "scripts/governance/release-interval-567-manifest.json",
+          "before": null,
+          "after": "1c12cf3795d1ac617d67e9f11bec0c475e78f6c1d42430f47aa496645c59d3b0"
+        }
+      ]
+    },
+    {
+      "sha": "b4e59ae5f0d3a5ec07ae1d9461bca30fd3a64bc3",
+      "parent": "e05101240d44060691dfb4e95a03d00662e92495",
+      "headSha": "8def493fff688fbfe439141a0582b6d9f3f520cb",
+      "pr": 570,
+      "files": [
+        {
+          "path": ".github/workflows/migrate-interval-production.yml",
+          "before": "d2da5b97fc287c76fa36e34a2bcb33b260caaceb47d74dc942cc8dddbd068436",
+          "after": "0cd5488527c716f9cce113386feb881f94e9459f27e4fe84d14d92b045de704c"
+        },
+        {
+          "path": "docs/05-architecture/GATE_6_B1_SPATIAL_567_EXECUTION_RUNBOOK.md",
+          "before": "f107d98980ea5281131ca60218228e6451e1d536d52d4b30f0989807bfd4f21f",
+          "after": "2c3bd4a7ce44c4dec8bfe3900cbdc62ee712ccab4da535c76c3fbaa936afa885"
+        },
+        {
+          "path": "scripts/governance/interval-migration.mjs",
+          "before": "08205e94eb61146dde4ebcf812759cc2bab1e25c5a1a6ba338f817294f469821",
+          "after": "9cc7ec807f1bb0b58738fb86d7f02b53c39c9f5f851496800de1bf86b93190ac"
+        },
+        {
+          "path": "scripts/governance/interval-migration.spec.mjs",
+          "before": "f943834e2594efd6a366e8f28b09df4d46b9588ba38b985c2316ed32ca6d83aa",
+          "after": "527e090f3dc58c3f5e6caedf951d80b3127b0a30c23092c30893bdb51511a0c8"
+        }
+      ]
+    },
+    {
+      "sha": "5bedc79d5c5009da4c26f2cbbe7c71ee9e5c4137",
+      "parent": "b4e59ae5f0d3a5ec07ae1d9461bca30fd3a64bc3",
+      "headSha": "3c6f91e9bcaf376e3b61c0e6d9fd13701e06ee20",
+      "pr": 571,
+      "files": [
+        {
+          "path": "docs/05-architecture/GATE_6_B1_SPATIAL_567_EXECUTION_RUNBOOK.md",
+          "before": "2c3bd4a7ce44c4dec8bfe3900cbdc62ee712ccab4da535c76c3fbaa936afa885",
+          "after": "8899ee72dfb5b75927b8322b2fdd3eab4c89ed4d4474d0934f19eee0ac64b601"
+        },
+        {
+          "path": "scripts/governance/interval-migration.mjs",
+          "before": "9cc7ec807f1bb0b58738fb86d7f02b53c39c9f5f851496800de1bf86b93190ac",
+          "after": "76068bca081b628c10c22d3e80ab5b420c860a3dbe16046c9a770293a08efaf0"
+        },
+        {
+          "path": "scripts/governance/interval-migration.spec.mjs",
+          "before": "527e090f3dc58c3f5e6caedf951d80b3127b0a30c23092c30893bdb51511a0c8",
+          "after": "b7cb27dd2248a18c84bc20ebd54c437bc6db12aeefd2c0987202c19d8d166c83"
+        },
+        {
+          "path": "scripts/governance/release-interval-567-manifest.json",
+          "before": "1c12cf3795d1ac617d67e9f11bec0c475e78f6c1d42430f47aa496645c59d3b0",
+          "after": "514084c03011c436781dfbed62a1acbc1279d070f50fcf6ae9bcfac2bff9d009"
+        }
+      ]
+    }
+  ],
+  "gate6Evidence": {
+    "sourceSha": "5bedc79d5c5009da4c26f2cbbe7c71ee9e5c4137",
+    "publishedBaseSha": "fcc7801548fe60c3994f08fa18dc5f11431c6138",
+    "project": "nhirlpkuvonggctdzzad",
+    "manifestPath": "scripts/governance/release-interval-567-manifest.json",
+    "manifestSha256": "514084c03011c436781dfbed62a1acbc1279d070f50fcf6ae9bcfac2bff9d009",
+    "workflow": ".github/workflows/migrate-interval-production.yml",
+    "environment": "production-db",
+    "preflight": {
+      "operation": "preflight",
+      "runId": 42663931916,
+      "artifactId": 13694739033,
+      "artifactName": "interval-preflight-report-42663931916-1",
+      "artifactDigest": "sha256:94a7d7f2acfb4d93ccc495359a9993c11ccb400b4d4d7d9ef25b9e1e99ad85ea",
+      "reportFile": "interval-migration-preflight-report.json",
+      "reportSha256": "a7fa51057a6fdce8eb6aec1ca370dfabefc8fc4ae9cd0e514faf45c115b927ea",
+      "expectedState": "READ_ONLY_PREFLIGHT_PASS",
+      "expectedObservedLedgerHead": "20261024190000",
+      "expectedObservedLedgerCount": 78,
+      "expectedLedgerDigest": "2301a502cf8e72146f1939707cc14ed36f9c76e6cbf78ae743d2e514c39441b6"
+    },
+    "install": {
+      "operation": "install",
+      "runId": 42670874992,
+      "artifactId": 13697939670,
+      "artifactName": "interval-install-report-42670874992-1",
+      "artifactDigest": "sha256:d102bfa15f9561ee0f97399cdbd1dd694664b4481c3bf19e5b219fcecbec9b99",
+      "reportFile": "interval-migration-install-report.json",
+      "reportSha256": "6c3c33d2761a540b1ae708f54c5abc672b741c9a0449320a48b869544d96a762",
+      "expectedState": "INSTALLED_AND_VERIFIED",
+      "expectedPreflightRunId": "42663931916",
+      "expectedPreflightDigest": "a7fa51057a6fdce8eb6aec1ca370dfabefc8fc4ae9cd0e514faf45c115b927ea",
+      "expectedInstalledVersions": ["20261107210000", "20261107210100", "20261107210200"]
+    },
+    "backfill": {
+      "operation": "backfill",
+      "runId": 42859276342,
+      "artifactId": 13783913208,
+      "artifactName": "interval-backfill-report-42859276342-1",
+      "artifactDigest": "sha256:9ff2e35b0e9948c05f4ee7917127222b10804b5ba53a7a605dde73f12f130d67",
+      "reportFile": "interval-migration-backfill-report.json",
+      "reportSha256": "b440b2dd2eb5274d8a1c6c075118446859939ce25bf56ac3e3dabdb395d7e891",
+      "expectedState": "BACKFILL_VERIFIED",
+      "expectedInstallRunId": "42670874992",
+      "expectedInstallReportSha256": "6c3c33d2761a540b1ae708f54c5abc672b741c9a0449320a48b869544d96a762"
+    }
+  },
+  "governanceBranch": "fix/gate7-b1-spatial-post-gate6-reconciliation",
   "governancePaths": [
-    ".github/workflows/deploy-production.yml",
     "scripts/governance/release-b1-spatial-567.json",
     "scripts/governance/release-b1-spatial-567.mjs",
     "scripts/governance/release-b1-spatial-567.spec.mjs",
-    "scripts/governance/release-eatclean-1a-flow04-563.spec.mjs",
-    "scripts/governance/release-json.spec.mjs",
-    "scripts/governance/release-plan.mjs",
-    "scripts/governance/release-reconciliation.mjs"
+    "scripts/governance/release-plan.mjs"
   ],
   "constraints": {
     "productionSqlAuthorized": false,
