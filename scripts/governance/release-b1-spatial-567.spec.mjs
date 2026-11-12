@@ -732,6 +732,12 @@ test("B1 Spatial 567 integrated: --b1-567-payload and prepare() reconcile post-G
       { cwd: dir, encoding: "utf8" },
     ).trim();
     execFileSync("git", ["checkout", "--quiet", govCommit], { cwd: dir });
+    for (const rel of [
+      "scripts/governance/release-smoke-retry-574.mjs",
+      "scripts/governance/release-smoke-retry-574.json",
+    ]) {
+      fs.copyFileSync(path.join(repoRoot, rel), path.join(dir, rel));
+    }
 
     const baselineReport = {
       schema: 1,

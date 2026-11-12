@@ -1,4 +1,10 @@
 import {
+  SMOKE_RETRY_574,
+  smokeRetry574Payload,
+  smokeRetry574ScopeId,
+  authorizeSmokeRetry574,
+} from "./release-smoke-retry-574.mjs";
+import {
   B1_SPATIAL_567,
   b1Spatial567Payload,
   b1Spatial567ScopeId,
@@ -466,6 +472,50 @@ export function rollbackV1Snapshot(ctx, base, diff, prs, currentMainSha) {
   }
   return { ...s, diff };
 }
+export function smokeRetry574Snapshot(ctx, base, diff, prs, currentMainSha) {
+  const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
+  s.candidatePr = api(`pulls/${SMOKE_RETRY_574.candidatePr}`);
+  s.commits = s.commits.map((c) => {
+    let parent;
+    try {
+      parent = git("rev-parse", `${c.sha}^1`).trim();
+    } catch {
+      parent = null;
+    }
+    let headSha;
+    try {
+      headSha = execFileSync("git", ["rev-parse", `${c.sha}^2`], {
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "ignore"],
+      }).trim();
+    } catch {
+      try {
+        headSha = api(`pulls/${c.pr}`).head.sha;
+      } catch {
+        headSha = null;
+      }
+    }
+    return {
+      sha: c.sha,
+      parent,
+      headSha,
+      pr: c.pr,
+      files: c.paths.map((p) => {
+        const fileHash = (rev) => {
+          const entry = git("ls-tree", rev, "--", p);
+          if (!entry) return null;
+          const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+          demand(blob, "Smoke Retry 574 requires regular Git blobs");
+          return hash(
+            execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+          );
+        };
+        return { path: p, before: fileHash(`${c.sha}^1`), after: fileHash(c.sha) };
+      }),
+    };
+  });
+  return { ...s, diff };
+}
 export function b1Spatial567Snapshot(ctx, base, diff, prs, currentMainSha) {
   const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
   s.productPrs = B1_SPATIAL_567.productPrs.map((n) => api(`pulls/${n}`));
@@ -805,6 +855,15 @@ export function p1Orders532Snapshot(ctx, base, diff, prs, currentMainSha) {
 }
 export function routeExactInterval(ctx, base, diff, prs, currentMain, inputs, run, policy) {
   const prNumber = (p) => (typeof p === "number" ? p : p?.number);
+  if (base.sha === SMOKE_RETRY_574.baseline.sha) {
+    return authorizeSmokeRetry574(
+      smokeRetry574Snapshot(ctx, base, diff, prs, currentMain),
+      inputs,
+      ctx,
+      run,
+      policy,
+    );
+  }
   if (base.sha === B1_SPATIAL_567.baseline.sha) {
     const isB1Candidate =
       diff.commits.includes(B1_SPATIAL_567.candidateSha) &&
@@ -1292,6 +1351,30 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         `${JSON.stringify({ payload, authorizationId: hash(JSON.stringify(payload)) }, null, 2)}\n`,
       );
       process.exit(0); // Read-only reconciliation, never artifact/ledger or authorization.
+    }
+    if (process.argv[2] === "--smoke-retry-574-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((c) => assertMergedCommit(pages(`commits/${c}/pulls`), c));
+      const payload = smokeRetry574Payload(
+        smokeRetry574Snapshot(ctx, base, diff, prs, sha),
+        policy,
+      );
+      fs.writeSync(
+        1,
+        JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: smokeRetry574ScopeId(payload),
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+      process.exit(0); // Read-only proposal; never dispatch or production authority.
     }
     if (process.argv[2] === "--b1-567-payload") {
       const sha = api("git/ref/heads/main").object.sha;
