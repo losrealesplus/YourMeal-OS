@@ -26,47 +26,12 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, AlertTriangle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { MarketSource } from '../../domain/types';
-import { isValidUuid } from '../../domain/uuid';
 import {
   MarketCatalogIngestionService,
   IngestionReport,
   QuarantinedRow,
 } from '../../application/market-catalog-ingestion-service';
-
-export interface ExecuteCatalogCsvIngestionParams {
-  ingestionService: MarketCatalogIngestionService;
-  csvContent: string;
-  fileName: string;
-  userId?: string;
-  selectedSourceId?: string;
-  visibilityScope: 'public' | 'private';
-  tenantId?: string;
-}
-
-export async function executeCatalogCsvIngestion({
-  ingestionService,
-  csvContent,
-  fileName,
-  userId,
-  selectedSourceId,
-  visibilityScope,
-  tenantId,
-}: ExecuteCatalogCsvIngestionParams): Promise<IngestionReport> {
-  if (!csvContent.trim()) {
-    throw new Error('Por favor, introduce o sube el contenido CSV/TSV del catálogo.');
-  }
-
-  if (!isValidUuid(userId)) {
-    throw new Error('Se requiere una sesión autenticada válida (UUID) para auditar la ingesta.');
-  }
-
-  return ingestionService.ingestCsv(csvContent, {
-    fileName,
-    importedBy: userId,
-    defaultSourceId: selectedSourceId || undefined,
-    ownerTenantId: visibilityScope === 'private' && tenantId ? tenantId : null,
-  });
-}
+import { executeCatalogCsvIngestion } from '../../application/command-center-actions';
 
 export interface CatalogIngestionDrawerProps {
   open: boolean;
@@ -75,6 +40,7 @@ export interface CatalogIngestionDrawerProps {
   ingestionService: MarketCatalogIngestionService;
   userId?: string;
   tenantId?: string;
+  canPublishPublic?: boolean;
   onIngestionSuccess?: () => void;
 }
 
@@ -85,14 +51,23 @@ export function CatalogIngestionDrawer({
   ingestionService,
   userId,
   tenantId,
+  canPublishPublic = false,
   onIngestionSuccess,
 }: CatalogIngestionDrawerProps) {
   const [selectedSourceId, setSelectedSourceId] = useState<string>(sources[0]?.id || '');
-  const [visibilityScope, setVisibilityScope] = useState<'public' | 'private'>('public');
+  const [visibilityScope, setVisibilityScope] = useState<'public' | 'private'>(
+    canPublishPublic ? 'public' : 'private'
+  );
   const [fileName, setFileName] = useState<string>('manual-upload.csv');
   const [csvContent, setCsvContent] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [lastResult, setLastResult] = useState<IngestionReport | null>(null);
+
+  useEffect(() => {
+    if (!canPublishPublic && visibilityScope === 'public') {
+      setVisibilityScope('private');
+    }
+  }, [canPublishPublic, visibilityScope]);
 
   useEffect(() => {
     if (sources.length > 0 && !sources.some((s) => s.id === selectedSourceId)) {
@@ -125,6 +100,7 @@ export function CatalogIngestionDrawer({
         selectedSourceId,
         visibilityScope,
         tenantId,
+        canPublishPublic,
       });
 
       setLastResult(result);
@@ -204,7 +180,9 @@ export function CatalogIngestionDrawer({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="public">Público (Core compartido)</SelectItem>
+                    {canPublishPublic && (
+                      <SelectItem value="public">Público (Core compartido)</SelectItem>
+                    )}
                     <SelectItem value="private">Tarifa privada del tenant</SelectItem>
                   </SelectContent>
                 </Select>

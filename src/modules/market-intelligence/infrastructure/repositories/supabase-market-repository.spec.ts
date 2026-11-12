@@ -1,4 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/integrations/supabase/types';
 import { SupabaseMarketRepository } from './supabase-market-repository';
 
 describe('SupabaseMarketRepository', () => {
@@ -105,7 +107,7 @@ describe('SupabaseMarketRepository', () => {
         }
         return {};
       }),
-    } as any;
+    } as unknown as SupabaseClient<Database>;
 
     const repo = new SupabaseMarketRepository(mockSupabase);
     const obsId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -191,7 +193,7 @@ describe('SupabaseMarketRepository', () => {
 
     const repo = new SupabaseMarketRepository({
       from: vi.fn().mockReturnValue({ select: selectMock }),
-    } as any);
+    } as unknown as SupabaseClient<Database>);
 
     const list = await repo.getMappingsForIngredient('t-1', 'ing-1');
     expect(list).toHaveLength(2);

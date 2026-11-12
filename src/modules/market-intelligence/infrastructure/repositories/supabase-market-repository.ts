@@ -142,7 +142,7 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
 
   public async saveProduct(product: MarketProduct): Promise<void> {
     const productId = isValidUuid(product.id) ? product.id : generateMarketEntityUuid();
-    const { error } = await this.supabase.from('market_products').upsert({
+    const { error } = await this.supabase.from('market_products').insert({
       id: productId,
       source_id: product.sourceId,
       external_sku: product.externalSku || `SKU-${productId.slice(0, 8)}`,
@@ -433,6 +433,15 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       const list = obsByProduct.get(o.market_product_id) || [];
       list.push(mappedObs);
       obsByProduct.set(o.market_product_id, list);
+    }
+    for (const list of obsByProduct.values()) {
+      list.sort((a, b) => {
+        const tsDiff = new Date(b.observedAt).getTime() - new Date(a.observedAt).getTime();
+        if (tsDiff !== 0) return tsDiff;
+        const aOwned = a.ownerTenantId === tenantId ? 1 : 0;
+        const bOwned = b.ownerTenantId === tenantId ? 1 : 0;
+        return bOwned - aOwned;
+      });
     }
 
     const results: BenchmarkInputObservation[] = [];

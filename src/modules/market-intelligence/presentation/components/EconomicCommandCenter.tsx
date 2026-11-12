@@ -54,161 +54,18 @@ import {
   ActionabilityGrade,
   BenchmarkCalculation,
   NegotiationBrief,
+  ComparabilityGrade,
 } from "../../domain/types";
-import { isValidUuid } from "../../domain/uuid";
-import { supabase } from "@/integrations/supabase/client";
+import { persistDecisionIntent } from "../../application/command-center-actions";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
-export interface PersistDecisionIntentParams {
-  supabaseClient?: typeof supabase;
-  tenantId: string;
-  userId?: string;
-  userName?: string;
-  activeScenarioId?: string | null;
-  onScenarioCreated?: (scenarioId: string) => void;
-  opportunity: EconomicOpportunity;
-  ingredientsCount: number;
-  dishesCount: number;
-  intentType: string;
-  targetPrice: string;
-  targetDate: string;
-  intentRationale: string;
-}
-
-export async function persistDecisionIntent({
-  supabaseClient = supabase,
-  tenantId,
-  userId,
-  userName = "Gerente",
-  activeScenarioId = null,
-  onScenarioCreated,
-  opportunity: op,
-  ingredientsCount,
-  dishesCount,
-  intentType,
-  targetPrice,
-  targetDate,
-  intentRationale,
-}: PersistDecisionIntentParams): Promise<NonNullable<EconomicOpportunity["recordedDecision"]>> {
-  if (!tenantId) {
-    throw new Error("Falta tenantId para registrar la decisión.");
-  }
-  if (!intentRationale.trim()) {
-    throw new Error("Describe la justificación de la decisión antes de guardar.");
-  }
-
-  const targetNum =
-    targetPrice.trim().length > 0 && !Number.isNaN(Number(targetPrice))
-      ? Number(targetPrice)
-      : op.benchmarkPriceExTax ?? undefined;
-
-  // 1. Resolve or create a valid scenario_id (NOT NULL FK on cost_decision_intents)
-  let resolvedScenarioId = activeScenarioId || null;
-
-  if (!resolvedScenarioId) {
-    const { data: latestScenario, error: lookupError } = await supabaseClient
-      .from("cost_simulation_scenarios")
-      .select("id")
-      .eq("tenant_id", tenantId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (lookupError) {
-      throw new Error(`No se pudo consultar el escenario activo: ${lookupError.message}`);
-    }
-
-    if (latestScenario?.id) {
-      resolvedScenarioId = latestScenario.id;
-      onScenarioCreated?.(latestScenario.id);
-    } else {
-      const baselinePayload = {
-        snapshotId: `baseline-${tenantId}-${Date.now()}`,
-        capturedAt: new Date().toISOString(),
-        tenantId,
-        source: "market_intelligence_command_center",
-        ingredientsCount,
-        dishesCount,
-      };
-
-      const { data: createdScenario, error: createScenarioErr } = await supabaseClient
-        .from("cost_simulation_scenarios")
-        .insert({
-          tenant_id: tenantId,
-          name: `Baseline Market Intelligence (${new Date().toISOString().slice(0, 10)})`,
-          preset_type: "custom",
-          baseline_snapshot_id: baselinePayload.snapshotId,
-          baseline_snapshot: baselinePayload,
-          applied_variables: { ingredientId: op.ingredientId },
-          status: "simulated",
-          created_by: isValidUuid(userId) ? userId : null,
-        })
-        .select("id")
-        .single();
-
-      if (createScenarioErr || !createdScenario?.id) {
-        throw new Error(
-          `No se pudo crear el escenario base requerido: ${createScenarioErr?.message || "Sin respuesta"}`,
-        );
-      }
-
-      resolvedScenarioId = createdScenario.id;
-      onScenarioCreated?.(createdScenario.id);
-    }
-  }
-
-  const allowedIntentType =
-    intentType === "renegotiate_supplier" ||
-    intentType === "adjust_menu_price" ||
-    intentType === "reformulate_recipe" ||
-    intentType === "accept_margin_compression" ||
-    intentType === "other"
-      ? intentType
-      : "other";
-
-  const formattedRationale =
-    targetNum !== undefined
-      ? `[${op.ingredientName} @ ${targetNum.toFixed(2)} €/${op.unit}] ${intentRationale.trim()}`
-      : `[${op.ingredientName}] ${intentRationale.trim()}`;
-
-  // 2. Persist real row in cost_decision_intents and fail loudly on DB errors
-  const { data: persistedIntent, error: insertError } = await supabaseClient
-    .from("cost_decision_intents")
-    .insert({
-      tenant_id: tenantId,
-      scenario_id: resolvedScenarioId,
-      intent_type: allowedIntentType,
-      target_entity_type: "ingredient",
-      target_entity_id: isValidUuid(op.ingredientId) ? op.ingredientId : null,
-      rationale: formattedRationale,
-      planned_effective_date: targetDate || null,
-      status: "pending_action",
-      recorded_by: isValidUuid(userId) ? userId : null,
-    })
-    .select("id, recorded_at")
-    .single();
-
-  if (insertError || !persistedIntent) {
-    throw new Error(insertError?.message || "No se pudo persistir la decisión en Supabase.");
-  }
-
-  return {
-    id: persistedIntent.id,
-    intentType: allowedIntentType,
-    targetPriceExTax: targetNum,
-    plannedEffectiveDate: targetDate,
-    rationale: intentRationale.trim(),
-    authorName: userName,
-    createdAt: persistedIntent.recorded_at || new Date().toISOString(),
-  };
-}
 
 export interface EconomicCommandCenterProps {
   tenantId: string;
   tenantName?: string;
   userId?: string;
   userName?: string;
+  canPublishPublic?: boolean;
   activeScenarioId?: string | null;
   onScenarioCreated?: (scenarioId: string) => void;
   ingredients: Array<{
@@ -241,6 +98,7 @@ export function EconomicCommandCenter({
   tenantName = "Restaurante",
   userId,
   userName = "Gerente",
+  canPublishPublic = false,
   activeScenarioId = null,
   onScenarioCreated,
   ingredients,
@@ -300,10 +158,24 @@ export function EconomicCommandCenter({
   // Construct Canonical Economic Opportunities Feed
   // ───────────────────────────────────────────────────────────────────────────
   const opportunities: EconomicOpportunity[] = useMemo(() => {
+    const gradePriority: Record<ComparabilityGrade, number> = {
+      HIGH: 3,
+      MEDIUM: 2,
+      LOW: 1,
+      UNKNOWN: 0,
+    };
+
     return ingredients.map((ing) => {
       const calc = benchmarksByIngredient.get(ing.id) || null;
-      const mapping = mappings.find(
+      const confirmedMappings = mappings.filter(
         (m) => m.tenantIngredientId === ing.id && m.matchStatus === "confirmed",
+      );
+      const bestComparabilityGrade = confirmedMappings.reduce<ComparabilityGrade>(
+        (best, cur) =>
+          gradePriority[cur.comparabilityGrade] > gradePriority[best]
+            ? cur.comparabilityGrade
+            : best,
+        "UNKNOWN",
       );
 
       const benchmarkExTax = calc && calc.components.length > 0 ? calc.benchmarkPriceExTax : null;
@@ -324,7 +196,7 @@ export function EconomicCommandCenter({
 
       // Deterministic Actionability Grade
       let actionabilityGrade: ActionabilityGrade = "INSUFFICIENT";
-      if (mapping && calc && calc.components.length > 0) {
+      if (confirmedMappings.length > 0 && calc && calc.components.length > 0) {
         if (variancePct !== null && variancePct > 5 && ing.annualVolume && ing.annualVolume > 0) {
           actionabilityGrade = "DIRECT_ACTION";
         } else if (!ing.annualVolume || ing.annualVolume === 0) {
@@ -400,7 +272,7 @@ export function EconomicCommandCenter({
         effectiveWacExTax: ing.cost,
         benchmarkPriceExTax: benchmarkExTax,
         variancePct,
-        comparabilityGrade: mapping?.comparabilityGrade || "UNKNOWN",
+        comparabilityGrade: bestComparabilityGrade,
         annualVolume: ing.annualVolume || null,
         potentialAnnualSavingsEur,
         actionabilityGrade,
@@ -433,7 +305,7 @@ export function EconomicCommandCenter({
       (d) => d.laborCost === 0 || d.energyCost === 0 || d.packagingCost === 0,
     );
     const unmappedIngredients = ingredients.filter(
-      (i) => !mappings.some((m) => m.tenantIngredientId === i.id),
+      (i) => !mappings.some((m) => m.tenantIngredientId === i.id && m.matchStatus === "confirmed"),
     );
 
     return {
@@ -780,7 +652,9 @@ export function EconomicCommandCenter({
                       </>
                     ) : (
                       <span className="text-xs text-slate-400 font-normal italic">
-                        {hasObservations ? "— (Requiere volumen anual)" : "— (Sin benchmark observable)"}
+                        {hasObservations
+                          ? "— (Requiere volumen anual)"
+                          : "— (Sin benchmark observable)"}
                       </span>
                     )}
                   </div>
@@ -1374,6 +1248,7 @@ export function EconomicCommandCenter({
         ingestionService={ingestionService}
         userId={userId}
         tenantId={tenantId}
+        canPublishPublic={canPublishPublic}
         onIngestionSuccess={refetch}
       />
 

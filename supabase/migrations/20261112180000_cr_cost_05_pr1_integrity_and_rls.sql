@@ -61,7 +61,7 @@ $$;
 GRANT UPDATE (valid_to, quality_status, promotion_status, raw_payload)
   ON public.market_price_observations TO authenticated;
 
--- 4. Fix market_products RLS: active approved staff + missing UPDATE policy
+-- 4. Fix market_products RLS: approved active staff may insert new catalog SKUs; UPDATE of shared Core products is SaaS admin only
 DROP POLICY IF EXISTS market_products_write_staff ON public.market_products;
 CREATE POLICY market_products_write_staff ON public.market_products
   FOR INSERT TO authenticated
@@ -81,26 +81,15 @@ CREATE POLICY market_products_update_staff ON public.market_products
   FOR UPDATE TO authenticated
   USING (
     public.is_saas_admin(auth.uid())
-    OR EXISTS (
-      SELECT 1 FROM public.tenant_members tm
-      WHERE tm.user_id = auth.uid()
-        AND tm.status = 'approved'
-        AND tm.deleted_at IS NULL
-        AND public.has_any_staff_role(auth.uid(), tm.tenant_id)
-    )
   )
   WITH CHECK (
     public.is_saas_admin(auth.uid())
-    OR EXISTS (
-      SELECT 1 FROM public.tenant_members tm
-      WHERE tm.user_id = auth.uid()
-        AND tm.status = 'approved'
-        AND tm.deleted_at IS NULL
-        AND public.has_any_staff_role(auth.uid(), tm.tenant_id)
-    )
   );
 
--- 5. Fix market_price_observations RLS: public vs private owner_tenant_id + active approved staff + UPDATE policy
+-- 5. Fix market_price_observations RLS:
+--    - SELECT: public (owner_tenant_id IS NULL) OR tenant members of private owner_tenant_id
+--    - INSERT / UPDATE of public rows (owner_tenant_id IS NULL): SaaS admin only
+--    - INSERT / UPDATE of private tenant tariffs (owner_tenant_id IS NOT NULL): active approved staff of that tenant or SaaS admin
 DROP POLICY IF EXISTS market_price_obs_read_auth ON public.market_price_observations;
 CREATE POLICY market_price_obs_read_auth ON public.market_price_observations
   FOR SELECT TO authenticated
@@ -114,24 +103,22 @@ CREATE POLICY market_price_obs_insert_staff ON public.market_price_observations
   FOR INSERT TO authenticated
   WITH CHECK (
     (
-      owner_tenant_id IS NULL
-      AND (
-        public.is_saas_admin(auth.uid())
-        OR EXISTS (
-          SELECT 1 FROM public.tenant_members tm
-          WHERE tm.user_id = auth.uid()
-            AND tm.status = 'approved'
-            AND tm.deleted_at IS NULL
-            AND public.has_any_staff_role(auth.uid(), tm.tenant_id)
-        )
-      )
+      imported_by IS NULL
+      OR imported_by = auth.uid()
+      OR public.is_saas_admin(auth.uid())
     )
-    OR (
-      owner_tenant_id IS NOT NULL
-      AND public.is_tenant_member(owner_tenant_id)
-      AND (
-        public.has_any_staff_role(auth.uid(), owner_tenant_id)
-        OR public.is_saas_admin(auth.uid())
+    AND (
+      (
+        owner_tenant_id IS NULL
+        AND public.is_saas_admin(auth.uid())
+      )
+      OR (
+        owner_tenant_id IS NOT NULL
+        AND public.is_tenant_member(owner_tenant_id)
+        AND (
+          public.has_any_staff_role(auth.uid(), owner_tenant_id)
+          OR public.is_saas_admin(auth.uid())
+        )
       )
     )
   );
@@ -142,16 +129,7 @@ CREATE POLICY market_price_obs_update_staff ON public.market_price_observations
   USING (
     (
       owner_tenant_id IS NULL
-      AND (
-        public.is_saas_admin(auth.uid())
-        OR EXISTS (
-          SELECT 1 FROM public.tenant_members tm
-          WHERE tm.user_id = auth.uid()
-            AND tm.status = 'approved'
-            AND tm.deleted_at IS NULL
-            AND public.has_any_staff_role(auth.uid(), tm.tenant_id)
-        )
-      )
+      AND public.is_saas_admin(auth.uid())
     )
     OR (
       owner_tenant_id IS NOT NULL
@@ -165,16 +143,7 @@ CREATE POLICY market_price_obs_update_staff ON public.market_price_observations
   WITH CHECK (
     (
       owner_tenant_id IS NULL
-      AND (
-        public.is_saas_admin(auth.uid())
-        OR EXISTS (
-          SELECT 1 FROM public.tenant_members tm
-          WHERE tm.user_id = auth.uid()
-            AND tm.status = 'approved'
-            AND tm.deleted_at IS NULL
-            AND public.has_any_staff_role(auth.uid(), tm.tenant_id)
-        )
-      )
+      AND public.is_saas_admin(auth.uid())
     )
     OR (
       owner_tenant_id IS NOT NULL
@@ -186,7 +155,7 @@ CREATE POLICY market_price_obs_update_staff ON public.market_price_observations
     )
   );
 
--- 6. Fix market_volume_tiers RLS: scope SELECT to observation visibility & add missing INSERT policy
+-- 6. Fix market_volume_tiers RLS: scope SELECT to observation visibility & enforce SaaS-admin-only INSERT on public observations
 DROP POLICY IF EXISTS market_volume_tiers_read_auth ON public.market_volume_tiers;
 CREATE POLICY market_volume_tiers_read_auth ON public.market_volume_tiers
   FOR SELECT TO authenticated
@@ -211,16 +180,7 @@ CREATE POLICY market_volume_tiers_insert_staff ON public.market_volume_tiers
         AND (
           (
             mpo.owner_tenant_id IS NULL
-            AND (
-              public.is_saas_admin(auth.uid())
-              OR EXISTS (
-                SELECT 1 FROM public.tenant_members tm
-                WHERE tm.user_id = auth.uid()
-                  AND tm.status = 'approved'
-                  AND tm.deleted_at IS NULL
-                  AND public.has_any_staff_role(auth.uid(), tm.tenant_id)
-              )
-            )
+            AND public.is_saas_admin(auth.uid())
           )
           OR (
             mpo.owner_tenant_id IS NOT NULL

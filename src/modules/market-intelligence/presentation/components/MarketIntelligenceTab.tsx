@@ -49,6 +49,7 @@ export interface MarketIntelligenceTabProps {
   tenantId: string;
   tenantName?: string;
   userId?: string;
+  canPublishPublic?: boolean;
   ingredients: Array<{
     id: string;
     name: string;
@@ -64,6 +65,7 @@ export function MarketIntelligenceTab({
   tenantId,
   tenantName = 'Restaurante',
   userId,
+  canPublishPublic = false,
   ingredients,
   onInjectSimulation,
 }: MarketIntelligenceTabProps) {
@@ -528,6 +530,7 @@ export function MarketIntelligenceTab({
         ingestionService={ingestionService}
         userId={userId}
         tenantId={tenantId}
+        canPublishPublic={canPublishPublic}
         onIngestionSuccess={refetch}
       />
 

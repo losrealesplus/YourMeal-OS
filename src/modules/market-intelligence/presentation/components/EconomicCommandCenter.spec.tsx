@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderToString } from "react-dom/server";
+import { EconomicCommandCenter } from "./EconomicCommandCenter";
 import {
-  EconomicCommandCenter,
+  executeCatalogCsvIngestion,
   persistDecisionIntent,
-} from "./EconomicCommandCenter";
-import { executeCatalogCsvIngestion } from "./CatalogIngestionDrawer";
+} from "../../application/command-center-actions";
 
 const mockUseMarketIntelligence = vi.fn();
 
@@ -290,16 +290,45 @@ describe("EconomicCommandCenter & CatalogIngestionDrawer (CR-COST-05 PR1 Integri
       selectedSourceId: sourceId,
       visibilityScope: "private",
       tenantId,
+      canPublishPublic: false,
     });
 
-    expect(ingestCsv).toHaveBeenCalledWith(
-      "sku,producto,precio,unidad\nA1,Arroz,1.20,kg",
-      {
+    expect(ingestCsv).toHaveBeenCalledWith("sku,producto,precio,unidad\nA1,Arroz,1.20,kg", {
+      fileName: "test.csv",
+      importedBy: validUserId,
+      defaultSourceId: sourceId,
+      ownerTenantId: tenantId,
+    });
+
+    await expect(
+      executeCatalogCsvIngestion({
+        ingestionService: mockService,
+        csvContent: "sku,producto,precio,unidad\nA1,Arroz,1.20,kg",
         fileName: "test.csv",
-        importedBy: validUserId,
-        defaultSourceId: sourceId,
-        ownerTenantId: tenantId,
-      },
-    );
+        userId: validUserId,
+        selectedSourceId: sourceId,
+        visibilityScope: "public",
+        tenantId,
+        canPublishPublic: false,
+      }),
+    ).rejects.toThrow("administradores");
+
+    await executeCatalogCsvIngestion({
+      ingestionService: mockService,
+      csvContent: "sku,producto,precio,unidad\nA1,Arroz,1.20,kg",
+      fileName: "test.csv",
+      userId: validUserId,
+      selectedSourceId: sourceId,
+      visibilityScope: "public",
+      tenantId,
+      canPublishPublic: true,
+    });
+
+    expect(ingestCsv).toHaveBeenLastCalledWith("sku,producto,precio,unidad\nA1,Arroz,1.20,kg", {
+      fileName: "test.csv",
+      importedBy: validUserId,
+      defaultSourceId: sourceId,
+      ownerTenantId: null,
+    });
   });
 });
