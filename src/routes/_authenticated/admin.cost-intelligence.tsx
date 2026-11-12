@@ -108,7 +108,7 @@ function formatPercent(pct: number): string {
 }
 
 export function CostIntelligenceCockpitPage() {
-  const { user, tenantId, roles } = useAuth();
+  const { user, tenantId, roles, isSaasAdmin } = useAuth();
   const { can } = useCan();
   const [activeTab, setActiveTab] = useState<
     | "command_center"
@@ -582,6 +582,9 @@ export function CostIntelligenceCockpitPage() {
           tenantName={user?.user_metadata?.company_name || "Restaurante"}
           userId={user?.id}
           userName={user?.email || "Gerente"}
+          canPublishPublic={isSaasAdmin}
+          activeScenarioId={activeScenarioId}
+          onScenarioCreated={(id) => setActiveScenarioId(id)}
           canEditDishes={can("dishes.update") || can("dishes.write")}
           ingredients={liveIngredients.map((ing) => ({
             id: ing.id,
@@ -1407,6 +1410,8 @@ export function CostIntelligenceCockpitPage() {
         <MarketIntelligenceTab
           tenantId={tenantId}
           tenantName={user?.user_metadata?.company_name || "Restaurante"}
+          userId={user?.id}
+          canPublishPublic={isSaasAdmin}
           ingredients={liveIngredients.map((ing) => ({
             id: ing.id,
             name: ing.name,

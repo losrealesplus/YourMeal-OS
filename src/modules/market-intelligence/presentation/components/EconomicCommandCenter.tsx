@@ -54,9 +54,9 @@ import {
   ActionabilityGrade,
   BenchmarkCalculation,
   NegotiationBrief,
-  MarketProduct,
+  ComparabilityGrade,
 } from "../../domain/types";
-import { supabase } from "@/integrations/supabase/client";
+import { persistDecisionIntent } from "../../application/command-center-actions";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -65,6 +65,9 @@ export interface EconomicCommandCenterProps {
   tenantName?: string;
   userId?: string;
   userName?: string;
+  canPublishPublic?: boolean;
+  activeScenarioId?: string | null;
+  onScenarioCreated?: (scenarioId: string) => void;
   ingredients: Array<{
     id: string;
     name: string;
@@ -95,6 +98,9 @@ export function EconomicCommandCenter({
   tenantName = "Restaurante",
   userId,
   userName = "Gerente",
+  canPublishPublic = false,
+  activeScenarioId = null,
+  onScenarioCreated,
   ingredients,
   dishes,
   canEditDishes = true,
@@ -112,7 +118,7 @@ export function EconomicCommandCenter({
     ingestionService,
     mappingService,
     generateNegotiationBrief,
-  } = useMarketIntelligence(tenantId);
+  } = useMarketIntelligence(tenantId, ingredients);
 
   // Deepening tools drawers & modals state
   const [isIngestionOpen, setIsIngestionOpen] = useState(false);
@@ -152,28 +158,46 @@ export function EconomicCommandCenter({
   // Construct Canonical Economic Opportunities Feed
   // ───────────────────────────────────────────────────────────────────────────
   const opportunities: EconomicOpportunity[] = useMemo(() => {
+    const gradePriority: Record<ComparabilityGrade, number> = {
+      HIGH: 3,
+      MEDIUM: 2,
+      LOW: 1,
+      UNKNOWN: 0,
+    };
+
     return ingredients.map((ing) => {
       const calc = benchmarksByIngredient.get(ing.id) || null;
-      const mapping = mappings.find(
+      const confirmedMappings = mappings.filter(
         (m) => m.tenantIngredientId === ing.id && m.matchStatus === "confirmed",
       );
+      const bestComparabilityGrade = confirmedMappings.reduce<ComparabilityGrade>(
+        (best, cur) =>
+          gradePriority[cur.comparabilityGrade] > gradePriority[best]
+            ? cur.comparabilityGrade
+            : best,
+        "UNKNOWN",
+      );
 
-      const benchmarkExTax = calc ? calc.benchmarkPriceExTax : 0;
+      const benchmarkExTax = calc && calc.components.length > 0 ? calc.benchmarkPriceExTax : null;
       const variancePct =
-        benchmarkExTax > 0 && ing.cost > 0
+        benchmarkExTax !== null && benchmarkExTax > 0 && ing.cost > 0
           ? ((ing.cost - benchmarkExTax) / benchmarkExTax) * 100
-          : 0;
+          : null;
 
       // Annual savings grounded strictly in verified volume
       const potentialAnnualSavingsEur =
-        ing.annualVolume && ing.annualVolume > 0 && benchmarkExTax > 0 && ing.cost > benchmarkExTax
+        ing.annualVolume &&
+        ing.annualVolume > 0 &&
+        benchmarkExTax !== null &&
+        benchmarkExTax > 0 &&
+        ing.cost > benchmarkExTax
           ? (ing.cost - benchmarkExTax) * ing.annualVolume
           : null;
 
       // Deterministic Actionability Grade
       let actionabilityGrade: ActionabilityGrade = "INSUFFICIENT";
-      if (mapping && calc && calc.components.length > 0) {
-        if (variancePct > 5 && ing.annualVolume && ing.annualVolume > 0) {
+      if (confirmedMappings.length > 0 && calc && calc.components.length > 0) {
+        if (variancePct !== null && variancePct > 5 && ing.annualVolume && ing.annualVolume > 0) {
           actionabilityGrade = "DIRECT_ACTION";
         } else if (!ing.annualVolume || ing.annualVolume === 0) {
           actionabilityGrade = "REVIEW_DATA";
@@ -203,7 +227,7 @@ export function EconomicCommandCenter({
         const isCostKnown = d.cost != null && d.isCalculable !== false;
         const rawCostCurrent = isCostKnown ? d.cost! : null;
         const rawSavings =
-          benchmarkExTax > 0 && ing.cost > benchmarkExTax
+          benchmarkExTax !== null && benchmarkExTax > 0 && ing.cost > benchmarkExTax
             ? (ing.cost - benchmarkExTax) * dishUsageKg
             : 0;
         const simulatedCost =
@@ -248,24 +272,12 @@ export function EconomicCommandCenter({
         effectiveWacExTax: ing.cost,
         benchmarkPriceExTax: benchmarkExTax,
         variancePct,
-        comparabilityGrade: mapping?.comparabilityGrade || "HIGH",
+        comparabilityGrade: bestComparabilityGrade,
         annualVolume: ing.annualVolume || null,
         potentialAnnualSavingsEur,
         actionabilityGrade,
         lifecycleState,
-        calculation: calc || {
-          tenantIngredientId: ing.id,
-          tenantIngredientName: ing.name,
-          calculatedAt: new Date().toISOString(),
-          canonicalUnit: "EUR_PER_KG",
-          benchmarkPriceExTax: 5.7,
-          minPriceExTax: 5.534,
-          maxPriceExTax: 7.2,
-          dispersionSpreadPct: 30.1,
-          observationsCount: 2,
-          highComparabilityCount: 1,
-          components: [],
-        },
+        calculation: calc && calc.components.length > 0 ? calc : null,
         affectedDishes: affectedDishesSim,
         recordedDecision: recordedDecisions[ing.id],
       };
@@ -293,7 +305,7 @@ export function EconomicCommandCenter({
       (d) => d.laborCost === 0 || d.energyCost === 0 || d.packagingCost === 0,
     );
     const unmappedIngredients = ingredients.filter(
-      (i) => !mappings.some((m) => m.tenantIngredientId === i.id),
+      (i) => !mappings.some((m) => m.tenantIngredientId === i.id && m.matchStatus === "confirmed"),
     );
 
     return {
@@ -309,6 +321,11 @@ export function EconomicCommandCenter({
   // Handlers for In-Situ Decision Flow
   // ───────────────────────────────────────────────────────────────────────────
   const handleToggleSimulate = (op: EconomicOpportunity) => {
+    if (op.benchmarkPriceExTax === null) {
+      toast.info("Mapea este ingrediente con observaciones de mercado para simular en carta.");
+      return;
+    }
+
     if (simulatingOpportunityId === op.ingredientId) {
       setSimulatingOpportunityId(null);
       toast.info("Simulación revertida a Costes Reales Auditados [REAL].");
@@ -323,58 +340,48 @@ export function EconomicCommandCenter({
 
   const handleOpenDecisionForm = (op: EconomicOpportunity) => {
     setDecidingOpportunityId(op.ingredientId);
-    setTargetPrice(op.benchmarkPriceExTax.toFixed(2));
+    const defaultPrice =
+      op.benchmarkPriceExTax !== null ? op.benchmarkPriceExTax : op.effectiveWacExTax;
+    setTargetPrice(defaultPrice > 0 ? defaultPrice.toFixed(2) : "");
     setIntentRationale(
-      `Brecha de +${op.variancePct.toFixed(1)}% identificada frente a benchmark mayorista observable. Negociación anclada en volumen anual consolidado.`,
+      op.variancePct !== null
+        ? `Brecha de ${op.variancePct >= 0 ? "+" : ""}${op.variancePct.toFixed(1)}% identificada frente a benchmark observable.`
+        : `Acción de gestión comercial para ${op.ingredientName}.`,
     );
   };
 
   const handleSaveDecisionIntent = async (op: EconomicOpportunity) => {
     if (!tenantId) return;
+    if (!intentRationale.trim()) {
+      toast.error("Describe la justificación de la decisión antes de guardar.");
+      return;
+    }
+
     setIsSubmittingDecision(true);
 
     try {
-      const targetNum = Number(targetPrice) || op.benchmarkPriceExTax;
-      const decisionRecord = {
-        id: `dec-${Math.random().toString(36).substring(2, 9)}`,
-        opportunityId: op.id,
-        ingredientId: op.ingredientId,
-        ingredientName: op.ingredientName,
+      const decisionRecord = await persistDecisionIntent({
+        tenantId,
+        userId,
+        userName,
+        activeScenarioId,
+        onScenarioCreated,
+        opportunity: op,
+        ingredientsCount: ingredients.length,
+        dishesCount: dishes.length,
         intentType,
-        targetPriceExTax: targetNum,
-        plannedEffectiveDate: targetDate,
-        rationale: intentRationale,
-        authorName: userName,
-        createdAt: new Date().toISOString(),
-        status: "pending_execution",
-      };
+        targetPrice,
+        targetDate,
+        intentRationale,
+      });
 
-      // Persist in local state for seamless immediate UI transition
       setRecordedDecisions((prev) => ({
         ...prev,
         [op.ingredientId]: decisionRecord,
       }));
 
-      // Persist in Supabase cost_decision_intents table
-      try {
-        const client = supabase as unknown as {
-          from: (table: string) => {
-            insert: (row: Record<string, unknown>) => Promise<unknown>;
-          };
-        };
-        await client.from("cost_decision_intents").insert({
-          tenant_id: tenantId,
-          intent_type: intentType,
-          rationale: `[${op.ingredientName} @ ${targetNum.toFixed(2)} €/${op.unit}] ${intentRationale}`,
-          planned_effective_date: targetDate,
-          status: "pending_execution",
-        });
-      } catch {
-        // Fallback gracefully for local mock runtimes
-      }
-
       toast.success(
-        `Decisión registrada auditada para ${op.ingredientName} (#${decisionRecord.id})`,
+        `Decisión registrada auditada para ${op.ingredientName} (#${decisionRecord.id.slice(0, 8)})`,
       );
       setDecidingOpportunityId(null);
       setSimulatingOpportunityId(null);
@@ -396,7 +403,7 @@ export function EconomicCommandCenter({
         category: op.category || "General",
         unit: (op.unit === "kg" || op.unit === "l" ? op.unit : "unit") as "kg" | "l" | "unit",
         effectiveWacExTax: op.effectiveWacExTax,
-        annualVolume: op.annualVolume || 1200,
+        annualVolume: op.annualVolume ?? 0,
       });
       if (brief) setActiveBrief(brief);
     } catch (err: unknown) {
@@ -440,7 +447,7 @@ export function EconomicCommandCenter({
                 variant="outline"
                 className="text-[9px] uppercase font-mono bg-rose-50 text-rose-700 border-rose-200 font-semibold"
               >
-                [SIMULADO · FIXTURE]
+                [SIMULADO]
               </Badge>
             )}
           </div>
@@ -496,8 +503,10 @@ export function EconomicCommandCenter({
           <div className="text-2xl font-bold font-mono text-slate-900 mt-2">
             {ingredients.length - triageSummary.unmappedCount} / {ingredients.length} Mapeados
           </div>
-          <div className="text-xs text-indigo-700/90 mt-1 flex items-center justify-between">
-            <span>Makro, GM Cash, Mercadona</span>
+          <div className="text-xs text-indigo-700/90 mt-1 flex items-center justify-between gap-2">
+            <span className="truncate">
+              {sources.length > 0 ? sources.map((s) => s.name).join(", ") : "Sin fuentes activas"}
+            </span>
             <Button
               variant="ghost"
               size="sm"
@@ -530,8 +539,12 @@ export function EconomicCommandCenter({
           const isSimulating = simulatingOpportunityId === op.ingredientId;
           const isDeciding = decidingOpportunityId === op.ingredientId;
           const isRecorded = op.lifecycleState === "DECISION_RECORDED";
-          const wholesaleFloor = op.calculation.minPriceExTax || 5.534;
-          const retailCeiling = op.calculation.maxPriceExTax || 7.2;
+          const hasObservations = Boolean(op.calculation && op.calculation.components.length > 0);
+          const wholesaleFloor = hasObservations ? op.calculation!.minPriceExTax : null;
+          const retailCeiling = hasObservations ? op.calculation!.maxPriceExTax : null;
+          const observableSourceNames = op.calculation
+            ? Array.from(new Set(op.calculation.components.map((c) => c.sourceName)))
+            : [];
 
           return (
             <PanelCard
@@ -587,26 +600,37 @@ export function EconomicCommandCenter({
 
                   <div className="text-xs text-slate-500 font-mono flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <span>
-                      WAC Real [REAL — fixture/local]:{" "}
+                      WAC Real [REAL]:{" "}
                       <strong className="text-slate-800">
                         {op.effectiveWacExTax.toFixed(2)} €/{op.unit}
                       </strong>
                     </span>
                     <span>──►</span>
-                    <span>
-                      Benchmark [OBSERVADO — fixture/local]:{" "}
-                      <strong className="text-indigo-700">
-                        {op.benchmarkPriceExTax.toFixed(2)} €/{op.unit}
-                      </strong>
-                    </span>
-                    <span
-                      className={cn(
-                        "font-bold",
-                        op.variancePct > 0 ? "text-rose-600" : "text-emerald-600",
-                      )}
-                    >
-                      (+{op.variancePct.toFixed(1)}% sobreprecio)
-                    </span>
+                    {op.benchmarkPriceExTax !== null ? (
+                      <>
+                        <span>
+                          Benchmark [OBSERVADO]:{" "}
+                          <strong className="text-indigo-700">
+                            {op.benchmarkPriceExTax.toFixed(2)} €/{op.unit}
+                          </strong>
+                        </span>
+                        {op.variancePct !== null && (
+                          <span
+                            className={cn(
+                              "font-bold",
+                              op.variancePct > 0 ? "text-rose-600" : "text-emerald-600",
+                            )}
+                          >
+                            ({op.variancePct >= 0 ? "+" : ""}
+                            {op.variancePct.toFixed(1)}% vs mercado)
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-slate-400 font-sans italic">
+                        Benchmark [OBSERVADO]: Sin datos mapeados
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -623,18 +647,20 @@ export function EconomicCommandCenter({
                           variant="outline"
                           className="text-[8px] uppercase font-mono bg-emerald-50 text-emerald-700 border-emerald-300 font-semibold"
                         >
-                          [SIMULADO · FIXTURE]
+                          [SIMULADO]
                         </Badge>
                       </>
                     ) : (
                       <span className="text-xs text-slate-400 font-normal italic">
-                        — (Requiere volumen anual)
+                        {hasObservations
+                          ? "— (Requiere volumen anual)"
+                          : "— (Sin benchmark observable)"}
                       </span>
                     )}
                   </div>
                   <div className="text-[10px] text-slate-500">
                     {op.annualVolume
-                      ? `Volumen: ${op.annualVolume} ${op.unit}/año [FIXTURE]`
+                      ? `Volumen: ${op.annualVolume} ${op.unit}/año`
                       : "Volumen no registrado"}
                   </div>
                 </div>
@@ -642,37 +668,49 @@ export function EconomicCommandCenter({
 
               {/* Ground Truth Evidence Strip */}
               <div className="py-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 border-b border-slate-100">
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <span className="text-slate-400 font-medium">Evidencia Observable:</span>
-                  <span className="font-mono">
-                    Suelo Makro:{" "}
-                    <strong className="text-slate-800">
-                      {wholesaleFloor.toFixed(2)} €/{op.unit}
-                    </strong>
-                  </span>
-                  <span className="text-slate-300">|</span>
-                  <span className="font-mono">
-                    Techo Mercadona:{" "}
-                    <strong className="text-slate-800">
-                      {retailCeiling.toFixed(2)} €/{op.unit}
-                    </strong>
-                  </span>
-                  <span className="text-slate-300">|</span>
-                  <span className="text-emerald-700 font-semibold">
-                    Comparabilidad: {op.comparabilityGrade}
-                  </span>
+                  {hasObservations && wholesaleFloor !== null && retailCeiling !== null ? (
+                    <>
+                      <span className="font-mono">
+                        Mínimo observable:{" "}
+                        <strong className="text-slate-800">
+                          {wholesaleFloor.toFixed(2)} €/{op.unit}
+                        </strong>
+                      </span>
+                      <span className="text-slate-300">|</span>
+                      <span className="font-mono">
+                        Máximo observable:{" "}
+                        <strong className="text-slate-800">
+                          {retailCeiling.toFixed(2)} €/{op.unit}
+                        </strong>
+                      </span>
+                      <span className="text-slate-300">|</span>
+                      <span className="text-emerald-700 font-semibold">
+                        Comparabilidad: {op.comparabilityGrade}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-slate-400 italic">
+                      Sin observaciones de mercado mapeadas para este ingrediente
+                    </span>
+                  )}
                 </div>
 
                 <div className="text-[11px] text-slate-500">
                   Platos afectados:{" "}
-                  <strong>{op.affectedDishes.map((d) => d.dishName).join(", ")}</strong>
+                  <strong>
+                    {op.affectedDishes.length > 0
+                      ? op.affectedDishes.map((d) => d.dishName).join(", ")
+                      : "Ninguno en escandallos"}
+                  </strong>
                 </div>
               </div>
 
               {/* ───────────────────────────────────────────────────────── */}
               {/* STATE: IN-SITU SIMULATION CANVAS EXPANSION (E9 CONTEXTUAL) */}
               {/* ───────────────────────────────────────────────────────── */}
-              {isSimulating && (
+              {isSimulating && op.benchmarkPriceExTax !== null && (
                 <div className="my-3 p-4 rounded-xl bg-indigo-50/70 border border-indigo-200 text-slate-900 space-y-3 animate-fade-in">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -711,7 +749,7 @@ export function EconomicCommandCenter({
                           <th className="py-2 px-3 text-right">Coste Proyectado [SIMULADO]</th>
                           <th className="py-2 px-3 text-right">Margen Base</th>
                           <th className="py-2 px-3 text-right">Margen Proyectado</th>
-                          <th className="py-2 px-3 text-right">Impacto Mensual (400 u)</th>
+                          <th className="py-2 px-3 text-right">Impacto Mensual</th>
                           <th className="py-2 px-3 text-right">Costes Indirectos</th>
                         </tr>
                       </thead>
@@ -873,8 +911,8 @@ export function EconomicCommandCenter({
                           <SelectItem value="accept_margin_compression">
                             ⏱️ Aceptar Compresión Temporal
                           </SelectItem>
-                          <SelectItem value="investigate_further">
-                            🔍 Solicitar Cotizaciones Adicionales
+                          <SelectItem value="other">
+                            🔍 Solicitar Cotizaciones Adicionales / Otra
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -908,7 +946,7 @@ export function EconomicCommandCenter({
                       rows={2}
                       value={intentRationale}
                       onChange={(e) => setIntentRationale(e.target.value)}
-                      placeholder="Describe el motivo del acuerdo, referencia Makro usada o estrategia comercial..."
+                      placeholder="Describe el motivo del acuerdo, referencia de proveedor observada o estrategia comercial..."
                       className="text-xs bg-slate-800 border-slate-700 text-white resize-none"
                     />
                   </div>
@@ -984,14 +1022,17 @@ export function EconomicCommandCenter({
               {/* Action Toolbar */}
               <div className="flex flex-wrap items-center justify-between gap-2 pt-3 text-xs">
                 <div className="text-[11px] text-slate-400 font-mono">
-                  Fuentes observables: {op.calculation.components.length || 2} (Makro, Mercadona)
+                  {hasObservations && op.calculation
+                    ? `Fuentes observables: ${op.calculation.components.length} (${observableSourceNames.join(", ")})`
+                    : "Fuentes observables: 0 (sin observaciones mapeadas)"}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setSelectedSpreadCalc(op.calculation)}
+                    disabled={!hasObservations || !op.calculation}
+                    onClick={() => op.calculation && setSelectedSpreadCalc(op.calculation)}
                     className="h-7 text-xs text-slate-600 hover:text-slate-900"
                   >
                     <Search className="w-3 h-3 mr-1" />
@@ -1001,6 +1042,7 @@ export function EconomicCommandCenter({
                   <Button
                     size="sm"
                     variant="outline"
+                    disabled={!hasObservations || !op.calculation}
                     onClick={() => handleOpenBrief(op)}
                     className="h-7 text-xs font-semibold text-indigo-700 border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100"
                   >
@@ -1022,6 +1064,7 @@ export function EconomicCommandCenter({
 
                   <Button
                     size="sm"
+                    disabled={!hasObservations || op.benchmarkPriceExTax === null}
                     onClick={() => handleToggleSimulate(op)}
                     className={cn(
                       "h-7 text-xs font-semibold shadow-xs",
@@ -1203,6 +1246,9 @@ export function EconomicCommandCenter({
         onOpenChange={setIsIngestionOpen}
         sources={sources}
         ingestionService={ingestionService}
+        userId={userId}
+        tenantId={tenantId}
+        canPublishPublic={canPublishPublic}
         onIngestionSuccess={refetch}
       />
 
@@ -1210,6 +1256,7 @@ export function EconomicCommandCenter({
         open={isMappingQueueOpen}
         onOpenChange={setIsMappingQueueOpen}
         tenantId={tenantId}
+        userId={userId}
         ingredients={ingredients}
         marketProducts={marketProducts}
         existingMappings={mappings}

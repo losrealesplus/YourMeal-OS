@@ -49,6 +49,8 @@ export class CsvCatalogParser {
     tipo_precio: 'tax_mode',
     tax_mode: 'tax_mode',
     // tax rate
+    iva: 'tax_rate',
+    igic: 'tax_rate',
     tipo_iva: 'tax_rate',
     tipo_igic: 'tax_rate',
     tax_rate: 'tax_rate',

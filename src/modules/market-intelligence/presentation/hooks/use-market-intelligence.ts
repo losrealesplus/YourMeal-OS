@@ -4,7 +4,7 @@
  * MarketCatalogIngestionService, and ProductMappingService.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { SupabaseMarketRepository } from '../../infrastructure/repositories/supabase-market-repository';
 import { MarketBenchmarkService } from '../../application/market-benchmark-service';
@@ -16,8 +16,17 @@ import {
   ProductMapping,
   BenchmarkCalculation,
   NegotiationBrief,
+  StandardUnit,
   TenantIngredientEconomicRef,
 } from '../../domain/types';
+
+export interface MarketIngredientMetadataRef {
+  id: string;
+  name?: string;
+  unit?: string;
+  cost?: number;
+  category?: string;
+}
 
 export interface IngredientBenchmarkItem {
   ingredientId: string;
@@ -35,7 +44,15 @@ export interface IngredientBenchmarkItem {
   calculation: BenchmarkCalculation | null;
 }
 
-export function useMarketIntelligence(tenantId: string | null | undefined) {
+function normalizeUnit(raw?: string): StandardUnit {
+  if (raw === 'l' || raw === 'unit') return raw;
+  return 'kg';
+}
+
+export function useMarketIntelligence(
+  tenantId: string | null | undefined,
+  ingredientRefs?: MarketIngredientMetadataRef[]
+) {
   const [sources, setSources] = useState<MarketSource[]>([]);
   const [marketProducts, setMarketProducts] = useState<MarketProduct[]>([]);
   const [mappings, setMappings] = useState<ProductMapping[]>([]);
@@ -44,6 +61,9 @@ export function useMarketIntelligence(tenantId: string | null | undefined) {
   >(new Map());
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const ingredientRefsRef = useRef(ingredientRefs);
+  ingredientRefsRef.current = ingredientRefs;
 
   const repository = useMemo(() => new SupabaseMarketRepository(supabase), []);
   const benchmarkService = useMemo(() => new MarketBenchmarkService(repository), [repository]);
@@ -72,27 +92,32 @@ export function useMarketIntelligence(tenantId: string | null | undefined) {
       }
       setMarketProducts(allProducts);
 
-      // 3. Fetch tenant mappings
+      // 3. Fetch tenant mappings (supports 1:N mappings per ingredient)
       const tenantMappings = await repository.getMappingsByTenant(tenantId);
       setMappings(tenantMappings);
 
-      // 4. Calculate benchmarks for mapped ingredients
+      // 4. Calculate benchmarks once per mapped ingredient
       const confirmedMappings = tenantMappings.filter((m) => m.matchStatus === 'confirmed');
+      const uniqueIngredientIds = Array.from(
+        new Set(confirmedMappings.map((m) => m.tenantIngredientId))
+      );
+      const refsById = new Map((ingredientRefsRef.current || []).map((r) => [r.id, r]));
       const benchmarkMap = new Map<string, BenchmarkCalculation>();
 
-      for (const m of confirmedMappings) {
+      for (const ingredientId of uniqueIngredientIds) {
+        const refMeta = refsById.get(ingredientId);
         const tenantRef: TenantIngredientEconomicRef = {
-          id: m.tenantIngredientId,
+          id: ingredientId,
           tenantId,
-          name: m.tenantIngredientId,
-          category: 'General',
-          unit: 'kg',
-          effectiveWacExTax: 0,
+          name: refMeta?.name || ingredientId,
+          category: refMeta?.category || 'General',
+          unit: normalizeUnit(refMeta?.unit),
+          effectiveWacExTax: refMeta?.cost ?? 0,
         };
 
         const result = await benchmarkService.getBenchmarkForIngredient(tenantId, tenantRef);
         if (result.benchmark) {
-          benchmarkMap.set(m.tenantIngredientId, result.benchmark);
+          benchmarkMap.set(ingredientId, result.benchmark);
         }
       }
 

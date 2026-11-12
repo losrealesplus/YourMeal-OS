@@ -22,8 +22,22 @@ export interface IMarketIntelligenceRepository {
   getObservationsByProduct(productId: string): Promise<MarketPriceObservation[]>;
   findObservationByFingerprint(fingerprint: string): Promise<MarketPriceObservation | null>;
   saveObservation(observation: MarketPriceObservation, fingerprint: string): Promise<void>;
+  updateObservationValidity(
+    observationId: string,
+    validTo: string,
+    rawPayload?: Record<string, unknown>
+  ): Promise<void>;
 
   getMappingsByTenant(tenantId: string): Promise<ProductMapping[]>;
+  getMappingsForIngredient(
+    tenantId: string,
+    tenantIngredientId: string
+  ): Promise<ProductMapping[]>;
+  getMappingForProduct(
+    tenantId: string,
+    tenantIngredientId: string,
+    marketProductId: string
+  ): Promise<ProductMapping | null>;
   getMapping(tenantId: string, tenantIngredientId: string): Promise<ProductMapping | null>;
   saveMapping(mapping: ProductMapping): Promise<void>;
 
