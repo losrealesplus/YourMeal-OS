@@ -62,6 +62,8 @@ test("CLI policy, event and API diagnostics emit no raw payload or secrets", () 
     fs.mkdirSync(source, { recursive: true });
     for (const f of [
       "release-plan.mjs",
+      "release-smoke-retry-574.mjs",
+      "release-smoke-retry-574.json",
       "release-rollback-v1.mjs",
       "release-rollback-v1.json",
       "release-staff-orders-523.mjs",

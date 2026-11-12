@@ -1,0 +1,49 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "f585c653795967d6d2161d6be04e361b9566ef39",
+    "deploymentId": 7692130125,
+    "versionId": "f467a3b2-b5bc-4672-ac9b-379e4da936d0"
+  },
+  "candidateSha": "70ab2a73608dcdb4070d6772a6bfb9a7cfcf06de",
+  "candidatePr": 574,
+  "candidateHeadSha": "3b8ca9f752303098cc7515dcc7be021576438de0",
+  "candidateBranch": "fix/gate7-smoke-retry-observability",
+  "candidateFiles": [
+    {
+      "path": "docs/99-internal/development-journal/2026-11-11-gate7-run-42885576096-smoke-recovery.md",
+      "before": null,
+      "after": "2dfea5771e5807ba9143a4faa1b821874263e25e01e254989ba26b8723f62f37"
+    },
+    {
+      "path": "scripts/governance/release-publication.spec.mjs",
+      "before": "0ad2624e206e3fddd288e5ce2cacc93b5c12fe408c1a528477cddd40f2802b96",
+      "after": "1ad9311f9621771cabad8ce6ca9138c050d2aeb7b853f2181b6268720a4d9dc5"
+    },
+    {
+      "path": "scripts/governance/release-publish.mjs",
+      "before": "f6159393157d9b4bfdc4993423378f4ade0786fe117538d2f58bc29deae9afa2",
+      "after": "97a80726ad3dd255fd18c00cf884a35c2e1163712993dfcb5fda47bedd2bbe8d"
+    }
+  ],
+  "governanceBranch": "codex/gate7-smoke-retry-574-reconciliation",
+  "governancePaths": [
+    ".github/workflows/deploy-production.yml",
+    "docs/99-internal/development-journal/2026-11-12-gate7-smoke-retry-574-reconciliation.md",
+    "scripts/governance/release-b1-spatial-567.spec.mjs",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-smoke-retry-574.json",
+    "scripts/governance/release-smoke-retry-574.mjs",
+    "scripts/governance/release-smoke-retry-574.spec.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false
+  }
+}
