@@ -24,6 +24,7 @@ import {
   ComparabilityGrade,
 } from '../../domain/types';
 import { BenchmarkInputObservation } from '../../domain/benchmark-calculator';
+import { generateMarketEntityUuid, isValidUuid } from '../../domain/uuid';
 import { IMarketIntelligenceRepository } from './market-repository-interface';
 
 export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
@@ -140,10 +141,11 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
   }
 
   public async saveProduct(product: MarketProduct): Promise<void> {
+    const productId = isValidUuid(product.id) ? product.id : generateMarketEntityUuid();
     const { error } = await this.supabase.from('market_products').upsert({
-      id: product.id,
+      id: productId,
       source_id: product.sourceId,
-      external_sku: product.externalSku || `SKU-${product.id.slice(0, 8)}`,
+      external_sku: product.externalSku || `SKU-${productId.slice(0, 8)}`,
       raw_name: product.rawName,
       brand: product.brand,
       category: product.category || 'General Food',
@@ -235,9 +237,13 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     observation: MarketPriceObservation,
     fingerprint: string
   ): Promise<void> {
+    const observationId = isValidUuid(observation.id)
+      ? observation.id
+      : generateMarketEntityUuid();
     const { error: obsErr } = await this.supabase.from('market_price_observations').insert({
-      id: observation.id,
+      id: observationId,
       market_product_id: observation.marketProductId,
+      owner_tenant_id: observation.ownerTenantId ?? null,
       fingerprint,
       observed_at: observation.observedAt,
       valid_from: observation.validFrom,
@@ -253,14 +259,19 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       location_name: observation.locationName || 'Central Warehouse',
       capture_method: observation.captureMethod,
       quality_status: observation.qualityStatus,
+      raw_payload: observation.rawPayload ?? null,
+      imported_by:
+        observation.importedBy && isValidUuid(observation.importedBy)
+          ? observation.importedBy
+          : null,
     });
 
     if (obsErr) throw obsErr;
 
     if (observation.volumeTiers && observation.volumeTiers.length > 0) {
       const tierRows = observation.volumeTiers.map((t) => ({
-        id: t.id,
-        observation_id: observation.id,
+        id: isValidUuid(t.id) ? t.id : generateMarketEntityUuid(),
+        observation_id: observationId,
         min_quantity: t.minQuantity,
         tier_normalized_price_ex_tax: t.tierNormalizedPriceExTax,
       }));
@@ -271,6 +282,24 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
 
       if (tierErr) throw tierErr;
     }
+  }
+
+  public async updateObservationValidity(
+    observationId: string,
+    validTo: string,
+    rawPayload?: Record<string, unknown>
+  ): Promise<void> {
+    const patch: Record<string, unknown> = { valid_to: validTo };
+    if (rawPayload !== undefined) {
+      patch.raw_payload = rawPayload;
+    }
+
+    const { error } = await this.supabase
+      .from('market_price_observations')
+      .update(patch)
+      .eq('id', observationId);
+
+    if (error) throw error;
   }
 
   // --------------------------------------------------------------------------
@@ -288,15 +317,32 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     return (data || []).map(this.mapMappingFromDb);
   }
 
-  public async getMapping(
+  public async getMappingsForIngredient(
     tenantId: string,
     tenantIngredientId: string
+  ): Promise<ProductMapping[]> {
+    const { data, error } = await this.supabase
+      .from('product_mappings')
+      .select('*')
+      .eq('tenant_id', tenantId)
+      .eq('tenant_ingredient_id', tenantIngredientId)
+      .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map(this.mapMappingFromDb);
+  }
+
+  public async getMappingForProduct(
+    tenantId: string,
+    tenantIngredientId: string,
+    marketProductId: string
   ): Promise<ProductMapping | null> {
     const { data, error } = await this.supabase
       .from('product_mappings')
       .select('*')
       .eq('tenant_id', tenantId)
       .eq('tenant_ingredient_id', tenantIngredientId)
+      .eq('market_product_id', marketProductId)
       .maybeSingle();
 
     if (error) throw error;
@@ -304,10 +350,20 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     return this.mapMappingFromDb(data);
   }
 
+  public async getMapping(
+    tenantId: string,
+    tenantIngredientId: string
+  ): Promise<ProductMapping | null> {
+    const mappings = await this.getMappingsForIngredient(tenantId, tenantIngredientId);
+    if (mappings.length === 0) return null;
+    return mappings.find((m) => m.matchStatus === 'confirmed') || mappings[0];
+  }
+
   public async saveMapping(mapping: ProductMapping): Promise<void> {
+    const mappingId = isValidUuid(mapping.id) ? mapping.id : generateMarketEntityUuid();
     const { error } = await this.supabase.from('product_mappings').upsert(
       {
-        id: mapping.id,
+        id: mappingId,
         tenant_id: mapping.tenantId,
         tenant_ingredient_id: mapping.tenantIngredientId,
         market_product_id: mapping.marketProductId,
@@ -443,6 +499,7 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     return {
       id: row.id,
       marketProductId: row.market_product_id,
+      ownerTenantId: row.owner_tenant_id ?? null,
       observedAt: row.observed_at,
       validFrom: row.valid_from || undefined,
       validTo: row.valid_to || undefined,
@@ -457,6 +514,8 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       locationName: row.location_name || undefined,
       captureMethod: row.capture_method as CaptureMethod,
       qualityStatus: row.quality_status as QualityStatus,
+      rawPayload: row.raw_payload || undefined,
+      importedBy: row.imported_by || undefined,
       volumeTiers: tiers.length > 0 ? tiers : undefined,
       createdAt: row.created_at,
     };

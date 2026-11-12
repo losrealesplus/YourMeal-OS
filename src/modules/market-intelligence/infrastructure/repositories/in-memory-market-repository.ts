@@ -95,24 +95,58 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
     observation: MarketPriceObservation,
     fingerprint: string
   ): Promise<void> {
+    if (this.observationFingerprints.has(fingerprint)) {
+      throw new Error(`Duplicate observation fingerprint: ${fingerprint}`);
+    }
     this.observations.set(observation.id, { ...observation });
     this.observationFingerprints.set(fingerprint, observation.id);
+  }
+
+  public async updateObservationValidity(
+    observationId: string,
+    validTo: string,
+    rawPayload?: Record<string, unknown>
+  ): Promise<void> {
+    const existing = this.observations.get(observationId);
+    if (!existing) {
+      throw new Error(`MarketPriceObservation not found: ${observationId}`);
+    }
+    this.observations.set(observationId, {
+      ...existing,
+      validTo,
+      ...(rawPayload !== undefined ? { rawPayload } : {}),
+    });
   }
 
   public async getMappingsByTenant(tenantId: string): Promise<ProductMapping[]> {
     return Array.from(this.mappings.values()).filter((m) => m.tenantId === tenantId);
   }
 
+  public async getMappingsForIngredient(
+    tenantId: string,
+    tenantIngredientId: string
+  ): Promise<ProductMapping[]> {
+    return Array.from(this.mappings.values()).filter(
+      (m) => m.tenantId === tenantId && m.tenantIngredientId === tenantIngredientId
+    );
+  }
+
+  public async getMappingForProduct(
+    tenantId: string,
+    tenantIngredientId: string,
+    marketProductId: string
+  ): Promise<ProductMapping | null> {
+    const key = `${tenantId}:${tenantIngredientId}:${marketProductId}`;
+    return this.mappings.get(key) || null;
+  }
+
   public async getMapping(
     tenantId: string,
     tenantIngredientId: string
   ): Promise<ProductMapping | null> {
-    for (const m of this.mappings.values()) {
-      if (m.tenantId === tenantId && m.tenantIngredientId === tenantIngredientId) {
-        return m;
-      }
-    }
-    return null;
+    const all = await this.getMappingsForIngredient(tenantId, tenantIngredientId);
+    if (all.length === 0) return null;
+    return all.find((m) => m.matchStatus === 'confirmed') || all[0];
   }
 
   public async saveMapping(mapping: ProductMapping): Promise<void> {

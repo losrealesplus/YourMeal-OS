@@ -325,6 +325,122 @@ export type Database = {
           },
         ]
       }
+      cost_decision_intents: {
+        Row: {
+          id: string
+          intent_type: string
+          planned_effective_date: string | null
+          rationale: string
+          recorded_at: string
+          recorded_by: string | null
+          scenario_id: string
+          status: string
+          target_entity_id: string | null
+          target_entity_type: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          intent_type: string
+          planned_effective_date?: string | null
+          rationale: string
+          recorded_at?: string
+          recorded_by?: string | null
+          scenario_id: string
+          status?: string
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          intent_type?: string
+          planned_effective_date?: string | null
+          rationale?: string
+          recorded_at?: string
+          recorded_by?: string | null
+          scenario_id?: string
+          status?: string
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cost_decision_intents_scenario_id_fkey"
+            columns: ["scenario_id"]
+            isOneToOne: false
+            referencedRelation: "cost_simulation_scenarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cost_decision_intents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cost_simulation_scenarios: {
+        Row: {
+          applied_variables: Json
+          baseline_snapshot: Json
+          baseline_snapshot_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          preset_type: string
+          simulation_result: Json | null
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          applied_variables?: Json
+          baseline_snapshot: Json
+          baseline_snapshot_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          preset_type?: string
+          simulation_result?: Json | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          applied_variables?: Json
+          baseline_snapshot?: Json
+          baseline_snapshot_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          preset_type?: string
+          simulation_result?: Json | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cost_simulation_scenarios_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_addresses: {
         Row: {
           city: string | null
@@ -1360,6 +1476,217 @@ export type Database = {
           },
         ]
       }
+      market_price_observations: {
+        Row: {
+          capture_method: string
+          created_at: string
+          currency: string
+          fingerprint: string
+          id: string
+          imported_by: string | null
+          location_name: string
+          market_product_id: string
+          normalized_price_ex_tax: number
+          normalized_unit: string
+          observed_at: string
+          owner_tenant_id: string | null
+          price_raw: number
+          promotion_status: string
+          quality_status: string
+          raw_payload: Json | null
+          region_code: string
+          tax_mode: string
+          tax_rate: number
+          valid_from: string
+          valid_to: string
+        }
+        Insert: {
+          capture_method?: string
+          created_at?: string
+          currency?: string
+          fingerprint: string
+          id?: string
+          imported_by?: string | null
+          location_name?: string
+          market_product_id: string
+          normalized_price_ex_tax: number
+          normalized_unit?: string
+          observed_at?: string
+          owner_tenant_id?: string | null
+          price_raw: number
+          promotion_status?: string
+          quality_status?: string
+          raw_payload?: Json | null
+          region_code?: string
+          tax_mode?: string
+          tax_rate?: number
+          valid_from?: string
+          valid_to?: string
+        }
+        Update: {
+          capture_method?: string
+          created_at?: string
+          currency?: string
+          fingerprint?: string
+          id?: string
+          imported_by?: string | null
+          location_name?: string
+          market_product_id?: string
+          normalized_price_ex_tax?: number
+          normalized_unit?: string
+          observed_at?: string
+          owner_tenant_id?: string | null
+          price_raw?: number
+          promotion_status?: string
+          quality_status?: string
+          raw_payload?: Json | null
+          region_code?: string
+          tax_mode?: string
+          tax_rate?: number
+          valid_from?: string
+          valid_to?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_price_observations_market_product_id_fkey"
+            columns: ["market_product_id"]
+            isOneToOne: false
+            referencedRelation: "market_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_price_observations_owner_tenant_id_fkey"
+            columns: ["owner_tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_products: {
+        Row: {
+          brand: string | null
+          category: string
+          created_at: string
+          cut_specification: string | null
+          external_sku: string
+          id: string
+          quality_grade: string
+          raw_name: string
+          source_id: string
+          standard_quantity: number
+          standard_unit: string
+          thermal_state: string
+          updated_at: string
+        }
+        Insert: {
+          brand?: string | null
+          category?: string
+          created_at?: string
+          cut_specification?: string | null
+          external_sku: string
+          id?: string
+          quality_grade?: string
+          raw_name: string
+          source_id: string
+          standard_quantity?: number
+          standard_unit?: string
+          thermal_state?: string
+          updated_at?: string
+        }
+        Update: {
+          brand?: string | null
+          category?: string
+          created_at?: string
+          cut_specification?: string | null
+          external_sku?: string
+          id?: string
+          quality_grade?: string
+          raw_name?: string
+          source_id?: string
+          standard_quantity?: number
+          standard_unit?: string
+          thermal_state?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_products_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "market_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_sources: {
+        Row: {
+          created_at: string
+          default_region: string
+          default_tax_mode: string
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          source_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_region?: string
+          default_tax_mode?: string
+          id: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          source_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_region?: string
+          default_tax_mode?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          source_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      market_volume_tiers: {
+        Row: {
+          created_at: string
+          id: string
+          min_quantity: number
+          observation_id: string
+          tier_normalized_price_ex_tax: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          min_quantity: number
+          observation_id: string
+          tier_normalized_price_ex_tax: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          min_quantity?: number
+          observation_id?: string
+          tier_normalized_price_ex_tax?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_volume_tiers_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "market_price_observations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       operational_exceptions: {
         Row: {
           acknowledged_at: string | null
@@ -1712,6 +2039,70 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      product_mappings: {
+        Row: {
+          comparability_grade: string
+          created_at: string
+          id: string
+          market_product_id: string
+          match_confidence: number
+          match_status: string
+          tenant_id: string
+          tenant_ingredient_id: string
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          comparability_grade?: string
+          created_at?: string
+          id?: string
+          market_product_id: string
+          match_confidence?: number
+          match_status?: string
+          tenant_id: string
+          tenant_ingredient_id: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          comparability_grade?: string
+          created_at?: string
+          id?: string
+          market_product_id?: string
+          match_confidence?: number
+          match_status?: string
+          tenant_id?: string
+          tenant_ingredient_id?: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_mappings_market_product_id_fkey"
+            columns: ["market_product_id"]
+            isOneToOne: false
+            referencedRelation: "market_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_mappings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_mappings_tenant_ingredient_id_fkey"
+            columns: ["tenant_ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

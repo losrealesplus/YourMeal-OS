@@ -17,12 +17,15 @@ import {
 } from '../domain/types';
 import { CsvCatalogParser, RawCsvRow } from '../infrastructure/csv-catalog-parser';
 import { IMarketIntelligenceRepository } from '../infrastructure/repositories/market-repository-interface';
+import { generateMarketEntityUuid } from '../domain/uuid';
 
 export interface IngestionOptions {
   fileName?: string;
   importedBy: string; // User UUID
   captureMethod?: CaptureMethod;
   defaultRegion?: RegionCode;
+  defaultSourceId?: string;
+  ownerTenantId?: string | null;
 }
 
 export interface QuarantinedRow {
@@ -113,10 +116,13 @@ export class MarketCatalogIngestionService {
       (await this.repository.getSourceByName(entry.sourceIdOrName));
     const product = await this.repository.findProductByName(source!.id, entry.productName);
     const observations = await this.repository.getObservationsByProduct(product!.id);
+    const latest = [...observations].sort(
+      (a, b) => new Date(b.observedAt).getTime() - new Date(a.observedAt).getTime()
+    )[0];
 
     return {
-      observationId: observations[0].id,
-      normalizedPriceExTax: observations[0].normalizedPriceExTax,
+      observationId: latest.id,
+      normalizedPriceExTax: latest.normalizedPriceExTax,
     };
   }
 
@@ -142,7 +148,7 @@ export class MarketCatalogIngestionService {
       const data = row.data;
 
       // 1. Validate mandatory fields
-      const sourceNameRaw = data.source_name;
+      const sourceNameRaw = data.source_name || options.defaultSourceId;
       const productName = data.product_name;
       const rawPriceStr = data.raw_price?.replace(',', '.');
       const quantityStr = data.quantity?.replace(',', '.');
@@ -250,7 +256,7 @@ export class MarketCatalogIngestionService {
 
       if (!marketProduct) {
         marketProduct = {
-          id: `mp-${matchedSource.id}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+          id: generateMarketEntityUuid(),
           sourceId: matchedSource.id,
           externalSku,
           rawName: productName,
@@ -275,38 +281,50 @@ export class MarketCatalogIngestionService {
         data.promotion_status === 'temporary_discount' || data.promotion_status === 'clearance'
           ? data.promotion_status
           : 'standard';
+      const ownerTenantId = options.ownerTenantId ?? null;
 
       const observedDateStr = nowIso.slice(0, 10);
-      const fingerprint = this.computeFingerprint(
+      const fingerprint = await this.computeFingerprint(
         matchedSource.id,
         externalSku,
         observedDateStr,
         regionCode,
         locationName,
         promoStatus,
-        normalizedResult.normalizedPriceExTax
+        normalizedResult.normalizedPriceExTax,
+        ownerTenantId
       );
+
+      const rawPayload: Record<string, unknown> = {
+        fileName: options.fileName || null,
+        lineNumber: row.lineNumber,
+        rawLine: row.rawLine,
+        parsedFields: data,
+      };
+      const nextValidTo =
+        data.valid_to || new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
 
       const existingObservation = await this.repository.findObservationByFingerprint(fingerprint);
 
       if (existingObservation) {
-        // Idempotent update: update validity window, no duplicate time-series row
-        const updatedObs: MarketPriceObservation = {
-          ...existingObservation,
-          validTo: data.valid_to || new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
-        };
-        await this.repository.saveObservation(updatedObs, fingerprint);
+        // Idempotent metadata/validity update: NEVER insert a duplicate time-series row
+        await this.repository.updateObservationValidity(
+          existingObservation.id,
+          nextValidTo,
+          rawPayload
+        );
         updatedCount++;
       } else {
         const qualityStatus: QualityStatus =
           promoStatus !== 'standard' ? 'PROMOTIONAL' : 'OBSERVED';
 
         const newObservation: MarketPriceObservation = {
-          id: `obs-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+          id: generateMarketEntityUuid(),
           marketProductId: marketProduct.id,
+          ownerTenantId,
           observedAt: nowIso,
           validFrom: data.valid_from || observedDateStr,
-          validTo: data.valid_to || new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
+          validTo: nextValidTo,
           priceRaw: rawPrice,
           currency: 'EUR',
           taxMode,
@@ -318,6 +336,8 @@ export class MarketCatalogIngestionService {
           locationName,
           captureMethod: options.captureMethod || 'catalog_import',
           qualityStatus,
+          rawPayload,
+          importedBy: options.importedBy,
           createdAt: nowIso,
         };
 
@@ -338,27 +358,37 @@ export class MarketCatalogIngestionService {
     };
   }
 
-  private computeFingerprint(
+  private async computeFingerprint(
     sourceId: string,
     sku: string,
     observedDate: string,
     regionCode: string,
     locationName: string,
     promoStatus: string,
-    normalizedPrice: number
-  ): string {
-    const rawKey = `${sourceId}|${sku}|${observedDate}|${regionCode}|${locationName}|${promoStatus}|${normalizedPrice.toFixed(4)}`;
-    return this.simpleHash(rawKey);
+    normalizedPrice: number,
+    ownerTenantId: string | null = null
+  ): Promise<string> {
+    const scope = ownerTenantId ?? 'PUBLIC';
+    const rawKey = `${scope}|${sourceId}|${sku}|${observedDate}|${regionCode}|${locationName}|${promoStatus}|${normalizedPrice.toFixed(4)}`;
+    return this.sha256Hex(rawKey);
   }
 
-  private simpleHash(str: string): string {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash |= 0; // Convert to 32bit integer
+  private async sha256Hex(str: string): Promise<string> {
+    if (typeof globalThis.crypto !== 'undefined' && globalThis.crypto.subtle) {
+      const encoded = new TextEncoder().encode(str);
+      const digest = await globalThis.crypto.subtle.digest('SHA-256', encoded);
+      return Array.from(new Uint8Array(digest))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
     }
-    return Math.abs(hash).toString(16).padStart(8, '0');
+    let hash1 = 0x811c9dc5;
+    let hash2 = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      hash1 = Math.imul(hash1 ^ c, 0x01000193);
+      hash2 = Math.imul(hash2 ^ (c + i), 0x01000193);
+    }
+    return (hash1 >>> 0).toString(16).padStart(8, '0') + (hash2 >>> 0).toString(16).padStart(8, '0');
   }
 
   private generateSku(sourceId: string, name: string): string {

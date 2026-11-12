@@ -12,6 +12,7 @@ import {
   TenantIngredientEconomicRef,
 } from '../domain/types';
 import { IMarketIntelligenceRepository } from '../infrastructure/repositories/market-repository-interface';
+import { generateMarketEntityUuid } from '../domain/uuid';
 
 export interface MappingSuggestion {
   marketProduct: MarketProduct;
@@ -29,6 +30,7 @@ export interface IngredientMappingOverview {
   mediumMatchReviewNeeded: MappingSuggestion[];
   lowMatchAlternatives: MappingSuggestion[];
   confirmedMapping: MappingSuggestion | null;
+  confirmedMappings: MappingSuggestion[];
 }
 
 export class ProductMappingService {
@@ -44,7 +46,10 @@ export class ProductMappingService {
     const sources = await this.repository.getSources();
     const sourceMap = new Map(sources.map((s) => [s.id, s.name]));
 
-    const existingMapping = await this.repository.getMapping(tenantId, ingredient.id);
+    const existingMappings = await this.repository.getMappingsForIngredient(tenantId, ingredient.id);
+    const confirmedProductIds = new Set(
+      existingMappings.filter((m) => m.matchStatus === 'confirmed').map((m) => m.marketProductId)
+    );
 
     const allProducts: MarketProduct[] = [];
     for (const s of sources) {
@@ -55,7 +60,7 @@ export class ProductMappingService {
     const highMatchSuggestions: MappingSuggestion[] = [];
     const mediumMatchReviewNeeded: MappingSuggestion[] = [];
     const lowMatchAlternatives: MappingSuggestion[] = [];
-    let confirmedMapping: MappingSuggestion | null = null;
+    const confirmedMappings: MappingSuggestion[] = [];
 
     for (const product of allProducts) {
       const matchResult = ProductMatcher.evaluateMatch(
@@ -75,10 +80,7 @@ export class ProductMappingService {
             )[0]
           : undefined;
 
-      const isThisConfirmed =
-        existingMapping !== null &&
-        existingMapping.marketProductId === product.id &&
-        existingMapping.matchStatus === 'confirmed';
+      const isThisConfirmed = confirmedProductIds.has(product.id);
 
       const suggestion: MappingSuggestion = {
         marketProduct: product,
@@ -90,7 +92,7 @@ export class ProductMappingService {
       };
 
       if (isThisConfirmed) {
-        confirmedMapping = suggestion;
+        confirmedMappings.push(suggestion);
       }
 
       // Categorize according to 4-tier policy
@@ -115,7 +117,8 @@ export class ProductMappingService {
       highMatchSuggestions,
       mediumMatchReviewNeeded,
       lowMatchAlternatives,
-      confirmedMapping,
+      confirmedMapping: confirmedMappings[0] ?? null,
+      confirmedMappings,
     };
   }
 
@@ -137,10 +140,14 @@ export class ProductMappingService {
     }
 
     const nowIso = new Date().toISOString();
-    const existing = await this.repository.getMapping(tenantId, tenantIngredientId);
+    const existing = await this.repository.getMappingForProduct(
+      tenantId,
+      tenantIngredientId,
+      marketProductId
+    );
 
     const mapping: ProductMapping = {
-      id: existing ? existing.id : (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : '00000000-0000-0000-0000-000000000000'),
+      id: existing ? existing.id : generateMarketEntityUuid(),
       tenantId,
       tenantIngredientId,
       marketProductId,
@@ -165,8 +172,12 @@ export class ProductMappingService {
     tenantIngredientId: string,
     marketProductId: string
   ): Promise<void> {
-    const existing = await this.repository.getMapping(tenantId, tenantIngredientId);
-    if (existing && existing.marketProductId === marketProductId) {
+    const existing = await this.repository.getMappingForProduct(
+      tenantId,
+      tenantIngredientId,
+      marketProductId
+    );
+    if (existing) {
       await this.repository.saveMapping({
         ...existing,
         matchStatus: 'rejected',

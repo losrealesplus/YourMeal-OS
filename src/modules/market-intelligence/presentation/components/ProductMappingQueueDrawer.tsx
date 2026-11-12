@@ -56,6 +56,7 @@ export interface ProductMappingQueueDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tenantId: string;
+  userId?: string;
   ingredients: UnmappedIngredientItem[];
   marketProducts: MarketProduct[];
   existingMappings: ProductMapping[];
@@ -67,6 +68,7 @@ export function ProductMappingQueueDrawer({
   open,
   onOpenChange,
   tenantId,
+  userId,
   ingredients,
   marketProducts,
   existingMappings,
@@ -74,17 +76,18 @@ export function ProductMappingQueueDrawer({
   onMappingUpdated,
 }: ProductMappingQueueDrawerProps) {
   const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [selectedGrade, setSelectedGrade] = useState<ComparabilityGrade>('HIGH');
+  const [gradeByProductId, setGradeByProductId] = useState<Record<string, ComparabilityGrade>>({});
   const [searchFilter, setSearchFilter] = useState<string>('');
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  // Map of confirmed mappings by tenantIngredientId
+  // Map of confirmed mappings (1:N) by tenantIngredientId
   const confirmedMap = useMemo(() => {
-    const map = new Map<string, ProductMapping>();
+    const map = new Map<string, ProductMapping[]>();
     for (const m of existingMappings) {
       if (m.matchStatus === 'confirmed') {
-        map.set(m.tenantIngredientId, m);
+        const list = map.get(m.tenantIngredientId) || [];
+        list.push(m);
+        map.set(m.tenantIngredientId, list);
       }
     }
     return map;
@@ -134,7 +137,7 @@ export function ProductMappingQueueDrawer({
 
   const handleConfirmMapping = async (
     productId: string,
-    confidence: number,
+    _confidence: number,
     grade: ComparabilityGrade
   ) => {
     if (!activeIngredient) return;
@@ -147,7 +150,7 @@ export function ProductMappingQueueDrawer({
         productId,
         {
           overrideComparability: grade,
-          verifiedBy: 'user-session',
+          verifiedBy: userId || 'operator',
         }
       );
 
@@ -214,14 +217,14 @@ export function ProductMappingQueueDrawer({
             <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
               {ingredients.map((ing) => {
                 const isSelected = activeIngredient?.id === ing.id;
-                const isMapped = confirmedMap.has(ing.id);
+                const mappedCount = confirmedMap.get(ing.id)?.length || 0;
+                const isMapped = mappedCount > 0;
 
                 return (
                   <button
                     key={ing.id}
                     onClick={() => {
                       setSelectedIngredientId(ing.id);
-                      setSelectedProductId(null);
                     }}
                     className={cn(
                       'w-full text-left p-2.5 rounded-lg border text-xs transition-all flex items-center justify-between',
@@ -239,7 +242,7 @@ export function ProductMappingQueueDrawer({
                     <div>
                       {isMapped ? (
                         <Badge className="bg-emerald-100 text-emerald-800 text-[10px] px-1.5">
-                          Mapeado
+                          Mapeado ({mappedCount})
                         </Badge>
                       ) : (
                         <Badge variant="outline" className="text-slate-400 text-[10px] px-1.5">
@@ -283,13 +286,23 @@ export function ProductMappingQueueDrawer({
                     filteredCandidates.map(({ product, score, suggestedGrade }) => {
                       const isHighDirect = score >= 0.90;
                       const isAssisted = score >= 0.70 && score < 0.90;
+                      const existingProductMapping = (confirmedMap.get(activeIngredient.id) || []).find(
+                        (m) => m.marketProductId === product.id
+                      );
+                      const isAlreadyConfirmed = Boolean(existingProductMapping);
+                      const effectiveGrade =
+                        gradeByProductId[product.id] ||
+                        existingProductMapping?.comparabilityGrade ||
+                        suggestedGrade;
 
                       return (
                         <div
                           key={product.id}
                           className={cn(
                             'p-3 rounded-lg border text-xs transition-all space-y-2',
-                            isHighDirect
+                            isAlreadyConfirmed
+                              ? 'bg-emerald-50/60 border-emerald-300'
+                              : isHighDirect
                               ? 'bg-emerald-50/30 border-emerald-200'
                               : isAssisted
                               ? 'bg-blue-50/30 border-blue-200'
@@ -298,8 +311,13 @@ export function ProductMappingQueueDrawer({
                         >
                           <div className="flex items-start justify-between">
                             <div>
-                              <div className="font-semibold text-slate-900 text-sm">
-                                {product.rawName}
+                              <div className="font-semibold text-slate-900 text-sm flex items-center gap-2">
+                                <span>{product.rawName}</span>
+                                {isAlreadyConfirmed && (
+                                  <Badge className="bg-emerald-700 text-white text-[10px] px-1.5">
+                                    Enlazado
+                                  </Badge>
+                                )}
                               </div>
                               <div className="text-[11px] text-slate-500 font-mono mt-0.5">
                                 Fuente: {product.sourceId} · Formato: {product.standardQuantity}{' '}
@@ -314,8 +332,13 @@ export function ProductMappingQueueDrawer({
                             <div className="flex items-center gap-2">
                               <span className="text-[11px] text-slate-500">Comparabilidad:</span>
                               <Select
-                                defaultValue={suggestedGrade}
-                                onValueChange={(v) => setSelectedGrade(v as ComparabilityGrade)}
+                                value={effectiveGrade}
+                                onValueChange={(v) =>
+                                  setGradeByProductId((prev) => ({
+                                    ...prev,
+                                    [product.id]: v as ComparabilityGrade,
+                                  }))
+                                }
                               >
                                 <SelectTrigger className="h-6 w-32 text-[11px]">
                                   <SelectValue />
@@ -332,17 +355,17 @@ export function ProductMappingQueueDrawer({
                               size="sm"
                               disabled={isSaving}
                               onClick={() =>
-                                handleConfirmMapping(product.id, score, selectedGrade || suggestedGrade)
+                                handleConfirmMapping(product.id, score, effectiveGrade)
                               }
                               className={cn(
                                 'h-7 text-xs font-semibold text-white',
-                                isHighDirect
+                                isHighDirect || isAlreadyConfirmed
                                   ? 'bg-emerald-600 hover:bg-emerald-700'
                                   : 'bg-indigo-600 hover:bg-indigo-700'
                               )}
                             >
                               <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                              Confirmar Mapeo
+                              {isAlreadyConfirmed ? 'Actualizar Mapeo' : 'Confirmar Mapeo'}
                             </Button>
                           </div>
                         </div>

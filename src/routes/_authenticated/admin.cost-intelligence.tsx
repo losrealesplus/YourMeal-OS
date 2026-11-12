@@ -582,6 +582,8 @@ export function CostIntelligenceCockpitPage() {
           tenantName={user?.user_metadata?.company_name || "Restaurante"}
           userId={user?.id}
           userName={user?.email || "Gerente"}
+          activeScenarioId={activeScenarioId}
+          onScenarioCreated={(id) => setActiveScenarioId(id)}
           canEditDishes={can("dishes.update") || can("dishes.write")}
           ingredients={liveIngredients.map((ing) => ({
             id: ing.id,
@@ -1407,6 +1409,7 @@ export function CostIntelligenceCockpitPage() {
         <MarketIntelligenceTab
           tenantId={tenantId}
           tenantName={user?.user_metadata?.company_name || "Restaurante"}
+          userId={user?.id}
           ingredients={liveIngredients.map((ing) => ({
             id: ing.id,
             name: ing.name,

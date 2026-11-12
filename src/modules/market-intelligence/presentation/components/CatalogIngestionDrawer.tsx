@@ -3,7 +3,7 @@
  * Real CSV/TSV market catalog ingestion with quarantine inspection and deduplication feedback.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -23,20 +23,58 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Upload, AlertTriangle, CheckCircle2, FileText, RefreshCw, Info } from 'lucide-react';
+import { Upload, AlertTriangle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { MarketSource } from '../../domain/types';
+import { isValidUuid } from '../../domain/uuid';
 import {
   MarketCatalogIngestionService,
   IngestionReport,
   QuarantinedRow,
 } from '../../application/market-catalog-ingestion-service';
 
+export interface ExecuteCatalogCsvIngestionParams {
+  ingestionService: MarketCatalogIngestionService;
+  csvContent: string;
+  fileName: string;
+  userId?: string;
+  selectedSourceId?: string;
+  visibilityScope: 'public' | 'private';
+  tenantId?: string;
+}
+
+export async function executeCatalogCsvIngestion({
+  ingestionService,
+  csvContent,
+  fileName,
+  userId,
+  selectedSourceId,
+  visibilityScope,
+  tenantId,
+}: ExecuteCatalogCsvIngestionParams): Promise<IngestionReport> {
+  if (!csvContent.trim()) {
+    throw new Error('Por favor, introduce o sube el contenido CSV/TSV del catálogo.');
+  }
+
+  if (!isValidUuid(userId)) {
+    throw new Error('Se requiere una sesión autenticada válida (UUID) para auditar la ingesta.');
+  }
+
+  return ingestionService.ingestCsv(csvContent, {
+    fileName,
+    importedBy: userId,
+    defaultSourceId: selectedSourceId || undefined,
+    ownerTenantId: visibilityScope === 'private' && tenantId ? tenantId : null,
+  });
+}
+
 export interface CatalogIngestionDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   sources: MarketSource[];
   ingestionService: MarketCatalogIngestionService;
+  userId?: string;
+  tenantId?: string;
   onIngestionSuccess?: () => void;
 }
 
@@ -45,17 +83,28 @@ export function CatalogIngestionDrawer({
   onOpenChange,
   sources,
   ingestionService,
+  userId,
+  tenantId,
   onIngestionSuccess,
 }: CatalogIngestionDrawerProps) {
-  const [selectedSourceId, setSelectedSourceId] = useState<string>('src-makro');
+  const [selectedSourceId, setSelectedSourceId] = useState<string>(sources[0]?.id || '');
+  const [visibilityScope, setVisibilityScope] = useState<'public' | 'private'>('public');
+  const [fileName, setFileName] = useState<string>('manual-upload.csv');
   const [csvContent, setCsvContent] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [lastResult, setLastResult] = useState<IngestionReport | null>(null);
+
+  useEffect(() => {
+    if (sources.length > 0 && !sources.some((s) => s.id === selectedSourceId)) {
+      setSelectedSourceId(sources[0].id);
+    }
+  }, [sources, selectedSourceId]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setFileName(file.name);
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target?.result as string;
@@ -66,28 +115,28 @@ export function CatalogIngestionDrawer({
   };
 
   const handleIngest = async () => {
-    if (!csvContent.trim()) {
-      toast.error('Por favor, introduce o sube el contenido CSV/TSV del catálogo.');
-      return;
-    }
-
     setIsProcessing(true);
     try {
-      const result = await ingestionService.ingestCsv(csvContent, {
-        fileName: 'manual-upload.csv',
-        importedBy: 'current-user-session',
+      const result = await executeCatalogCsvIngestion({
+        ingestionService,
+        csvContent,
+        fileName,
+        userId,
+        selectedSourceId,
+        visibilityScope,
+        tenantId,
       });
 
       setLastResult(result);
 
-      if (result.createdObservationsCount > 0) {
+      if (result.createdObservationsCount > 0 || result.updatedObservationsCount > 0) {
         toast.success(
-          `Importación exitosa: ${result.createdObservationsCount} observaciones creadas (${result.quarantinedCount} en cuarentena).`
+          `Importación completada: ${result.createdObservationsCount} creadas, ${result.updatedObservationsCount} actualizadas (${result.quarantinedCount} en cuarentena).`
         );
         onIngestionSuccess?.();
       } else if (result.quarantinedCount > 0) {
         toast.warning(
-          `Atención: 0 filas válidas creadas, ${result.quarantinedCount} filas en cuarentena.`
+          `Atención: 0 filas válidas procesadas, ${result.quarantinedCount} filas en cuarentena.`
         );
       }
     } catch (err: any) {
@@ -126,21 +175,41 @@ export function CatalogIngestionDrawer({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* Source Selector */}
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-slate-700">Fuente de Mercado</Label>
-            <Select value={selectedSourceId} onValueChange={setSelectedSourceId}>
-              <SelectTrigger className="w-full text-sm">
-                <SelectValue placeholder="Selecciona una fuente" />
-              </SelectTrigger>
-              <SelectContent>
-                {sources.map((src) => (
-                  <SelectItem key={src.id} value={src.id}>
-                    {src.name} ({getSourceTypeLabel(src.sourceType)})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Source Selector & Scope */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-slate-700">Fuente de Mercado (por defecto)</Label>
+              <Select value={selectedSourceId} onValueChange={setSelectedSourceId}>
+                <SelectTrigger className="w-full text-sm">
+                  <SelectValue placeholder="Selecciona una fuente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sources.map((src) => (
+                    <SelectItem key={src.id} value={src.id}>
+                      {src.name} ({getSourceTypeLabel(src.sourceType)})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {tenantId && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-slate-700">Visibilidad de Precios</Label>
+                <Select
+                  value={visibilityScope}
+                  onValueChange={(v) => setVisibilityScope(v as 'public' | 'private')}
+                >
+                  <SelectTrigger className="w-full text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Público (Core compartido)</SelectItem>
+                    <SelectItem value="private">Tarifa privada del tenant</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           {/* File Upload / Paste */}
@@ -185,6 +254,11 @@ export function CatalogIngestionDrawer({
                   <Badge className="bg-emerald-100 text-emerald-800 text-xs">
                     {lastResult.createdObservationsCount} Creados
                   </Badge>
+                  {lastResult.updatedObservationsCount > 0 && (
+                    <Badge className="bg-blue-100 text-blue-800 text-xs">
+                      {lastResult.updatedObservationsCount} Actualizados
+                    </Badge>
+                  )}
                   <Badge variant="outline" className="text-xs bg-white text-slate-600">
                     {lastResult.validCount} Válidos
                   </Badge>

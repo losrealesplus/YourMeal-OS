@@ -3,6 +3,7 @@ import { ProductMappingService } from './product-mapping-service';
 import { InMemoryMarketRepository } from '../infrastructure/repositories/in-memory-market-repository';
 import { MarketCatalogIngestionService } from './market-catalog-ingestion-service';
 import { TenantIngredientEconomicRef } from '../domain/types';
+import { isValidUuid } from '../domain/uuid';
 
 describe('ProductMappingService (CR-COST-05 Phase 2)', () => {
   let repository: InMemoryMarketRepository;
@@ -75,6 +76,7 @@ Makro,Aceite de Oliva 5L,38.50,5,l,ex_tax,,ambient
     );
 
     expect(mapping.matchStatus).toBe('confirmed');
+    expect(isValidUuid(mapping.id)).toBe(true);
     expect(mapping.comparabilityGrade).toBe('HIGH');
     expect(mapping.verifiedBy).toBe('Alex Procurement Manager');
 
@@ -83,6 +85,48 @@ Makro,Aceite de Oliva 5L,38.50,5,l,ex_tax,,ambient
     expect(retrieved).not.toBeNull();
     expect(retrieved?.marketProductId).toBe(chickenProd.id);
     expect(retrieved?.matchStatus).toBe('confirmed');
+  });
+
+  it('supports 1:N mappings per tenant ingredient without overwriting previous suppliers', async () => {
+    const makroProd = (await repository.getProductsBySource('src-makro')).find((p) =>
+      p.rawName.includes('Pechuga')
+    )!;
+    const gmProd = (await repository.getProductsBySource('src-gmcash')).find((p) =>
+      p.rawName.includes('Pechuga')
+    )!;
+
+    const mapMakro = await mappingService.confirmMapping(
+      tenantId,
+      'ing-chicken-001',
+      makroProd.id,
+      { overrideComparability: 'HIGH', verifiedBy: '11111111-1111-4111-8111-111111111111' }
+    );
+    const mapGm = await mappingService.confirmMapping(
+      tenantId,
+      'ing-chicken-001',
+      gmProd.id,
+      { overrideComparability: 'HIGH', verifiedBy: '11111111-1111-4111-8111-111111111111' }
+    );
+
+    expect(mapMakro.id).not.toBe(mapGm.id);
+    expect(isValidUuid(mapMakro.id)).toBe(true);
+    expect(isValidUuid(mapGm.id)).toBe(true);
+
+    const allMappings = await repository.getMappingsForIngredient(tenantId, 'ing-chicken-001');
+    expect(allMappings).toHaveLength(2);
+    expect(allMappings.map((m) => m.marketProductId)).toEqual([makroProd.id, gmProd.id]);
+
+    const overview = await mappingService.getSuggestionsForIngredient(tenantId, {
+      id: 'ing-chicken-001',
+      tenantId,
+      name: 'Pechuga de Pollo Limpia',
+      category: 'Aves',
+      thermalState: 'fresh',
+      unit: 'kg',
+      effectiveWacExTax: 6.04,
+    });
+    expect(overview.confirmedMappings).toHaveLength(2);
+    expect(overview.confirmedMappings.every((m) => m.isConfirmed)).toBe(true);
   });
 
   it('allows rejecting a candidate mapping', async () => {

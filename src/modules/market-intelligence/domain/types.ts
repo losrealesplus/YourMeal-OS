@@ -83,6 +83,7 @@ export interface MarketVolumeTier {
 export interface MarketPriceObservation {
   id: string;
   marketProductId: string;
+  ownerTenantId?: string | null;
   observedAt: string;
   validFrom?: string;
   validTo?: string;
@@ -97,6 +98,8 @@ export interface MarketPriceObservation {
   locationName?: string;
   captureMethod: CaptureMethod;
   qualityStatus: QualityStatus;
+  rawPayload?: Record<string, unknown>;
+  importedBy?: string;
   volumeTiers?: MarketVolumeTier[];
   createdAt: string;
 }
@@ -271,14 +274,14 @@ export interface EconomicOpportunity {
   category?: string;
   unit: string;
   effectiveWacExTax: number;
-  benchmarkPriceExTax: number;
-  variancePct: number;
+  benchmarkPriceExTax: number | null;
+  variancePct: number | null;
   comparabilityGrade: ComparabilityGrade;
   annualVolume: number | null;
   potentialAnnualSavingsEur: number | null;
   actionabilityGrade: ActionabilityGrade;
   lifecycleState: OpportunityLifecycleState;
-  calculation: BenchmarkCalculation;
+  calculation: BenchmarkCalculation | null;
   affectedDishes: AffectedDishSim[];
   recordedDecision?: {
     id: string;

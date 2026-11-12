@@ -48,6 +48,7 @@ import { toast } from 'sonner';
 export interface MarketIntelligenceTabProps {
   tenantId: string;
   tenantName?: string;
+  userId?: string;
   ingredients: Array<{
     id: string;
     name: string;
@@ -62,6 +63,7 @@ export interface MarketIntelligenceTabProps {
 export function MarketIntelligenceTab({
   tenantId,
   tenantName = 'Restaurante',
+  userId,
   ingredients,
   onInjectSimulation,
 }: MarketIntelligenceTabProps) {
@@ -77,7 +79,7 @@ export function MarketIntelligenceTab({
     mappingService,
     repository,
     generateNegotiationBrief,
-  } = useMarketIntelligence(tenantId);
+  } = useMarketIntelligence(tenantId, ingredients);
 
   // Modals & Drawers state
   const [isIngestionOpen, setIsIngestionOpen] = useState<boolean>(false);
@@ -219,8 +221,8 @@ export function MarketIntelligenceTab({
         name: ingredient.name,
         category: ingredient.category || 'General',
         unit: (ingredient.unit as any) || 'kg',
-        effectiveWacExTax: ingredient.cost || 1.0,
-        annualVolume: ingredient.annualVolume || 0,
+        effectiveWacExTax: ingredient.cost ?? 0,
+        annualVolume: ingredient.annualVolume ?? 0,
       });
 
       if (brief) {
@@ -259,7 +261,7 @@ export function MarketIntelligenceTab({
             <h2 className="text-xl font-bold tracking-tight">Inteligencia de Precios de Mercado</h2>
           </div>
           <p className="text-xs text-slate-400 mt-1 max-w-xl">
-            Observación de precios mayoristas y minoristas (Makro, GM Cash, 5 Océanos, Mercadona),
+            Observación de precios en fuentes mayoristas y minoristas configuradas,
             cálculo de benchmarks y cockpit de negociación con proveedores.
           </p>
         </div>
@@ -319,8 +321,8 @@ export function MarketIntelligenceTab({
           <div className="text-2xl font-bold font-mono text-slate-900 mt-1">
             {kpiMetrics.totalSources}
           </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">
-            Makro, GM Cash, 5 Océanos, Mercadona
+          <div className="text-[11px] text-slate-500 mt-0.5 truncate">
+            {sources.length > 0 ? sources.map((s) => s.name).join(', ') : 'Sin fuentes activas'}
           </div>
         </PanelCard>
 
@@ -524,6 +526,8 @@ export function MarketIntelligenceTab({
         onOpenChange={setIsIngestionOpen}
         sources={sources}
         ingestionService={ingestionService}
+        userId={userId}
+        tenantId={tenantId}
         onIngestionSuccess={refetch}
       />
 
@@ -531,6 +535,7 @@ export function MarketIntelligenceTab({
         open={isMappingQueueOpen}
         onOpenChange={setIsMappingQueueOpen}
         tenantId={tenantId}
+        userId={userId}
         ingredients={ingredients}
         marketProducts={marketProducts}
         existingMappings={mappings}
