@@ -410,6 +410,51 @@ ALTER TABLE public.market_products
     AND (drained_weight_unit IS NULL OR drained_weight_unit IN ('kg', 'g'))
   );
 
+CREATE OR REPLACE FUNCTION public.cr_cost_05_unit_dimension(u text)
+RETURNS text
+LANGUAGE sql
+IMMUTABLE
+STRICT
+SET search_path = public, pg_temp
+AS $$
+  SELECT CASE lower(btrim(u))
+    WHEN 'kg' THEN 'mass'
+    WHEN 'g' THEN 'mass'
+    WHEN 'l' THEN 'volume'
+    WHEN 'ml' THEN 'volume'
+    WHEN 'cl' THEN 'volume'
+    WHEN 'unit' THEN 'count'
+    ELSE NULL
+  END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.cr_cost_05_unit_factor(u text)
+RETURNS numeric
+LANGUAGE sql
+IMMUTABLE
+STRICT
+SET search_path = public, pg_temp
+AS $$
+  SELECT CASE lower(btrim(u))
+    WHEN 'kg' THEN 1.0::numeric
+    WHEN 'g' THEN 0.001::numeric
+    WHEN 'l' THEN 1.0::numeric
+    WHEN 'ml' THEN 0.001::numeric
+    WHEN 'cl' THEN 0.01::numeric
+    WHEN 'unit' THEN 1.0::numeric
+    ELSE NULL::numeric
+  END;
+$$;
+
+ALTER TABLE public.market_products
+  DROP CONSTRAINT IF EXISTS check_mp_pack_dimensions_compatible;
+ALTER TABLE public.market_products
+  ADD CONSTRAINT check_mp_pack_dimensions_compatible CHECK (
+    unit_content_unit IS NULL
+    OR net_content_unit IS NULL
+    OR public.cr_cost_05_unit_dimension(unit_content_unit) = public.cr_cost_05_unit_dimension(net_content_unit)
+  );
+
 ALTER TABLE public.market_products
   DROP CONSTRAINT IF EXISTS check_mp_no_pack_double_multiplication;
 ALTER TABLE public.market_products
@@ -417,8 +462,16 @@ ALTER TABLE public.market_products
     pack_count IS NULL
     OR unit_content_qty IS NULL
     OR net_content_qty IS NULL
-    OR unit_content_unit IS DISTINCT FROM net_content_unit
-    OR ABS((pack_count * unit_content_qty) - net_content_qty) <= 0.01
+    OR (
+      public.cr_cost_05_unit_dimension(unit_content_unit) = public.cr_cost_05_unit_dimension(net_content_unit)
+      AND ABS(
+        (pack_count * unit_content_qty * public.cr_cost_05_unit_factor(unit_content_unit))
+        - (net_content_qty * public.cr_cost_05_unit_factor(net_content_unit))
+      ) <= GREATEST(
+        0.0001::numeric,
+        (pack_count * unit_content_qty * public.cr_cost_05_unit_factor(unit_content_unit)) * 0.005::numeric
+      )
+    )
   );
 
 CREATE INDEX IF NOT EXISTS idx_market_products_gtin

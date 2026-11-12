@@ -102,3 +102,11 @@ En Bloque 2 se persisten los metadatos fiscales y comerciales necesarios sin imp
 - **AIEM:** `aiem_status` (`not_applicable`, `applicable_included`, `applicable_excluded`, `applicable_inclusion_unknown`, `unknown`), `aiem_evidence`, `aiem_rate` y `aiem_amount_raw`. Se conserva como metadato documental sin aplicarlo automáticamente como recargo ni duplicar importes.
 - **Deducibilidad dependiente del comprador:** la recuperabilidad o prorrata fiscal **no** es propiedad del SKU ni de la observación compartida; pertenece al perfil fiscal del comprador (*tenant*) en capas posteriores.
 - **Condiciones comerciales:** `freight_inclusion`, `freight_cost_raw`, `free_freight_min_order_amount`, `min_order_qty`, `min_order_unit`, `promotion_status`, `promotion_condition` y `promotion_valid_to`.
+
+---
+
+## 8. Política de Rollback Fail-Closed (Bloque 2)
+
+- El script de reversión (`supabase/migrations/rollback/20261112200000_cr_cost_05_pr2_physical_geo_fiscal_contract_down.sql`) es estrictamente **fail-closed**: **prohibido** fabricar valores por defecto (`ex_tax`, `0%`, `price_raw`, fechas inferidas) o deshabilitar la inmutabilidad de observaciones para forzar una bajada de versión.
+- Si existen filas con datos reales o metadatos específicos de Bloque 2 (observaciones con fiscalidad desconocida/`NULL`, metadatos fiscales/geo/comerciales, coberturas en `market_delivery_coverages`, establecimientos en `market_establishments`, packs/GTIN en `market_products` o regiones/códigos ampliados en `market_sources`), el rollback debe abortar explícitamente (`RAISE EXCEPTION`).
+- **Una vez registrados datos reales de Bloque 2, cualquier remediación en entornos activos debe realizarse únicamente mediante migración hacia adelante (*forward-only*).**

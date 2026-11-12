@@ -25,7 +25,12 @@ describe("CR-COST-05 Block 2 (PR2): Physical Format, Geo Coverage & Fiscal Contr
 
     expect(sql).toContain("ADD COLUMN IF NOT EXISTS gtin text NULL");
     expect(sql).toContain("CONSTRAINT check_mp_gtin_digits CHECK");
+    expect(sql).toContain("CREATE OR REPLACE FUNCTION public.cr_cost_05_unit_dimension");
+    expect(sql).toContain("CREATE OR REPLACE FUNCTION public.cr_cost_05_unit_factor");
+    expect(sql).toContain("CONSTRAINT check_mp_pack_dimensions_compatible CHECK");
     expect(sql).toContain("CONSTRAINT check_mp_no_pack_double_multiplication CHECK");
+    expect(sql).toContain("public.cr_cost_05_unit_factor(unit_content_unit)");
+    expect(sql).toContain("public.cr_cost_05_unit_factor(net_content_unit)");
     expect(sql).toContain("ALTER COLUMN tax_rate DROP NOT NULL");
     expect(sql).toContain("ALTER COLUMN normalized_price_ex_tax DROP NOT NULL");
     expect(sql).toContain("CONSTRAINT check_mpo_tax_normalization_integrity CHECK");
@@ -46,12 +51,19 @@ describe("CR-COST-05 Block 2 (PR2): Physical Format, Geo Coverage & Fiscal Contr
     );
   });
 
-  it("verifies rollback script restores pre-PR2 constraints cleanly", () => {
+  it("enforces fail-closed rollback without fabricating defaults or disabling immutability", () => {
     const downSql = fs.readFileSync(rollbackPath, "utf8");
+    expect(downSql).toContain("Fail-Closed Rollback Aborted");
+    expect(downSql).toContain("forward-only");
+    expect(downSql).toContain("tax_mode = 'unknown'");
+    expect(downSql).toContain("v_delivery_coverages_count");
+    expect(downSql).toContain("v_establishments_count");
+    expect(downSql).not.toContain("DISABLE TRIGGER");
+    expect(downSql).not.toMatch(/\bUPDATE\s+public\.market_price_observations\b/i);
     expect(downSql).toContain("DROP TABLE IF EXISTS public.market_delivery_coverages CASCADE");
     expect(downSql).toContain("DROP TABLE IF EXISTS public.market_establishments CASCADE");
-    expect(downSql).toContain("DISABLE TRIGGER trg_market_price_obs_immutability");
-    expect(downSql).toContain("ENABLE TRIGGER trg_market_price_obs_immutability");
+    expect(downSql).toContain("DROP FUNCTION IF EXISTS public.cr_cost_05_unit_factor(text)");
+    expect(downSql).toContain("DROP FUNCTION IF EXISTS public.cr_cost_05_unit_dimension(text)");
     expect(downSql).toContain("ALTER COLUMN tax_rate SET NOT NULL");
   });
 });

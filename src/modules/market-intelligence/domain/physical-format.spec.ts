@@ -82,6 +82,52 @@ describe("PhysicalFormat (CR-COST-05 Block 2)", () => {
         }),
       ).toThrow("Pack consistency mismatch");
     });
+
+    it("validates equivalent units across scales (2 x 500 g == 1 kg) and rejects cross-unit discrepancies (2 x 500 g != 0.1 kg, 10 x 1 g != 0.02 kg)", () => {
+      const validCrossUnit = resolvePhysicalPack({
+        packCount: 2,
+        unitContentQty: 500,
+        unitContentUnit: "g",
+        netContentQty: 1,
+        netContentUnit: "kg",
+        observedPriceBasis: "per_pack",
+      });
+      expect(validCrossUnit.standardQuantity).toBe(1);
+      expect(validCrossUnit.standardUnit).toBe("kg");
+
+      const validVolume = resolvePhysicalPack({
+        packCount: 6,
+        unitContentQty: 250,
+        unitContentUnit: "ml",
+        netContentQty: 1.5,
+        netContentUnit: "l",
+        observedPriceBasis: "per_pack",
+      });
+      expect(validVolume.standardQuantity).toBe(1.5);
+      expect(validVolume.standardUnit).toBe("l");
+
+      expect(() =>
+        resolvePhysicalPack({
+          packCount: 2,
+          unitContentQty: 500,
+          unitContentUnit: "g",
+          netContentQty: 0.1,
+          netContentUnit: "kg",
+          observedPriceBasis: "per_pack",
+        }),
+      ).toThrow("Pack consistency mismatch");
+
+      expect(() =>
+        resolvePhysicalPack({
+          packCount: 10,
+          unitContentQty: 1,
+          unitContentUnit: "g",
+          netContentQty: 0.02,
+          netContentUnit: "kg",
+          observedPriceBasis: "per_pack",
+        }),
+      ).toThrow("Pack consistency mismatch");
+    });
   });
 
   describe("Dimension separation & density boundary", () => {

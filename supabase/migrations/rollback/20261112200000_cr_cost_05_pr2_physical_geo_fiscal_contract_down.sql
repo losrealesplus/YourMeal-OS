@@ -1,7 +1,135 @@
 -- ============================================================================
 -- ROLLBACK: CR-COST-05 PR2 (BLOCK 2) PHYSICAL FORMATS, GEO COVERAGE & FISCAL METADATA
--- Reverses 20261112200000_cr_cost_05_pr2_physical_geo_fiscal_contract.sql cleanly back to PR1.
+-- Fail-closed rollback to PR1 (20261112180000_cr_cost_05_pr1_integrity_and_rls.sql).
+--
+-- IMPORTANT POLICY (CR-COST-05):
+--   This rollback MUST NEVER fabricate defaults, convert NULL/unknown values into
+--   synthetic numbers/tax modes, or silently destroy recorded PR2 data.
+--   Once real PR2 data is recorded in production or staging, remediation MUST
+--   be forward-only; this script intentionally aborts (RAISE EXCEPTION) if any
+--   PR2-only rows, non-representable observations, or PR2 metadata exist.
 -- ============================================================================
+
+DO $$
+DECLARE
+  v_delivery_coverages_count bigint := 0;
+  v_establishments_count bigint := 0;
+  v_pr2_sources_count bigint := 0;
+  v_pr2_products_count bigint := 0;
+  v_unrepresentable_obs_count bigint := 0;
+  v_pr2_metadata_obs_count bigint := 0;
+BEGIN
+  IF to_regclass('public.market_delivery_coverages') IS NOT NULL THEN
+    SELECT count(*) INTO v_delivery_coverages_count
+    FROM public.market_delivery_coverages;
+  END IF;
+
+  IF to_regclass('public.market_establishments') IS NOT NULL THEN
+    SELECT count(*) INTO v_establishments_count
+    FROM public.market_establishments;
+  END IF;
+
+  IF to_regclass('public.market_sources') IS NOT NULL THEN
+    SELECT count(*) INTO v_pr2_sources_count
+    FROM public.market_sources
+    WHERE provider_code IS NOT NULL
+       OR country_code IS NOT NULL
+       OR channel_type IS NOT NULL
+       OR default_region NOT IN (
+         'ES_TENERIFE_TF',
+         'ES_GRAN_CANARIA_GC',
+         'ES_CANARIAS_REGIONAL',
+         'ES_PENINSULA_MAINLAND',
+         'ES_NATIONAL'
+       );
+  END IF;
+
+  IF to_regclass('public.market_products') IS NOT NULL THEN
+    SELECT count(*) INTO v_pr2_products_count
+    FROM public.market_products
+    WHERE gtin IS NOT NULL
+       OR origin IS NOT NULL
+       OR pack_presentation IS NOT NULL
+       OR pack_count IS NOT NULL
+       OR unit_content_qty IS NOT NULL
+       OR unit_content_unit IS NOT NULL
+       OR net_content_qty IS NOT NULL
+       OR net_content_unit IS NOT NULL
+       OR drained_weight_qty IS NOT NULL
+       OR drained_weight_unit IS NOT NULL
+       OR density_kg_per_l IS NOT NULL
+       OR (
+         measurement_dimension IS NOT NULL
+         AND measurement_dimension IS DISTINCT FROM (
+           CASE standard_unit
+             WHEN 'l' THEN 'volume'
+             WHEN 'unit' THEN 'count'
+             ELSE 'mass'
+           END
+         )
+       );
+  END IF;
+
+  IF to_regclass('public.market_price_observations') IS NOT NULL THEN
+    SELECT count(*) INTO v_unrepresentable_obs_count
+    FROM public.market_price_observations
+    WHERE tax_mode = 'unknown'
+       OR tax_mode NOT IN ('ex_tax', 'inc_tax')
+       OR tax_rate IS NULL
+       OR normalized_price_ex_tax IS NULL
+       OR valid_to IS NULL
+       OR currency IS DISTINCT FROM 'EUR';
+
+    SELECT count(*) INTO v_pr2_metadata_obs_count
+    FROM public.market_price_observations
+    WHERE observed_price_basis IS DISTINCT FROM 'unknown'
+       OR normalization_basis IS DISTINCT FROM 'unknown'
+       OR normalization_status IS DISTINCT FROM 'computed'
+       OR establishment_id IS NOT NULL
+       OR observation_country_code IS NOT NULL
+       OR observation_subdivision_code IS NOT NULL
+       OR observation_province_code IS NOT NULL
+       OR observation_island_code IS NOT NULL
+       OR observation_postal_code IS NOT NULL
+       OR observed_channel IS DISTINCT FROM 'unknown'
+       OR delivery_coverage_state IS DISTINCT FROM 'unknown'
+       OR availability_status IS DISTINCT FROM 'unknown'
+       OR validity_source IS DISTINCT FROM 'inferred_default'
+       OR tax_regime IS DISTINCT FROM 'UNKNOWN'
+       OR tax_rate_source IS DISTINCT FROM 'unknown'
+       OR tax_rule_ref IS NOT NULL
+       OR tax_effective_from IS NOT NULL
+       OR tax_effective_to IS NOT NULL
+       OR aiem_status IS DISTINCT FROM 'unknown'
+       OR aiem_evidence IS NOT NULL
+       OR aiem_rate IS NOT NULL
+       OR aiem_amount_raw IS NOT NULL
+       OR freight_inclusion IS DISTINCT FROM 'unknown'
+       OR freight_cost_raw IS NOT NULL
+       OR free_freight_min_order_amount IS NOT NULL
+       OR min_order_qty IS NOT NULL
+       OR min_order_unit IS NOT NULL
+       OR promotion_condition IS NOT NULL
+       OR promotion_valid_to IS NOT NULL;
+  END IF;
+
+  IF v_delivery_coverages_count > 0
+     OR v_establishments_count > 0
+     OR v_pr2_sources_count > 0
+     OR v_pr2_products_count > 0
+     OR v_unrepresentable_obs_count > 0
+     OR v_pr2_metadata_obs_count > 0 THEN
+    RAISE EXCEPTION 'CR-COST-05 PR2 Fail-Closed Rollback Aborted: found recorded PR2 or non-PR1-representable data (coverages=%, establishments=%, sources=%, products=%, unrepresentable_obs=%, metadata_obs=%). Once real PR2 data is recorded, remediation must be forward-only; refusing to fabricate defaults or destroy evidence.',
+      v_delivery_coverages_count,
+      v_establishments_count,
+      v_pr2_sources_count,
+      v_pr2_products_count,
+      v_unrepresentable_obs_count,
+      v_pr2_metadata_obs_count
+      USING ERRCODE = 'object_not_in_prerequisite_state';
+  END IF;
+END
+$$;
 
 -- 1. Restore PR1 grants and trigger function on public.market_price_observations
 REVOKE UPDATE ON public.market_price_observations FROM authenticated;
@@ -113,14 +241,7 @@ ALTER TABLE public.market_price_observations
   DROP COLUMN IF EXISTS normalization_basis,
   DROP COLUMN IF EXISTS observed_price_basis;
 
--- Normalize NULL rows back cleanly if rolling back on pre-PR2 test datasets
-ALTER TABLE public.market_price_observations DISABLE TRIGGER trg_market_price_obs_immutability;
-UPDATE public.market_price_observations SET tax_mode = 'ex_tax' WHERE tax_mode = 'unknown';
-UPDATE public.market_price_observations SET tax_rate = 0.0 WHERE tax_rate IS NULL;
-UPDATE public.market_price_observations SET normalized_price_ex_tax = price_raw WHERE normalized_price_ex_tax IS NULL;
-UPDATE public.market_price_observations SET valid_to = (valid_from + INTERVAL '14 days')::date WHERE valid_to IS NULL;
-ALTER TABLE public.market_price_observations ENABLE TRIGGER trg_market_price_obs_immutability;
-
+-- Restore strict PR1 constraints directly (safe without UPDATEs because preflight verified representability)
 ALTER TABLE public.market_price_observations
   DROP CONSTRAINT IF EXISTS check_mpo_currency,
   ADD CONSTRAINT check_mpo_currency CHECK (currency = 'EUR');
@@ -140,18 +261,22 @@ ALTER TABLE public.market_price_observations
   ALTER COLUMN normalized_price_ex_tax SET NOT NULL,
   ALTER COLUMN valid_to SET NOT NULL;
 
--- 4. Drop PR2 additions on public.market_products
+-- 4. Drop PR2 additions on public.market_products and unit helper functions in strict dependency order
 DROP INDEX IF EXISTS public.idx_market_products_gtin;
 DROP TRIGGER IF EXISTS trg_market_products_sync_dimension ON public.market_products;
 DROP FUNCTION IF EXISTS public.trg_sync_market_product_dimension();
 
 ALTER TABLE public.market_products
   DROP CONSTRAINT IF EXISTS check_mp_no_pack_double_multiplication,
+  DROP CONSTRAINT IF EXISTS check_mp_pack_dimensions_compatible,
   DROP CONSTRAINT IF EXISTS check_mp_unit_pairs,
   DROP CONSTRAINT IF EXISTS check_mp_pack_positive,
   DROP CONSTRAINT IF EXISTS check_mp_pack_presentation,
   DROP CONSTRAINT IF EXISTS check_mp_dimension_consistency,
   DROP CONSTRAINT IF EXISTS check_mp_gtin_digits;
+
+DROP FUNCTION IF EXISTS public.cr_cost_05_unit_factor(text);
+DROP FUNCTION IF EXISTS public.cr_cost_05_unit_dimension(text);
 
 ALTER TABLE public.market_products
   DROP COLUMN IF EXISTS density_kg_per_l,

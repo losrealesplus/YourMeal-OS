@@ -290,7 +290,8 @@ export function resolvePhysicalPack(input: PhysicalPackInput): ResolvedPhysicalP
     }
     const expectedNetStd = input.packCount * input.unitContentQty * innerSpec.factorToStandard;
     const declaredNetStd = input.netContentQty * netSpec.factorToStandard;
-    if (Math.abs(expectedNetStd - declaredNetStd) > 0.01) {
+    const tolerance = Math.max(0.0001, expectedNetStd * 0.005);
+    if (Math.abs(expectedNetStd - declaredNetStd) > tolerance) {
       throw new Error(
         `Pack consistency mismatch: ${input.packCount} x ${input.unitContentQty} ${input.unitContentUnit} (${round(expectedNetStd, 4)} ${innerSpec.standardUnit}) contradicts netContent (${round(declaredNetStd, 4)} ${netSpec.standardUnit}).`,
       );
