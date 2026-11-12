@@ -18,7 +18,7 @@ export interface MappingSuggestion {
   marketProduct: MarketProduct;
   sourceName: string;
   matchResult: MatchConfidenceResult;
-  latestNormalizedPriceExTax?: number;
+  latestNormalizedPriceExTax?: number | null;
   latestPriceUnit?: string;
   isConfirmed: boolean;
 }

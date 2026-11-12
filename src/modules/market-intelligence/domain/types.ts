@@ -10,18 +10,136 @@ export type SourceType =
   | 'regional_specialist'
   | 'retail_ceiling';
 
-export type TaxMode = 'ex_tax' | 'inc_tax';
+export type TaxMode = 'ex_tax' | 'inc_tax' | 'unknown';
 
-export type RegionCode =
+export type TaxInclusion = 'excluded' | 'included' | 'unknown';
+
+export type TaxRegime =
+  | 'IVA'
+  | 'IGIC'
+  | 'IPSI'
+  | 'VAT'
+  | 'GST'
+  | 'SALES_TAX'
+  | 'EXEMPT'
+  | 'OUT_OF_SCOPE'
+  | 'UNKNOWN';
+
+export type TaxRateSource =
+  | 'observed_document'
+  | 'official_tariff_table'
+  | 'source_declared_default'
+  | 'tenant_supplied'
+  | 'not_applicable'
+  | 'unknown';
+
+export type AiemStatus =
+  | 'not_applicable'
+  | 'applicable_included'
+  | 'applicable_excluded'
+  | 'applicable_inclusion_unknown'
+  | 'unknown';
+
+export type KnownSpainRegionCode =
   | 'ES_TENERIFE_TF'
   | 'ES_GRAN_CANARIA_GC'
   | 'ES_CANARIAS_REGIONAL'
   | 'ES_PENINSULA_MAINLAND'
   | 'ES_NATIONAL';
 
+/** Country-agnostic region identifier; preserves canonical Spain region tokens. */
+export type RegionCode = KnownSpainRegionCode | (string & {});
+
 export type ThermalState = 'fresh' | 'frozen' | 'ambient' | 'dry';
 
+export type MeasurementDimension = 'mass' | 'volume' | 'count';
+
 export type StandardUnit = 'kg' | 'l' | 'unit';
+
+export type ContentUnit = 'kg' | 'g' | 'l' | 'ml' | 'cl' | 'unit';
+
+export type PackPresentation =
+  | 'bulk'
+  | 'bag'
+  | 'box'
+  | 'tray'
+  | 'bottle'
+  | 'can'
+  | 'jar'
+  | 'sachet'
+  | 'vacuum'
+  | 'drum'
+  | 'pack'
+  | 'other';
+
+export type ObservedPriceBasis = 'per_pack' | 'per_inner_unit' | 'per_base_unit' | 'unknown';
+
+export type NormalizationBasis = 'net_content' | 'drained_weight' | 'unit_count' | 'unknown';
+
+export type NormalizationStatus =
+  | 'computed'
+  | 'tax_unknown'
+  | 'tax_rate_missing'
+  | 'dimension_incompatible'
+  | 'pack_incomplete';
+
+export type ChannelKind =
+  | 'cash_carry'
+  | 'wholesale_depot'
+  | 'retail_store'
+  | 'online_store'
+  | 'direct_delivery'
+  | 'unknown';
+
+export type SourceChannelType =
+  | 'b2b_wholesale'
+  | 'cash_carry'
+  | 'regional_distributor'
+  | 'retail_store'
+  | 'retail_online'
+  | 'direct_producer'
+  | 'unknown';
+
+export type ObservedChannel =
+  | 'cash_carry'
+  | 'b2b_portal'
+  | 'retail_shelf'
+  | 'retail_online'
+  | 'supplier_quote'
+  | 'catalog_sheet'
+  | 'unknown';
+
+export type FulfillmentMode = 'delivery' | 'pickup_only' | 'delivery_and_pickup' | 'unknown';
+
+export type CoverageStatus =
+  | 'documented_available'
+  | 'documented_unavailable'
+  | 'conditional'
+  | 'unknown';
+
+export type DeliveryCoverageState =
+  | 'delivery_available'
+  | 'pickup_only'
+  | 'unavailable_in_target'
+  | 'unknown';
+
+export type AvailabilityStatus =
+  | 'in_stock'
+  | 'out_of_stock'
+  | 'limited'
+  | 'on_request'
+  | 'discontinued'
+  | 'unknown';
+
+export type ValiditySource =
+  | 'source_declared'
+  | 'contract_agreed'
+  | 'inferred_default'
+  | 'unknown';
+
+export type FreightInclusion = 'included' | 'excluded' | 'free_above_threshold' | 'unknown';
+
+export type MinOrderUnit = 'pack' | 'unit' | 'kg' | 'l' | 'order_amount';
 
 export type NormalizedUnit = 'EUR_PER_KG' | 'EUR_PER_L' | 'EUR_PER_UNIT';
 
@@ -48,6 +166,9 @@ export interface MarketSource {
   id: string;
   name: string;
   sourceType: SourceType;
+  providerCode?: string | null;
+  countryCode?: string | null;
+  channelType?: SourceChannelType | null;
   defaultTaxMode: TaxMode;
   defaultRegion: RegionCode;
   isActive: boolean;
@@ -56,16 +177,66 @@ export interface MarketSource {
   updatedAt: string;
 }
 
+export interface MarketEstablishment {
+  id: string;
+  sourceId: string;
+  ownerTenantId?: string | null;
+  establishmentCode: string;
+  name: string;
+  channelKind: ChannelKind;
+  countryCode?: string | null;
+  regionCode?: RegionCode | null;
+  subdivisionCode?: string | null;
+  provinceCode?: string | null;
+  islandCode?: string | null;
+  postalCode?: string | null;
+  city?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MarketDeliveryCoverage {
+  id: string;
+  sourceId: string;
+  establishmentId?: string | null;
+  ownerTenantId?: string | null;
+  fulfillmentMode: FulfillmentMode;
+  coverageStatus: CoverageStatus;
+  countryCode: string;
+  regionCode?: RegionCode | null;
+  subdivisionCode?: string | null;
+  provinceCode?: string | null;
+  islandCode?: string | null;
+  postalCodePrefix?: string | null;
+  validFrom?: string | null;
+  validTo?: string | null;
+  evidenceNote?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface MarketProduct {
   id: string;
   sourceId: string;
   externalSku?: string;
+  gtin?: string | null;
   rawName: string;
   brand?: string;
   category: string;
   thermalState: ThermalState;
+  measurementDimension?: MeasurementDimension | null;
   standardQuantity: number;
   standardUnit: StandardUnit;
+  packPresentation?: PackPresentation | null;
+  packCount?: number | null;
+  unitContentQty?: number | null;
+  unitContentUnit?: ContentUnit | null;
+  netContentQty?: number | null;
+  netContentUnit?: ContentUnit | null;
+  drainedWeightQty?: number | null;
+  drainedWeightUnit?: 'kg' | 'g' | null;
+  densityKgPerL?: number | null;
   cutSpecification?: string;
   qualityGrade?: string;
   origin?: string;
@@ -86,22 +257,62 @@ export interface MarketPriceObservation {
   ownerTenantId?: string | null;
   observedAt: string;
   validFrom?: string;
-  validTo?: string;
+  validTo?: string | null;
+  validitySource?: ValiditySource;
   priceRaw: number;
-  currency: 'EUR';
+  currency: string;
   taxMode: TaxMode;
-  taxRate: number; // e.g. 0.0, 0.03, 0.07, 0.10, 0.21
-  normalizedPriceExTax: number;
+  taxInclusion?: TaxInclusion;
+  taxRate: number | null; // Explicit 0 means 0%; null means unknown / undetermined
+  taxRegime?: TaxRegime;
+  taxRateSource?: TaxRateSource;
+  taxRuleRef?: string | null;
+  taxEffectiveFrom?: string | null;
+  taxEffectiveTo?: string | null;
+  aiemStatus?: AiemStatus;
+  aiemEvidence?: string | null;
+  aiemRate?: number | null;
+  aiemAmountRaw?: number | null;
+  normalizedPriceExTax: number | null;
   normalizedUnit: NormalizedUnit;
+  observedPriceBasis?: ObservedPriceBasis;
+  normalizationBasis?: NormalizationBasis;
+  normalizationStatus?: NormalizationStatus;
   promotionStatus: PromotionStatus;
+  promotionCondition?: string | null;
+  promotionValidTo?: string | null;
+  freightInclusion?: FreightInclusion;
+  freightCostRaw?: number | null;
+  freeFreightMinOrderAmount?: number | null;
+  minOrderQty?: number | null;
+  minOrderUnit?: MinOrderUnit | null;
   regionCode: RegionCode;
   locationName?: string;
+  establishmentId?: string | null;
+  observationCountryCode?: string | null;
+  observationSubdivisionCode?: string | null;
+  observationProvinceCode?: string | null;
+  observationIslandCode?: string | null;
+  observationPostalCode?: string | null;
+  observedChannel?: ObservedChannel;
+  deliveryCoverageState?: DeliveryCoverageState;
+  availabilityStatus?: AvailabilityStatus;
   captureMethod: CaptureMethod;
   qualityStatus: QualityStatus;
   rawPayload?: Record<string, unknown>;
   importedBy?: string;
   volumeTiers?: MarketVolumeTier[];
   createdAt: string;
+}
+
+/**
+ * Tax deductibility is strictly buyer/tenant-scoped, never a universal property of a market SKU.
+ */
+export interface BuyerFiscalProfileRef {
+  tenantId: string;
+  buyerTaxRegime: TaxRegime;
+  canRecoverInputTax: boolean | 'partial' | 'unknown';
+  recoveryRate: number | null;
 }
 
 export interface ProductMapping {
@@ -171,7 +382,7 @@ export interface BenchmarkComponent {
   observedAt: string;
   rawPrice: number;
   taxMode: TaxMode;
-  taxRate: number;
+  taxRate: number | null;
   normalizedPriceExTax: number;
   normalizedUnit: NormalizedUnit;
   comparabilityGrade: ComparabilityGrade;

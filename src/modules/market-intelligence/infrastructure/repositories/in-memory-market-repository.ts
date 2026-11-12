@@ -1,14 +1,19 @@
 import {
+  MarketDeliveryCoverage,
+  MarketEstablishment,
   MarketPriceObservation,
   MarketProduct,
   MarketSource,
   ProductMapping,
 } from '../../domain/types';
 import { BenchmarkInputObservation } from '../../domain/benchmark-calculator';
+import { sanitizeRawPayloadForScope } from '../../application/market-catalog-ingestion-service';
 import { IMarketIntelligenceRepository } from './market-repository-interface';
 
 export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
   private sources = new Map<string, MarketSource>();
+  private establishments = new Map<string, MarketEstablishment>();
+  private coverages = new Map<string, MarketDeliveryCoverage>();
   private products = new Map<string, MarketProduct>();
   private observations = new Map<string, MarketPriceObservation>();
   private observationFingerprints = new Map<string, string>(); // fingerprint -> observationId
@@ -42,6 +47,24 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
 
   public async saveSource(source: MarketSource): Promise<void> {
     this.sources.set(source.id, { ...source });
+  }
+
+  public async getEstablishmentsBySource(sourceId: string): Promise<MarketEstablishment[]> {
+    return Array.from(this.establishments.values()).filter(
+      (e) => e.sourceId === sourceId && e.isActive
+    );
+  }
+
+  public async saveEstablishment(establishment: MarketEstablishment): Promise<void> {
+    this.establishments.set(establishment.id, { ...establishment });
+  }
+
+  public async getCoveragesBySource(sourceId: string): Promise<MarketDeliveryCoverage[]> {
+    return Array.from(this.coverages.values()).filter((c) => c.sourceId === sourceId);
+  }
+
+  public async saveCoverage(coverage: MarketDeliveryCoverage): Promise<void> {
+    this.coverages.set(coverage.id, { ...coverage });
   }
 
   public async getProductById(id: string): Promise<MarketProduct | null> {
@@ -98,7 +121,11 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
     if (this.observationFingerprints.has(fingerprint)) {
       throw new Error(`Duplicate observation fingerprint: ${fingerprint}`);
     }
-    this.observations.set(observation.id, { ...observation });
+    const sanitizedPayload = sanitizeRawPayloadForScope(
+      observation.rawPayload,
+      observation.ownerTenantId
+    );
+    this.observations.set(observation.id, { ...observation, rawPayload: sanitizedPayload });
     this.observationFingerprints.set(fingerprint, observation.id);
   }
 
@@ -111,10 +138,11 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
     if (!existing) {
       throw new Error(`MarketPriceObservation not found: ${observationId}`);
     }
+    const sanitizedPayload = sanitizeRawPayloadForScope(rawPayload, existing.ownerTenantId);
     this.observations.set(observationId, {
       ...existing,
       validTo,
-      ...(rawPayload !== undefined ? { rawPayload } : {}),
+      ...(sanitizedPayload !== undefined ? { rawPayload: sanitizedPayload } : {}),
     });
   }
 

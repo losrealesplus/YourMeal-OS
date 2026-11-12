@@ -1476,77 +1476,325 @@ export type Database = {
           },
         ]
       }
+      market_delivery_coverages: {
+        Row: {
+          country_code: string
+          coverage_status: string
+          created_at: string
+          establishment_id: string | null
+          evidence_note: string | null
+          fulfillment_mode: string
+          id: string
+          island_code: string | null
+          owner_tenant_id: string | null
+          postal_code_prefix: string | null
+          province_code: string | null
+          region_code: string | null
+          source_id: string
+          subdivision_code: string | null
+          updated_at: string
+          valid_from: string | null
+          valid_to: string | null
+        }
+        Insert: {
+          country_code: string
+          coverage_status?: string
+          created_at?: string
+          establishment_id?: string | null
+          evidence_note?: string | null
+          fulfillment_mode?: string
+          id?: string
+          island_code?: string | null
+          owner_tenant_id?: string | null
+          postal_code_prefix?: string | null
+          province_code?: string | null
+          region_code?: string | null
+          source_id: string
+          subdivision_code?: string | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Update: {
+          country_code?: string
+          coverage_status?: string
+          created_at?: string
+          establishment_id?: string | null
+          evidence_note?: string | null
+          fulfillment_mode?: string
+          id?: string
+          island_code?: string | null
+          owner_tenant_id?: string | null
+          postal_code_prefix?: string | null
+          province_code?: string | null
+          region_code?: string | null
+          source_id?: string
+          subdivision_code?: string | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_delivery_coverages_establishment_id_fkey"
+            columns: ["establishment_id"]
+            isOneToOne: false
+            referencedRelation: "market_establishments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_delivery_coverages_owner_tenant_id_fkey"
+            columns: ["owner_tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_delivery_coverages_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "market_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_establishments: {
+        Row: {
+          channel_kind: string
+          city: string | null
+          country_code: string | null
+          created_at: string
+          establishment_code: string
+          id: string
+          is_active: boolean
+          island_code: string | null
+          name: string
+          owner_tenant_id: string | null
+          postal_code: string | null
+          province_code: string | null
+          region_code: string | null
+          source_id: string
+          subdivision_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          channel_kind?: string
+          city?: string | null
+          country_code?: string | null
+          created_at?: string
+          establishment_code: string
+          id?: string
+          is_active?: boolean
+          island_code?: string | null
+          name: string
+          owner_tenant_id?: string | null
+          postal_code?: string | null
+          province_code?: string | null
+          region_code?: string | null
+          source_id: string
+          subdivision_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          channel_kind?: string
+          city?: string | null
+          country_code?: string | null
+          created_at?: string
+          establishment_code?: string
+          id?: string
+          is_active?: boolean
+          island_code?: string | null
+          name?: string
+          owner_tenant_id?: string | null
+          postal_code?: string | null
+          province_code?: string | null
+          region_code?: string | null
+          source_id?: string
+          subdivision_code?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_establishments_owner_tenant_id_fkey"
+            columns: ["owner_tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_establishments_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "market_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_price_observations: {
         Row: {
+          aiem_amount_raw: number | null
+          aiem_evidence: string | null
+          aiem_rate: number | null
+          aiem_status: string
+          availability_status: string
           capture_method: string
           created_at: string
           currency: string
+          delivery_coverage_state: string
+          establishment_id: string | null
           fingerprint: string
+          free_freight_min_order_amount: number | null
+          freight_cost_raw: number | null
+          freight_inclusion: string
           id: string
           imported_by: string | null
           location_name: string
           market_product_id: string
-          normalized_price_ex_tax: number
+          min_order_qty: number | null
+          min_order_unit: string | null
+          normalization_basis: string
+          normalization_status: string
+          normalized_price_ex_tax: number | null
           normalized_unit: string
+          observation_country_code: string | null
+          observation_island_code: string | null
+          observation_postal_code: string | null
+          observation_province_code: string | null
+          observation_subdivision_code: string | null
           observed_at: string
+          observed_channel: string
+          observed_price_basis: string
           owner_tenant_id: string | null
           price_raw: number
+          promotion_condition: string | null
           promotion_status: string
+          promotion_valid_to: string | null
           quality_status: string
           raw_payload: Json | null
           region_code: string
+          tax_effective_from: string | null
+          tax_effective_to: string | null
           tax_mode: string
-          tax_rate: number
+          tax_rate: number | null
+          tax_rate_source: string
+          tax_regime: string
+          tax_rule_ref: string | null
           valid_from: string
-          valid_to: string
+          valid_to: string | null
+          validity_source: string
         }
         Insert: {
+          aiem_amount_raw?: number | null
+          aiem_evidence?: string | null
+          aiem_rate?: number | null
+          aiem_status?: string
+          availability_status?: string
           capture_method?: string
           created_at?: string
           currency?: string
+          delivery_coverage_state?: string
+          establishment_id?: string | null
           fingerprint: string
+          free_freight_min_order_amount?: number | null
+          freight_cost_raw?: number | null
+          freight_inclusion?: string
           id?: string
           imported_by?: string | null
           location_name?: string
           market_product_id: string
-          normalized_price_ex_tax: number
+          min_order_qty?: number | null
+          min_order_unit?: string | null
+          normalization_basis?: string
+          normalization_status?: string
+          normalized_price_ex_tax?: number | null
           normalized_unit?: string
+          observation_country_code?: string | null
+          observation_island_code?: string | null
+          observation_postal_code?: string | null
+          observation_province_code?: string | null
+          observation_subdivision_code?: string | null
           observed_at?: string
+          observed_channel?: string
+          observed_price_basis?: string
           owner_tenant_id?: string | null
           price_raw: number
+          promotion_condition?: string | null
           promotion_status?: string
+          promotion_valid_to?: string | null
           quality_status?: string
           raw_payload?: Json | null
           region_code?: string
+          tax_effective_from?: string | null
+          tax_effective_to?: string | null
           tax_mode?: string
-          tax_rate?: number
+          tax_rate?: number | null
+          tax_rate_source?: string
+          tax_regime?: string
+          tax_rule_ref?: string | null
           valid_from?: string
-          valid_to?: string
+          valid_to?: string | null
+          validity_source?: string
         }
         Update: {
+          aiem_amount_raw?: number | null
+          aiem_evidence?: string | null
+          aiem_rate?: number | null
+          aiem_status?: string
+          availability_status?: string
           capture_method?: string
           created_at?: string
           currency?: string
+          delivery_coverage_state?: string
+          establishment_id?: string | null
           fingerprint?: string
+          free_freight_min_order_amount?: number | null
+          freight_cost_raw?: number | null
+          freight_inclusion?: string
           id?: string
           imported_by?: string | null
           location_name?: string
           market_product_id?: string
-          normalized_price_ex_tax?: number
+          min_order_qty?: number | null
+          min_order_unit?: string | null
+          normalization_basis?: string
+          normalization_status?: string
+          normalized_price_ex_tax?: number | null
           normalized_unit?: string
+          observation_country_code?: string | null
+          observation_island_code?: string | null
+          observation_postal_code?: string | null
+          observation_province_code?: string | null
+          observation_subdivision_code?: string | null
           observed_at?: string
+          observed_channel?: string
+          observed_price_basis?: string
           owner_tenant_id?: string | null
           price_raw?: number
+          promotion_condition?: string | null
           promotion_status?: string
+          promotion_valid_to?: string | null
           quality_status?: string
           raw_payload?: Json | null
           region_code?: string
+          tax_effective_from?: string | null
+          tax_effective_to?: string | null
           tax_mode?: string
-          tax_rate?: number
+          tax_rate?: number | null
+          tax_rate_source?: string
+          tax_regime?: string
+          tax_rule_ref?: string | null
           valid_from?: string
-          valid_to?: string
+          valid_to?: string | null
+          validity_source?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "market_price_observations_establishment_id_fkey"
+            columns: ["establishment_id"]
+            isOneToOne: false
+            referencedRelation: "market_establishments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "market_price_observations_market_product_id_fkey"
             columns: ["market_product_id"]
@@ -1569,14 +1817,26 @@ export type Database = {
           category: string
           created_at: string
           cut_specification: string | null
+          density_kg_per_l: number | null
+          drained_weight_qty: number | null
+          drained_weight_unit: string | null
           external_sku: string
+          gtin: string | null
           id: string
+          measurement_dimension: string | null
+          net_content_qty: number | null
+          net_content_unit: string | null
+          origin: string | null
+          pack_count: number | null
+          pack_presentation: string | null
           quality_grade: string
           raw_name: string
           source_id: string
           standard_quantity: number
           standard_unit: string
           thermal_state: string
+          unit_content_qty: number | null
+          unit_content_unit: string | null
           updated_at: string
         }
         Insert: {
@@ -1584,14 +1844,26 @@ export type Database = {
           category?: string
           created_at?: string
           cut_specification?: string | null
+          density_kg_per_l?: number | null
+          drained_weight_qty?: number | null
+          drained_weight_unit?: string | null
           external_sku: string
+          gtin?: string | null
           id?: string
+          measurement_dimension?: string | null
+          net_content_qty?: number | null
+          net_content_unit?: string | null
+          origin?: string | null
+          pack_count?: number | null
+          pack_presentation?: string | null
           quality_grade?: string
           raw_name: string
           source_id: string
           standard_quantity?: number
           standard_unit?: string
           thermal_state?: string
+          unit_content_qty?: number | null
+          unit_content_unit?: string | null
           updated_at?: string
         }
         Update: {
@@ -1599,14 +1871,26 @@ export type Database = {
           category?: string
           created_at?: string
           cut_specification?: string | null
+          density_kg_per_l?: number | null
+          drained_weight_qty?: number | null
+          drained_weight_unit?: string | null
           external_sku?: string
+          gtin?: string | null
           id?: string
+          measurement_dimension?: string | null
+          net_content_qty?: number | null
+          net_content_unit?: string | null
+          origin?: string | null
+          pack_count?: number | null
+          pack_presentation?: string | null
           quality_grade?: string
           raw_name?: string
           source_id?: string
           standard_quantity?: number
           standard_unit?: string
           thermal_state?: string
+          unit_content_qty?: number | null
+          unit_content_unit?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1621,6 +1905,8 @@ export type Database = {
       }
       market_sources: {
         Row: {
+          channel_type: string | null
+          country_code: string | null
           created_at: string
           default_region: string
           default_tax_mode: string
@@ -1628,10 +1914,13 @@ export type Database = {
           is_active: boolean
           name: string
           notes: string | null
+          provider_code: string | null
           source_type: string
           updated_at: string
         }
         Insert: {
+          channel_type?: string | null
+          country_code?: string | null
           created_at?: string
           default_region?: string
           default_tax_mode?: string
@@ -1639,10 +1928,13 @@ export type Database = {
           is_active?: boolean
           name: string
           notes?: string | null
+          provider_code?: string | null
           source_type: string
           updated_at?: string
         }
         Update: {
+          channel_type?: string | null
+          country_code?: string | null
           created_at?: string
           default_region?: string
           default_tax_mode?: string
@@ -1650,6 +1942,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           notes?: string | null
+          provider_code?: string | null
           source_type?: string
           updated_at?: string
         }

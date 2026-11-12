@@ -79,16 +79,31 @@ export function PriceObservationHistoryModal({
                       </div>
 
                       <div className="text-right">
-                        <span className="font-mono font-bold text-slate-900 text-sm">
-                          {obs.normalizedPriceExTax.toFixed(2)} €/{obs.normalizedUnit.replace('EUR_PER_', '').toLowerCase()}
-                        </span>
-                        <span className="text-[11px] text-slate-400 ml-1">(sin IVA)</span>
+                        {obs.normalizedPriceExTax !== null ? (
+                          <>
+                            <span className="font-mono font-bold text-slate-900 text-sm">
+                              {obs.normalizedPriceExTax.toFixed(2)} €/{obs.normalizedUnit.replace('EUR_PER_', '').toLowerCase()}
+                            </span>
+                            <span className="text-[11px] text-slate-400 ml-1">(ex-imp.)</span>
+                          </>
+                        ) : (
+                          <span className="font-mono text-amber-700 text-xs">
+                            Sin determinar ({obs.normalizationStatus || 'fiscalidad pendiente'})
+                          </span>
+                        )}
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
-                      <span>Precio Bruto: {obs.priceRaw.toFixed(2)} € ({obs.taxMode}, IVA: {(obs.taxRate * 100).toFixed(0)}%)</span>
-                      <span>Región: {obs.regionCode}</span>
+                      <span>
+                        Precio Bruto: {obs.priceRaw.toFixed(2)} {obs.currency || '€'} ({obs.taxMode},{' '}
+                        {obs.taxRegime || 'Imp.'}:{' '}
+                        {obs.taxRate !== null ? `${(obs.taxRate * 100).toFixed(0)}%` : 'Sin determinar'})
+                      </span>
+                      <span>
+                        Región: {obs.observationIslandCode || obs.regionCode}
+                        {obs.observationPostalCode ? ` (${obs.observationPostalCode})` : ''}
+                      </span>
                     </div>
 
                     {/* Volume Tiers */}

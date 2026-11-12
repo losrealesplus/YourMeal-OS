@@ -54,10 +54,22 @@ export class BenchmarkCalculator {
       throw new Error(`No market observations provided for ingredient ${ingredient.name}`);
     }
 
-    const canonicalUnit = inputs[0].observation.normalizedUnit;
+    const computableInputs = inputs.filter(
+      (item) =>
+        item.observation.normalizedPriceExTax !== null &&
+        Number.isFinite(item.observation.normalizedPriceExTax)
+    );
+
+    if (computableInputs.length === 0) {
+      throw new Error(
+        `No computable ex-tax market observations provided for ingredient ${ingredient.name}`
+      );
+    }
+
+    const canonicalUnit = computableInputs[0].observation.normalizedUnit;
     const components: BenchmarkComponent[] = [];
 
-    for (const item of inputs) {
+    for (const item of computableInputs) {
       const { source, product, observation, mapping } = item;
 
       if (observation.normalizedUnit !== canonicalUnit) {
@@ -92,7 +104,7 @@ export class BenchmarkCalculator {
         rawPrice: observation.priceRaw,
         taxMode: observation.taxMode,
         taxRate: observation.taxRate,
-        normalizedPriceExTax: observation.normalizedPriceExTax,
+        normalizedPriceExTax: observation.normalizedPriceExTax as number,
         normalizedUnit: observation.normalizedUnit,
         comparabilityGrade: mapping.comparabilityGrade,
         weight: finalWeight,

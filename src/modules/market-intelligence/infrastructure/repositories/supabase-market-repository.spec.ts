@@ -203,4 +203,132 @@ describe('SupabaseMarketRepository', () => {
     expect(compatSingle?.marketProductId).toBe('prod-makro');
     expect(maybeSingleSpy).not.toHaveBeenCalled();
   });
+
+  it("preserves null taxRate/normalizedPriceExTax, sanitizes public rawPayload, and supports establishments & coverages", async () => {
+    const insertObsMock = vi.fn().mockResolvedValue({ error: null });
+    const insertEstMock = vi.fn().mockResolvedValue({ error: null });
+    const insertCovMock = vi.fn().mockResolvedValue({ error: null });
+    const selectMock = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        maybeSingle: vi.fn().mockResolvedValue({
+          data: {
+            id: "11111111-1111-4111-8111-111111111111",
+            market_product_id: "22222222-2222-4222-8222-222222222222",
+            owner_tenant_id: null,
+            observed_at: "2026-11-12T10:00:00Z",
+            valid_from: "2026-11-12",
+            valid_to: null,
+            price_raw: 3.34,
+            currency: "EUR",
+            tax_mode: "unknown",
+            tax_rate: null,
+            tax_regime: "UNKNOWN",
+            normalized_price_ex_tax: null,
+            normalized_unit: "EUR_PER_KG",
+            promotion_status: "standard",
+            region_code: "ES_CANARIAS_REGIONAL",
+            observation_postal_code: "08001",
+            capture_method: "catalog_import",
+            quality_status: "OBSERVED",
+            created_at: "2026-11-12T10:00:00Z",
+          },
+          error: null,
+        }),
+        order: vi.fn().mockResolvedValue({ data: [], error: null }),
+      }),
+    });
+
+    const repo = new SupabaseMarketRepository({
+      from: vi.fn((table: string) => {
+        if (table === "market_price_observations") {
+          return { insert: insertObsMock, select: selectMock };
+        }
+        if (table === "market_establishments") {
+          return { insert: insertEstMock, select: selectMock };
+        }
+        if (table === "market_delivery_coverages") {
+          return { insert: insertCovMock, select: selectMock };
+        }
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+          }),
+        };
+      }),
+    } as unknown as SupabaseClient<Database>);
+
+    await repo.saveObservation(
+      {
+        id: "11111111-1111-4111-8111-111111111111",
+        marketProductId: "22222222-2222-4222-8222-222222222222",
+        ownerTenantId: null,
+        observedAt: "2026-11-12T10:00:00Z",
+        validFrom: "2026-11-12",
+        validTo: null,
+        priceRaw: 3.34,
+        currency: "EUR",
+        taxMode: "unknown",
+        taxRate: null,
+        normalizedPriceExTax: null,
+        normalizedUnit: "EUR_PER_KG",
+        normalizationStatus: "tax_unknown",
+        promotionStatus: "standard",
+        regionCode: "ES_CANARIAS_REGIONAL",
+        observationPostalCode: "08001",
+        captureMethod: "catalog_import",
+        qualityStatus: "OBSERVED",
+        rawPayload: {
+          tenantId: "must-be-stripped",
+          lineNumber: 3,
+        },
+        createdAt: "2026-11-12T10:00:00Z",
+      },
+      "fp-block2-public",
+    );
+
+    expect(insertObsMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tax_rate: null,
+        normalized_price_ex_tax: null,
+        observation_postal_code: "08001",
+        raw_payload: { lineNumber: 3 },
+      }),
+    );
+
+    const mapped = await repo.getObservationById("11111111-1111-4111-8111-111111111111");
+    expect(mapped?.taxRate).toBeNull();
+    expect(mapped?.normalizedPriceExTax).toBeNull();
+    expect(mapped?.observationPostalCode).toBe("08001");
+
+    await repo.saveEstablishment({
+      id: "33333333-3333-4333-8333-333333333333",
+      sourceId: "src-makro",
+      ownerTenantId: null,
+      establishmentCode: "MAKRO-TF-ADEJE",
+      name: "Makro Adeje",
+      channelKind: "cash_carry",
+      countryCode: "ES",
+      islandCode: "TF",
+      postalCode: "38670",
+      isActive: true,
+      createdAt: "2026-11-12T00:00:00Z",
+      updatedAt: "2026-11-12T00:00:00Z",
+    });
+    expect(insertEstMock).toHaveBeenCalledTimes(1);
+
+    await repo.saveCoverage({
+      id: "44444444-4444-4444-8444-444444444444",
+      sourceId: "src-makro",
+      establishmentId: "33333333-3333-4333-8333-333333333333",
+      ownerTenantId: null,
+      fulfillmentMode: "delivery",
+      coverageStatus: "documented_available",
+      countryCode: "ES",
+      islandCode: "TF",
+      postalCodePrefix: "386",
+      createdAt: "2026-11-12T00:00:00Z",
+      updatedAt: "2026-11-12T00:00:00Z",
+    });
+    expect(insertCovMock).toHaveBeenCalledTimes(1);
+  });
 });
