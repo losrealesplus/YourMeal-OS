@@ -5,27 +5,61 @@
  */
 
 import { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/integrations/supabase/types';
 import {
+  AiemStatus,
+  AvailabilityStatus,
+  CaptureMethod,
+  ChannelKind,
+  ComparabilityGrade,
+  ContentUnit,
+  CoverageStatus,
+  DeliveryCoverageState,
+  FreightInclusion,
+  FulfillmentMode,
+  MarketDeliveryCoverage,
+  MarketEstablishment,
   MarketPriceObservation,
   MarketProduct,
   MarketSource,
   MarketVolumeTier,
-  ProductMapping,
-  SourceType,
-  TaxMode,
-  RegionCode,
-  ThermalState,
-  StandardUnit,
-  NormalizedUnit,
-  PromotionStatus,
-  CaptureMethod,
-  QualityStatus,
   MatchStatus,
-  ComparabilityGrade,
+  MeasurementDimension,
+  MinOrderUnit,
+  NormalizationBasis,
+  NormalizationStatus,
+  NormalizedUnit,
+  ObservedChannel,
+  ObservedPriceBasis,
+  PackPresentation,
+  ProductMapping,
+  PromotionStatus,
+  QualityStatus,
+  RegionCode,
+  SourceChannelType,
+  SourceType,
+  StandardUnit,
+  TaxMode,
+  TaxRateSource,
+  TaxRegime,
+  ThermalState,
+  ValiditySource,
 } from '../../domain/types';
 import { BenchmarkInputObservation } from '../../domain/benchmark-calculator';
+import { sanitizeRawPayloadForScope } from '../../application/market-catalog-ingestion-service';
 import { generateMarketEntityUuid, isValidUuid } from '../../domain/uuid';
 import { IMarketIntelligenceRepository } from './market-repository-interface';
+
+function parseNullableNumber(value: unknown): number | null {
+  if (value === null || value === undefined) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseOptionalNumber(value: unknown): number | null | undefined {
+  if (value === undefined) return undefined;
+  return parseNullableNumber(value);
+}
 
 export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
   constructor(private readonly supabase: SupabaseClient) {}
@@ -76,10 +110,89 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       id: source.id,
       name: source.name,
       source_type: source.sourceType,
+      provider_code: source.providerCode ?? null,
+      country_code: source.countryCode ?? null,
+      channel_type: source.channelType ?? null,
       default_tax_mode: source.defaultTaxMode,
       default_region: source.defaultRegion,
       is_active: source.isActive,
       notes: source.notes,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) throw error;
+  }
+
+  // --------------------------------------------------------------------------
+  // Establishments & Delivery Coverages
+  // --------------------------------------------------------------------------
+
+  public async getEstablishmentsBySource(sourceId: string): Promise<MarketEstablishment[]> {
+    const { data, error } = await this.supabase
+      .from('market_establishments')
+      .select('*')
+      .eq('source_id', sourceId)
+      .eq('is_active', true)
+      .order('name');
+
+    if (error) throw error;
+    return (data || []).map(this.mapEstablishmentFromDb);
+  }
+
+  public async saveEstablishment(establishment: MarketEstablishment): Promise<void> {
+    const estId = isValidUuid(establishment.id)
+      ? establishment.id
+      : generateMarketEntityUuid();
+    const { error } = await this.supabase.from('market_establishments').insert({
+      id: estId,
+      source_id: establishment.sourceId,
+      owner_tenant_id: establishment.ownerTenantId ?? null,
+      establishment_code: establishment.establishmentCode,
+      name: establishment.name,
+      channel_kind: establishment.channelKind || 'unknown',
+      country_code: establishment.countryCode ?? null,
+      region_code: establishment.regionCode ?? null,
+      subdivision_code: establishment.subdivisionCode ?? null,
+      province_code: establishment.provinceCode ?? null,
+      island_code: establishment.islandCode ?? null,
+      postal_code: establishment.postalCode ?? null,
+      city: establishment.city ?? null,
+      is_active: establishment.isActive,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) throw error;
+  }
+
+  public async getCoveragesBySource(sourceId: string): Promise<MarketDeliveryCoverage[]> {
+    const { data, error } = await this.supabase
+      .from('market_delivery_coverages')
+      .select('*')
+      .eq('source_id', sourceId)
+      .order('country_code');
+
+    if (error) throw error;
+    return (data || []).map(this.mapCoverageFromDb);
+  }
+
+  public async saveCoverage(coverage: MarketDeliveryCoverage): Promise<void> {
+    const covId = isValidUuid(coverage.id) ? coverage.id : generateMarketEntityUuid();
+    const { error } = await this.supabase.from('market_delivery_coverages').insert({
+      id: covId,
+      source_id: coverage.sourceId,
+      establishment_id: coverage.establishmentId ?? null,
+      owner_tenant_id: coverage.ownerTenantId ?? null,
+      fulfillment_mode: coverage.fulfillmentMode,
+      coverage_status: coverage.coverageStatus,
+      country_code: coverage.countryCode,
+      region_code: coverage.regionCode ?? null,
+      subdivision_code: coverage.subdivisionCode ?? null,
+      province_code: coverage.provinceCode ?? null,
+      island_code: coverage.islandCode ?? null,
+      postal_code_prefix: coverage.postalCodePrefix ?? null,
+      valid_from: coverage.validFrom ?? null,
+      valid_to: coverage.validTo ?? null,
+      evidence_note: coverage.evidenceNote ?? null,
       updated_at: new Date().toISOString(),
     });
 
@@ -146,14 +259,26 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       id: productId,
       source_id: product.sourceId,
       external_sku: product.externalSku || `SKU-${productId.slice(0, 8)}`,
+      gtin: product.gtin ?? null,
       raw_name: product.rawName,
       brand: product.brand,
       category: product.category || 'General Food',
       thermal_state: product.thermalState || 'ambient',
+      measurement_dimension: product.measurementDimension ?? null,
       standard_quantity: product.standardQuantity || 1.0,
       standard_unit: product.standardUnit || 'kg',
+      pack_presentation: product.packPresentation ?? null,
+      pack_count: product.packCount ?? null,
+      unit_content_qty: product.unitContentQty ?? null,
+      unit_content_unit: product.unitContentUnit ?? null,
+      net_content_qty: product.netContentQty ?? null,
+      net_content_unit: product.netContentUnit ?? null,
+      drained_weight_qty: product.drainedWeightQty ?? null,
+      drained_weight_unit: product.drainedWeightUnit ?? null,
+      density_kg_per_l: product.densityKgPerL ?? null,
       cut_specification: product.cutSpecification,
       quality_grade: product.qualityGrade || 'standard',
+      origin: product.origin ?? null,
       updated_at: new Date().toISOString(),
     });
 
@@ -240,26 +365,58 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     const observationId = isValidUuid(observation.id)
       ? observation.id
       : generateMarketEntityUuid();
+    const ownerTenantId = observation.ownerTenantId ?? null;
+    const sanitizedPayload = sanitizeRawPayloadForScope(observation.rawPayload, ownerTenantId);
+
     const { error: obsErr } = await this.supabase.from('market_price_observations').insert({
       id: observationId,
       market_product_id: observation.marketProductId,
-      owner_tenant_id: observation.ownerTenantId ?? null,
+      owner_tenant_id: ownerTenantId,
+      establishment_id: observation.establishmentId ?? null,
       fingerprint,
       observed_at: observation.observedAt,
       valid_from: observation.validFrom,
-      valid_to: observation.validTo,
+      valid_to: observation.validTo ?? null,
+      validity_source: observation.validitySource ?? 'inferred_default',
       price_raw: observation.priceRaw,
       currency: observation.currency,
       tax_mode: observation.taxMode,
       tax_rate: observation.taxRate,
+      tax_regime: observation.taxRegime ?? 'UNKNOWN',
+      tax_rate_source: observation.taxRateSource ?? 'unknown',
+      tax_rule_ref: observation.taxRuleRef ?? null,
+      tax_effective_from: observation.taxEffectiveFrom ?? null,
+      tax_effective_to: observation.taxEffectiveTo ?? null,
+      aiem_status: observation.aiemStatus ?? 'unknown',
+      aiem_evidence: observation.aiemEvidence ?? null,
+      aiem_rate: observation.aiemRate ?? null,
+      aiem_amount_raw: observation.aiemAmountRaw ?? null,
       normalized_price_ex_tax: observation.normalizedPriceExTax,
       normalized_unit: observation.normalizedUnit,
+      observed_price_basis: observation.observedPriceBasis ?? 'unknown',
+      normalization_basis: observation.normalizationBasis ?? 'unknown',
+      normalization_status: observation.normalizationStatus ?? 'computed',
       promotion_status: observation.promotionStatus,
+      promotion_condition: observation.promotionCondition ?? null,
+      promotion_valid_to: observation.promotionValidTo ?? null,
+      freight_inclusion: observation.freightInclusion ?? 'unknown',
+      freight_cost_raw: observation.freightCostRaw ?? null,
+      free_freight_min_order_amount: observation.freeFreightMinOrderAmount ?? null,
+      min_order_qty: observation.minOrderQty ?? null,
+      min_order_unit: observation.minOrderUnit ?? null,
       region_code: observation.regionCode,
       location_name: observation.locationName || 'Central Warehouse',
+      observation_country_code: observation.observationCountryCode ?? null,
+      observation_subdivision_code: observation.observationSubdivisionCode ?? null,
+      observation_province_code: observation.observationProvinceCode ?? null,
+      observation_island_code: observation.observationIslandCode ?? null,
+      observation_postal_code: observation.observationPostalCode ?? null,
+      observed_channel: observation.observedChannel ?? 'unknown',
+      delivery_coverage_state: observation.deliveryCoverageState ?? 'unknown',
+      availability_status: observation.availabilityStatus ?? 'unknown',
       capture_method: observation.captureMethod,
       quality_status: observation.qualityStatus,
-      raw_payload: observation.rawPayload ?? null,
+      raw_payload: sanitizedPayload ?? null,
       imported_by:
         observation.importedBy && isValidUuid(observation.importedBy)
           ? observation.importedBy
@@ -477,10 +634,60 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       id: row.id,
       name: row.name,
       sourceType: row.source_type as SourceType,
+      providerCode: row.provider_code,
+      countryCode: row.country_code,
+      channelType: row.channel_type as SourceChannelType | null | undefined,
       defaultTaxMode: row.default_tax_mode as TaxMode,
       defaultRegion: row.default_region as RegionCode,
       isActive: Boolean(row.is_active),
       notes: row.notes || undefined,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  }
+
+  private mapEstablishmentFromDb(
+    row: Database['public']['Tables']['market_establishments']['Row']
+  ): MarketEstablishment {
+    return {
+      id: row.id,
+      sourceId: row.source_id,
+      ownerTenantId: row.owner_tenant_id ?? null,
+      establishmentCode: row.establishment_code,
+      name: row.name,
+      channelKind: (row.channel_kind as ChannelKind) || 'unknown',
+      countryCode: row.country_code ?? null,
+      regionCode: (row.region_code as RegionCode) ?? null,
+      subdivisionCode: row.subdivision_code ?? null,
+      provinceCode: row.province_code ?? null,
+      islandCode: row.island_code ?? null,
+      postalCode: row.postal_code ?? null,
+      city: row.city ?? null,
+      isActive: Boolean(row.is_active),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  }
+
+  private mapCoverageFromDb(
+    row: Database['public']['Tables']['market_delivery_coverages']['Row']
+  ): MarketDeliveryCoverage {
+    return {
+      id: row.id,
+      sourceId: row.source_id,
+      establishmentId: row.establishment_id ?? null,
+      ownerTenantId: row.owner_tenant_id ?? null,
+      fulfillmentMode: (row.fulfillment_mode as FulfillmentMode) || 'unknown',
+      coverageStatus: (row.coverage_status as CoverageStatus) || 'unknown',
+      countryCode: row.country_code,
+      regionCode: (row.region_code as RegionCode) ?? null,
+      subdivisionCode: row.subdivision_code ?? null,
+      provinceCode: row.province_code ?? null,
+      islandCode: row.island_code ?? null,
+      postalCodePrefix: row.postal_code_prefix ?? null,
+      validFrom: row.valid_from ?? null,
+      validTo: row.valid_to ?? null,
+      evidenceNote: row.evidence_note ?? null,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
@@ -491,36 +698,83 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       id: row.id,
       sourceId: row.source_id,
       externalSku: row.external_sku || undefined,
+      gtin: row.gtin,
       rawName: row.raw_name,
       brand: row.brand || undefined,
       category: row.category,
       thermalState: row.thermal_state as ThermalState,
+      measurementDimension: row.measurement_dimension as
+        | MeasurementDimension
+        | null
+        | undefined,
       standardQuantity: Number(row.standard_quantity || 1.0),
       standardUnit: row.standard_unit as StandardUnit,
+      packPresentation: row.pack_presentation as PackPresentation | null | undefined,
+      packCount: parseOptionalNumber(row.pack_count),
+      unitContentQty: parseOptionalNumber(row.unit_content_qty),
+      unitContentUnit: row.unit_content_unit as ContentUnit | null | undefined,
+      netContentQty: parseOptionalNumber(row.net_content_qty),
+      netContentUnit: row.net_content_unit as ContentUnit | null | undefined,
+      drainedWeightQty: parseOptionalNumber(row.drained_weight_qty),
+      drainedWeightUnit: row.drained_weight_unit as 'kg' | 'g' | null | undefined,
+      densityKgPerL: parseOptionalNumber(row.density_kg_per_l),
       cutSpecification: row.cut_specification || undefined,
       qualityGrade: row.quality_grade || undefined,
+      origin: row.origin || undefined,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
   }
 
   private mapObservationFromDb(row: any, tiers: MarketVolumeTier[]): MarketPriceObservation {
+    const taxMode = row.tax_mode as TaxMode;
     return {
       id: row.id,
       marketProductId: row.market_product_id,
       ownerTenantId: row.owner_tenant_id ?? null,
       observedAt: row.observed_at,
       validFrom: row.valid_from || undefined,
-      validTo: row.valid_to || undefined,
+      validTo: row.valid_to ?? null,
+      validitySource: row.validity_source as ValiditySource | undefined,
       priceRaw: Number(row.price_raw),
-      currency: 'EUR',
-      taxMode: row.tax_mode as TaxMode,
-      taxRate: Number(row.tax_rate || 0),
-      normalizedPriceExTax: Number(row.normalized_price_ex_tax),
+      currency: row.currency || 'EUR',
+      taxMode,
+      taxInclusion:
+        taxMode === 'inc_tax' ? 'included' : taxMode === 'ex_tax' ? 'excluded' : 'unknown',
+      taxRate: parseNullableNumber(row.tax_rate),
+      taxRegime: row.tax_regime as TaxRegime | undefined,
+      taxRateSource: row.tax_rate_source as TaxRateSource | undefined,
+      taxRuleRef: row.tax_rule_ref,
+      taxEffectiveFrom: row.tax_effective_from,
+      taxEffectiveTo: row.tax_effective_to,
+      aiemStatus: row.aiem_status as AiemStatus | undefined,
+      aiemEvidence: row.aiem_evidence,
+      aiemRate: parseOptionalNumber(row.aiem_rate),
+      aiemAmountRaw: parseOptionalNumber(row.aiem_amount_raw),
+      normalizedPriceExTax: parseNullableNumber(row.normalized_price_ex_tax),
       normalizedUnit: row.normalized_unit as NormalizedUnit,
+      observedPriceBasis: row.observed_price_basis as ObservedPriceBasis | undefined,
+      normalizationBasis: row.normalization_basis as NormalizationBasis | undefined,
+      normalizationStatus: row.normalization_status as NormalizationStatus | undefined,
       promotionStatus: row.promotion_status as PromotionStatus,
+      promotionCondition: row.promotion_condition,
+      promotionValidTo: row.promotion_valid_to,
+      freightInclusion: row.freight_inclusion as FreightInclusion | undefined,
+      freightCostRaw: parseOptionalNumber(row.freight_cost_raw),
+      freeFreightMinOrderAmount: parseOptionalNumber(row.free_freight_min_order_amount),
+      minOrderQty: parseOptionalNumber(row.min_order_qty),
+      minOrderUnit: row.min_order_unit as MinOrderUnit | null | undefined,
       regionCode: row.region_code as RegionCode,
       locationName: row.location_name || undefined,
+      establishmentId: row.establishment_id,
+      observationCountryCode: row.observation_country_code,
+      observationSubdivisionCode: row.observation_subdivision_code,
+      observationProvinceCode: row.observation_province_code,
+      observationIslandCode: row.observation_island_code,
+      observationPostalCode: row.observation_postal_code,
+      observedChannel: row.observed_channel as ObservedChannel | undefined,
+      deliveryCoverageState: row.delivery_coverage_state as DeliveryCoverageState | undefined,
+      availabilityStatus: row.availability_status as AvailabilityStatus | undefined,
       captureMethod: row.capture_method as CaptureMethod,
       qualityStatus: row.quality_status as QualityStatus,
       rawPayload: row.raw_payload || undefined,

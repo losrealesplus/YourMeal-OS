@@ -1,4 +1,6 @@
 import {
+  MarketDeliveryCoverage,
+  MarketEstablishment,
   MarketPriceObservation,
   MarketProduct,
   MarketSource,
@@ -11,6 +13,12 @@ export interface IMarketIntelligenceRepository {
   getSourceById(id: string): Promise<MarketSource | null>;
   getSourceByName(name: string): Promise<MarketSource | null>;
   saveSource(source: MarketSource): Promise<void>;
+
+  getEstablishmentsBySource(sourceId: string): Promise<MarketEstablishment[]>;
+  saveEstablishment(establishment: MarketEstablishment): Promise<void>;
+
+  getCoveragesBySource(sourceId: string): Promise<MarketDeliveryCoverage[]>;
+  saveCoverage(coverage: MarketDeliveryCoverage): Promise<void>;
 
   getProductById(id: string): Promise<MarketProduct | null>;
   getProductsBySource(sourceId: string): Promise<MarketProduct[]>;
