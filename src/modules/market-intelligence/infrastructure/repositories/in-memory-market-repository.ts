@@ -1,4 +1,5 @@
 import {
+  ComparisonInputObservation,
   MarketDeliveryCoverage,
   MarketEstablishment,
   MarketPriceObservation,
@@ -306,6 +307,64 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
     }
 
     return results;
+  }
+
+  public async getComparisonInputsForIngredients(
+    tenantId: string,
+    ingredientIds: string[]
+  ): Promise<Map<string, ComparisonInputObservation[]>> {
+    const resultMap = new Map<string, ComparisonInputObservation[]>();
+
+    for (const ingredientId of ingredientIds) {
+      const activeMappings = Array.from(this.mappings.values()).filter(
+        (m) =>
+          m.tenantId === tenantId &&
+          m.tenantIngredientId === ingredientId &&
+          m.matchStatus === 'confirmed' &&
+          m.comparabilityGrade !== 'UNKNOWN'
+      );
+
+      const items: ComparisonInputObservation[] = [];
+
+      for (const mapping of activeMappings) {
+        const product = this.products.get(mapping.marketProductId);
+        if (!product) continue;
+        if (product.ownerTenantId != null && product.ownerTenantId !== tenantId) {
+          continue;
+        }
+
+        const source = this.sources.get(product.sourceId);
+        if (!source || !source.isActive) continue;
+
+        const coverages = Array.from(this.coverages.values()).filter(
+          (c) =>
+            c.sourceId === source.id &&
+            (c.ownerTenantId == null || c.ownerTenantId === tenantId)
+        );
+
+        const productObs = Array.from(this.observations.values())
+          .filter(
+            (o) =>
+              o.marketProductId === product.id &&
+              (o.ownerTenantId == null || o.ownerTenantId === tenantId)
+          )
+          .sort((a, b) => new Date(b.observedAt).getTime() - new Date(a.observedAt).getTime());
+
+        for (const obs of productObs) {
+          items.push({
+            source,
+            product,
+            observation: obs,
+            mapping,
+            coverages,
+          });
+        }
+      }
+
+      resultMap.set(ingredientId, items);
+    }
+
+    return resultMap;
   }
 
   public async getTenantConfig(tenantId: string): Promise<MarketTenantConfig | null> {

@@ -1,4 +1,5 @@
 import {
+  ComparisonInputObservation,
   MarketDeliveryCoverage,
   MarketEstablishment,
   MarketPriceObservation,
@@ -71,6 +72,11 @@ export interface IMarketIntelligenceRepository {
     tenantId: string,
     tenantIngredientId: string
   ): Promise<BenchmarkInputObservation[]>;
+
+  getComparisonInputsForIngredients(
+    tenantId: string,
+    ingredientIds: string[]
+  ): Promise<Map<string, ComparisonInputObservation[]>>;
 
   getTenantConfig(tenantId: string): Promise<MarketTenantConfig | null>;
   saveTenantConfig(config: MarketTenantConfig): Promise<void>;

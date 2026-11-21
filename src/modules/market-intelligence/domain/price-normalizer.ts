@@ -14,6 +14,7 @@ import type {
   CatchWeightPolicy,
   ContentUnit,
   FreightInclusion,
+  FreightStatus,
   MeasurementDimension,
   NormalizationBasis,
   NormalizationStatus,
@@ -103,8 +104,10 @@ export interface LandedCostResult {
   freightSurchargePerUnit: number | null;
   landedCostExTax: number | null;
   isFreightExempt: boolean;
-  freightStatus: 'included' | 'free_threshold_reached' | 'surcharged' | 'unknown_freight';
+  freightStatus: FreightStatus;
 }
+
+export type { FreightStatus };
 
 function resolveEffectiveTaxMode(input: RawPriceInput): TaxMode {
   if (input.taxInclusion === "included") return "inc_tax";

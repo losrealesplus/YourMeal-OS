@@ -6,20 +6,13 @@
 
 import type {
   DeliveryCoverageState,
+  DeliveryTargetQuery,
   FulfillmentMode,
   MarketDeliveryCoverage,
   RegionCode,
 } from "./types";
 
-export interface DeliveryTargetQuery {
-  countryCode: string; // ISO 3166-1 alpha-2, e.g. 'ES', 'PT'
-  regionCode?: RegionCode | null;
-  subdivisionCode?: string | null;
-  provinceCode?: string | null;
-  islandCode?: string | null;
-  postalCode?: string | null;
-  allowPickup?: boolean;
-}
+export type { DeliveryTargetQuery };
 
 export interface DeliveryCoverageEvaluation {
   state: DeliveryCoverageState;

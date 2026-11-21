@@ -5,8 +5,11 @@
  */
 
 import { BenchmarkCalculator } from '../domain/benchmark-calculator';
+import { OfferComparator } from '../domain/offer-comparator';
 import {
   BenchmarkCalculation,
+  ComparisonContext,
+  MarketOfferRanking,
   NegotiationBrief,
   TenantIngredientEconomicRef,
   VarianceAnalysis,
@@ -89,5 +92,67 @@ export class MarketBenchmarkService {
       variance,
       referenceDate
     );
+  }
+
+  /**
+   * Compares and ranks observable market offers for a single tenant ingredient (Bloque 3).
+   */
+  public async rankOffersForIngredient(
+    tenantId: string,
+    tenantRef: TenantIngredientEconomicRef,
+    context: ComparisonContext = {}
+  ): Promise<MarketOfferRanking> {
+    const inputsMap = await this.repository.getComparisonInputsForIngredients(tenantId, [
+      tenantRef.id,
+    ]);
+    const inputs = inputsMap.get(tenantRef.id) || [];
+    const tenantConfig = await this.repository.getTenantConfig(tenantId);
+
+    return OfferComparator.compareOffers(
+      {
+        id: tenantRef.id,
+        name: tenantRef.name,
+        effectiveWacExTax: tenantRef.effectiveWacExTax,
+        unit: tenantRef.unit,
+      },
+      inputs,
+      context,
+      tenantConfig
+    );
+  }
+
+  /**
+   * Batch-compares and ranks observable market offers for multiple tenant ingredients (Bloque 3).
+   */
+  public async rankOffersForIngredients(
+    tenantId: string,
+    tenantRefs: TenantIngredientEconomicRef[],
+    context: ComparisonContext = {}
+  ): Promise<Map<string, MarketOfferRanking>> {
+    const ingredientIds = tenantRefs.map((r) => r.id);
+    const inputsMap = await this.repository.getComparisonInputsForIngredients(
+      tenantId,
+      ingredientIds
+    );
+    const tenantConfig = await this.repository.getTenantConfig(tenantId);
+
+    const resultMap = new Map<string, MarketOfferRanking>();
+    for (const ref of tenantRefs) {
+      const inputs = inputsMap.get(ref.id) || [];
+      const ranking = OfferComparator.compareOffers(
+        {
+          id: ref.id,
+          name: ref.name,
+          effectiveWacExTax: ref.effectiveWacExTax,
+          unit: ref.unit,
+        },
+        inputs,
+        context,
+        tenantConfig
+      );
+      resultMap.set(ref.id, ranking);
+    }
+
+    return resultMap;
   }
 }
