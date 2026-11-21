@@ -135,6 +135,15 @@ export class CsvCatalogParser {
     density_kg_per_l: 'density_kg_per_l',
     base_precio: 'observed_price_basis',
     observed_price_basis: 'observed_price_basis',
+    // catch weight & customs classification (Block 2B)
+    peso_variable: 'is_catch_weight',
+    is_catch_weight: 'is_catch_weight',
+    catch_weight: 'is_catch_weight',
+    variable_weight: 'is_catch_weight',
+    taric: 'taric_code',
+    taric_code: 'taric_code',
+    codigo_arancelario: 'taric_code',
+    partida_arancelaria: 'taric_code',
     // geo & availability (Block 2)
     pais: 'observation_country_code',
     country_code: 'observation_country_code',

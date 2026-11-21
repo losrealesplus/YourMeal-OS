@@ -11,6 +11,7 @@ import {
   AiemStatus,
   AvailabilityStatus,
   CaptureMethod,
+  CatchWeightPolicy,
   ContentUnit,
   DeliveryCoverageState,
   FreightInclusion,
@@ -21,6 +22,7 @@ import {
   ObservedChannel,
   ObservedPriceBasis,
   PackPresentation,
+  PricingComparisonMode,
   PromotionStatus,
   QualityStatus,
   RegionCode,
@@ -42,6 +44,8 @@ export interface IngestionOptions {
   defaultRegion?: RegionCode;
   defaultSourceId?: string;
   ownerTenantId?: string | null;
+  catchWeightPolicy?: CatchWeightPolicy;
+  pricingComparisonMode?: PricingComparisonMode;
 }
 
 export interface QuarantinedRow {
@@ -117,6 +121,8 @@ export interface ManualMarketEntryInput {
   promotionCondition?: string | null;
   promotionValidTo?: string | null;
   netDrainedQuantity?: number;
+  isCatchWeight?: boolean;
+  taricCode?: string | null;
 }
 
 const FORBIDDEN_PUBLIC_RAW_PAYLOAD_KEYS = new Set([
@@ -288,6 +294,8 @@ export class MarketCatalogIngestionService {
         promotion_status: entry.promotionStatus || "standard",
         promotion_condition: entry.promotionCondition ?? "",
         promotion_valid_to: entry.promotionValidTo ?? "",
+        is_catch_weight: entry.isCatchWeight ? "true" : "false",
+        taric_code: entry.taricCode ?? "",
         net_drained_qty:
           entry.drainedWeightQty != null
             ? String(entry.drainedWeightQty)
@@ -364,7 +372,7 @@ export class MarketCatalogIngestionService {
         quarantinedRows.push({
           lineNumber: row.lineNumber,
           rawLine: row.rawLine,
-          reason: "Missing mandatory fields (source_name, product_name, raw_price, quantity, unit)",
+          reason: "INVALID_PHYSICAL_SPEC: Missing or invalid physical measurement specification (quantity/pack dimensions and unit required; defaulting to 1 kg is strictly prohibited).",
           fields: data,
         });
         continue;
@@ -528,6 +536,25 @@ export class MarketCatalogIngestionService {
           ? data.observed_price_basis
           : "unknown";
 
+      const isCatchWeightRaw = (data.is_catch_weight || "").trim().toLowerCase();
+      const isCatchWeight =
+        isCatchWeightRaw === "true" ||
+        isCatchWeightRaw === "1" ||
+        isCatchWeightRaw === "si" ||
+        isCatchWeightRaw === "sí" ||
+        isCatchWeightRaw === "yes";
+
+      const taricCode = (data.taric_code || "").trim() || null;
+      if (taricCode && !/^[0-9]{4,10}$/.test(taricCode)) {
+        quarantinedRows.push({
+          lineNumber: row.lineNumber,
+          rawLine: row.rawLine,
+          reason: `Invalid TARIC code "${data.taric_code}". Must be 4 to 10 numeric digits.`,
+          fields: data,
+        });
+        continue;
+      }
+
       // 5. Normalize Price (respecting taxMode='unknown' or missing inc_tax rate -> null)
       let normalizedResult;
       try {
@@ -547,6 +574,8 @@ export class MarketCatalogIngestionService {
           drainedWeightUnit: data.drained_weight_unit || null,
           densityKgPerL,
           observedPriceBasis,
+          isCatchWeight,
+          catchWeightPolicy: options.catchWeightPolicy || "allow_variable_kg",
         });
       } catch (err) {
         quarantinedRows.push({
@@ -591,6 +620,8 @@ export class MarketCatalogIngestionService {
           cutSpecification: data.cut_spec || undefined,
           qualityGrade: data.quality_grade || "standard",
           origin: data.origin || undefined,
+          isCatchWeight,
+          taricCode,
           createdAt: nowIso,
           updatedAt: nowIso,
         };

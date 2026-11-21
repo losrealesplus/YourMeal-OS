@@ -1823,6 +1823,7 @@ export type Database = {
           external_sku: string
           gtin: string | null
           id: string
+          is_catch_weight: boolean
           measurement_dimension: string | null
           net_content_qty: number | null
           net_content_unit: string | null
@@ -1835,6 +1836,7 @@ export type Database = {
           source_id: string
           standard_quantity: number
           standard_unit: string
+          taric_code: string | null
           thermal_state: string
           unit_content_qty: number | null
           unit_content_unit: string | null
@@ -1851,6 +1853,7 @@ export type Database = {
           external_sku: string
           gtin?: string | null
           id?: string
+          is_catch_weight?: boolean
           measurement_dimension?: string | null
           net_content_qty?: number | null
           net_content_unit?: string | null
@@ -1863,6 +1866,7 @@ export type Database = {
           source_id: string
           standard_quantity?: number
           standard_unit?: string
+          taric_code?: string | null
           thermal_state?: string
           unit_content_qty?: number | null
           unit_content_unit?: string | null
@@ -1879,6 +1883,7 @@ export type Database = {
           external_sku?: string
           gtin?: string | null
           id?: string
+          is_catch_weight?: boolean
           measurement_dimension?: string | null
           net_content_qty?: number | null
           net_content_unit?: string | null
@@ -1891,6 +1896,7 @@ export type Database = {
           source_id?: string
           standard_quantity?: number
           standard_unit?: string
+          taric_code?: string | null
           thermal_state?: string
           unit_content_qty?: number | null
           unit_content_unit?: string | null
@@ -1958,27 +1964,74 @@ export type Database = {
         }
         Relationships: []
       }
+      market_tenant_configs: {
+        Row: {
+          catch_weight_policy: string
+          created_at: string
+          id: string
+          pricing_comparison_mode: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          catch_weight_policy?: string
+          created_at?: string
+          id?: string
+          pricing_comparison_mode?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          catch_weight_policy?: string
+          created_at?: string
+          id?: string
+          pricing_comparison_mode?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_tenant_configs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_volume_tiers: {
         Row: {
           created_at: string
           id: string
           min_quantity: number
           observation_id: string
-          tier_normalized_price_ex_tax: number
+          tax_mode: string
+          tax_rate: number | null
+          tier_normalized_price_ex_tax: number | null
+          tier_price_raw: number | null
+          tier_quantity_unit: string
         }
         Insert: {
           created_at?: string
           id?: string
           min_quantity: number
           observation_id: string
-          tier_normalized_price_ex_tax: number
+          tax_mode?: string
+          tax_rate?: number | null
+          tier_normalized_price_ex_tax?: number | null
+          tier_price_raw?: number | null
+          tier_quantity_unit?: string
         }
         Update: {
           created_at?: string
           id?: string
           min_quantity?: number
           observation_id?: string
-          tier_normalized_price_ex_tax?: number
+          tax_mode?: string
+          tax_rate?: number | null
+          tier_normalized_price_ex_tax?: number | null
+          tier_price_raw?: number | null
+          tier_quantity_unit?: string
         }
         Relationships: [
           {

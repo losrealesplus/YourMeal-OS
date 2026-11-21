@@ -4,6 +4,7 @@ import {
   MarketPriceObservation,
   MarketProduct,
   MarketSource,
+  MarketTenantConfig,
   ProductMapping,
 } from '../../domain/types';
 import { BenchmarkInputObservation } from '../../domain/benchmark-calculator';
@@ -70,4 +71,7 @@ export interface IMarketIntelligenceRepository {
     tenantId: string,
     tenantIngredientId: string
   ): Promise<BenchmarkInputObservation[]>;
+
+  getTenantConfig(tenantId: string): Promise<MarketTenantConfig | null>;
+  saveTenantConfig(config: MarketTenantConfig): Promise<void>;
 }

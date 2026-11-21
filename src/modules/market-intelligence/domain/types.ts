@@ -10,7 +10,7 @@ export type SourceType =
   | 'regional_specialist'
   | 'retail_ceiling';
 
-export type TaxMode = 'ex_tax' | 'inc_tax' | 'unknown';
+export type TaxMode = 'ex_tax' | 'inc_tax' | 'in_tax' | 'exempt' | 'unknown';
 
 export type TaxInclusion = 'excluded' | 'included' | 'unknown';
 
@@ -241,6 +241,8 @@ export interface MarketProduct {
   cutSpecification?: string;
   qualityGrade?: string;
   origin?: string;
+  isCatchWeight?: boolean;
+  taricCode?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -249,7 +251,24 @@ export interface MarketVolumeTier {
   id: string;
   observationId: string;
   minQuantity: number;
-  tierNormalizedPriceExTax: number;
+  tierQuantityUnit?: string;
+  tierPriceRaw?: number | null;
+  taxMode?: TaxMode;
+  taxRate?: number | null;
+  tierNormalizedPriceExTax: number | null;
+}
+
+export type PricingComparisonMode = 'landed_cost' | 'origin_price';
+
+export type CatchWeightPolicy = 'allow_variable_kg' | 'strict_nominal_pack';
+
+export interface MarketTenantConfig {
+  id?: string;
+  tenantId: string;
+  pricingComparisonMode: PricingComparisonMode;
+  catchWeightPolicy: CatchWeightPolicy;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface MarketPriceObservation {

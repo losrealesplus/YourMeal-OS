@@ -11,13 +11,16 @@
 import { resolvePhysicalPack } from "./physical-format";
 import type {
   AiemStatus,
+  CatchWeightPolicy,
   ContentUnit,
+  FreightInclusion,
   MeasurementDimension,
   NormalizationBasis,
   NormalizationStatus,
   NormalizedUnit,
   ObservedPriceBasis,
   PackPresentation,
+  PricingComparisonMode,
   StandardUnit,
   TaxInclusion,
   TaxMode,
@@ -42,6 +45,8 @@ export interface RawPriceInput {
   observedPriceBasis?: ObservedPriceBasis | null;
   densityKgPerL?: number | null;
   targetDimension?: MeasurementDimension | null;
+  isCatchWeight?: boolean | null;
+  catchWeightPolicy?: CatchWeightPolicy | null;
   // Documentary AIEM metadata (must NOT alter priceExTax or duplicate surcharges)
   aiemStatus?: AiemStatus;
   aiemRate?: number | null;
@@ -59,10 +64,54 @@ export interface NormalizedPriceResult {
   normalizationStatus: NormalizationStatus;
 }
 
+export interface RawVolumeTierInput {
+  minQuantity: number;
+  tierQuantityUnit?: string;
+  tierPriceRaw: number;
+  taxMode?: TaxMode;
+  taxRate?: number | null;
+  parentTaxMode?: TaxMode;
+  parentTaxRate?: number | null;
+  parentStandardQuantity?: number;
+  isCatchWeight?: boolean | null;
+  catchWeightPolicy?: CatchWeightPolicy | null;
+}
+
+export interface NormalizedVolumeTierResult {
+  minQuantity: number;
+  tierQuantityUnit: string;
+  tierPriceRaw: number;
+  tierPriceExTax: number | null;
+  tierNormalizedPriceExTax: number | null;
+  taxMode: TaxMode;
+  taxRate: number | null;
+  normalizationStatus: NormalizationStatus;
+}
+
+export interface LandedCostInput {
+  normalizedPriceExTax: number | null;
+  freightInclusion: FreightInclusion;
+  freightCostRaw?: number | null;
+  freeFreightMinOrderAmount?: number | null;
+  orderAmount?: number | null;
+  batchQuantity?: number | null;
+}
+
+export interface LandedCostResult {
+  comparisonMode: PricingComparisonMode;
+  originPriceExTax: number | null;
+  freightSurchargePerUnit: number | null;
+  landedCostExTax: number | null;
+  isFreightExempt: boolean;
+  freightStatus: 'included' | 'free_threshold_reached' | 'surcharged' | 'unknown_freight';
+}
+
 function resolveEffectiveTaxMode(input: RawPriceInput): TaxMode {
   if (input.taxInclusion === "included") return "inc_tax";
   if (input.taxInclusion === "excluded") return "ex_tax";
   if (input.taxInclusion === "unknown") return "unknown";
+  if (input.taxMode === "in_tax") return "inc_tax";
+  if (input.taxMode === "exempt") return "ex_tax";
   return input.taxMode ?? "unknown";
 }
 
@@ -106,6 +155,8 @@ export class PriceNormalizer {
       observedPriceBasis: input.observedPriceBasis ?? "unknown",
       densityKgPerL: input.densityKgPerL,
       targetDimension: input.targetDimension,
+      isCatchWeight: input.isCatchWeight,
+      catchWeightPolicy: input.catchWeightPolicy,
     });
 
     // 2. Resolve tax exclusion without fabricating unknown tax rates
@@ -151,6 +202,168 @@ export class PriceNormalizer {
       measurementDimension: physical.measurementDimension,
       normalizationBasis: physical.normalizationBasis,
       normalizationStatus: "computed",
+    };
+  }
+
+  /**
+   * Normalizes a volume tier respecting D-010:
+   * If tax_mode is unknown or inc_tax lacks tax_rate, tier_normalized_price_ex_tax is strictly null.
+   */
+  public static normalizeVolumeTier(input: RawVolumeTierInput): NormalizedVolumeTierResult {
+    if (!Number.isFinite(input.tierPriceRaw) || input.tierPriceRaw < 0) {
+      throw new Error("Tier price raw cannot be negative");
+    }
+    if (!Number.isFinite(input.minQuantity) || input.minQuantity <= 0) {
+      throw new Error("Tier minQuantity must be strictly greater than 0");
+    }
+
+    const effectiveTaxMode: TaxMode =
+      input.taxMode && input.taxMode !== "unknown"
+        ? input.taxMode === "in_tax"
+          ? "inc_tax"
+          : input.taxMode === "exempt"
+            ? "ex_tax"
+            : input.taxMode
+        : input.parentTaxMode === "in_tax"
+          ? "inc_tax"
+          : input.parentTaxMode === "exempt"
+            ? "ex_tax"
+            : (input.parentTaxMode ?? "unknown");
+
+    const effectiveTaxRate =
+      input.taxRate !== undefined && input.taxRate !== null
+        ? input.taxRate
+        : (input.parentTaxRate ?? null);
+
+    const quantityDenominator =
+      input.parentStandardQuantity && input.parentStandardQuantity > 0
+        ? input.parentStandardQuantity
+        : 1.0;
+
+    if (effectiveTaxMode === "unknown") {
+      return {
+        minQuantity: input.minQuantity,
+        tierQuantityUnit: input.tierQuantityUnit || "unit",
+        tierPriceRaw: input.tierPriceRaw,
+        tierPriceExTax: null,
+        tierNormalizedPriceExTax: null,
+        taxMode: "unknown",
+        taxRate: null,
+        normalizationStatus: "tax_unknown",
+      };
+    }
+
+    if (
+      effectiveTaxMode === "inc_tax" &&
+      (effectiveTaxRate === null || effectiveTaxRate === undefined)
+    ) {
+      return {
+        minQuantity: input.minQuantity,
+        tierQuantityUnit: input.tierQuantityUnit || "unit",
+        tierPriceRaw: input.tierPriceRaw,
+        tierPriceExTax: null,
+        tierNormalizedPriceExTax: null,
+        taxMode: "inc_tax",
+        taxRate: null,
+        normalizationStatus: "tax_rate_missing",
+      };
+    }
+
+    const tierPriceExTax =
+      effectiveTaxMode === "inc_tax"
+        ? input.tierPriceRaw / (1 + (effectiveTaxRate as number))
+        : input.tierPriceRaw;
+
+    const tierNormalizedPriceExTax = tierPriceExTax / quantityDenominator;
+
+    return {
+      minQuantity: input.minQuantity,
+      tierQuantityUnit: input.tierQuantityUnit || "unit",
+      tierPriceRaw: input.tierPriceRaw,
+      tierPriceExTax: this.round(tierPriceExTax, 4),
+      tierNormalizedPriceExTax: this.round(tierNormalizedPriceExTax, 4),
+      taxMode: effectiveTaxMode,
+      taxRate: effectiveTaxRate,
+      normalizationStatus: "computed",
+    };
+  }
+
+  /**
+   * Evaluates comparison between Landed Cost and Origin Price (CR-COST-05 Block 2 / 3 Contract).
+   */
+  public static calculateLandedCost(
+    input: LandedCostInput,
+    comparisonMode: PricingComparisonMode = "landed_cost",
+  ): LandedCostResult {
+    if (input.normalizedPriceExTax === null) {
+      return {
+        comparisonMode,
+        originPriceExTax: null,
+        freightSurchargePerUnit: null,
+        landedCostExTax: null,
+        isFreightExempt: false,
+        freightStatus: "unknown_freight",
+      };
+    }
+
+    if (comparisonMode === "origin_price") {
+      return {
+        comparisonMode: "origin_price",
+        originPriceExTax: input.normalizedPriceExTax,
+        freightSurchargePerUnit: 0,
+        landedCostExTax: input.normalizedPriceExTax,
+        isFreightExempt: false,
+        freightStatus: input.freightInclusion === "included" ? "included" : "surcharged",
+      };
+    }
+
+    if (input.freightInclusion === "included") {
+      return {
+        comparisonMode: "landed_cost",
+        originPriceExTax: input.normalizedPriceExTax,
+        freightSurchargePerUnit: 0,
+        landedCostExTax: input.normalizedPriceExTax,
+        isFreightExempt: true,
+        freightStatus: "included",
+      };
+    }
+
+    if (
+      input.freightInclusion === "free_above_threshold" &&
+      input.freeFreightMinOrderAmount != null &&
+      input.orderAmount != null &&
+      input.orderAmount >= input.freeFreightMinOrderAmount
+    ) {
+      return {
+        comparisonMode: "landed_cost",
+        originPriceExTax: input.normalizedPriceExTax,
+        freightSurchargePerUnit: 0,
+        landedCostExTax: input.normalizedPriceExTax,
+        isFreightExempt: true,
+        freightStatus: "free_threshold_reached",
+      };
+    }
+
+    if (input.freightCostRaw != null && input.batchQuantity != null && input.batchQuantity > 0) {
+      const surcharge = input.freightCostRaw / input.batchQuantity;
+      return {
+        comparisonMode: "landed_cost",
+        originPriceExTax: input.normalizedPriceExTax,
+        freightSurchargePerUnit: this.round(surcharge, 4),
+        landedCostExTax: this.round(input.normalizedPriceExTax + surcharge, 4),
+        isFreightExempt: false,
+        freightStatus: "surcharged",
+      };
+    }
+
+    // Freight excluded or unknown without sufficient data to apportion
+    return {
+      comparisonMode: "landed_cost",
+      originPriceExTax: input.normalizedPriceExTax,
+      freightSurchargePerUnit: null,
+      landedCostExTax: input.normalizedPriceExTax,
+      isFreightExempt: false,
+      freightStatus: "unknown_freight",
     };
   }
 

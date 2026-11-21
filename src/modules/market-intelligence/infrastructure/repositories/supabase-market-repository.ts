@@ -10,6 +10,7 @@ import {
   AiemStatus,
   AvailabilityStatus,
   CaptureMethod,
+  CatchWeightPolicy,
   ChannelKind,
   ComparabilityGrade,
   ContentUnit,
@@ -22,6 +23,7 @@ import {
   MarketPriceObservation,
   MarketProduct,
   MarketSource,
+  MarketTenantConfig,
   MarketVolumeTier,
   MatchStatus,
   MeasurementDimension,
@@ -32,6 +34,7 @@ import {
   ObservedChannel,
   ObservedPriceBasis,
   PackPresentation,
+  PricingComparisonMode,
   ProductMapping,
   PromotionStatus,
   QualityStatus,
@@ -343,6 +346,8 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       cut_specification: product.cutSpecification,
       quality_grade: product.qualityGrade || 'standard',
       origin: product.origin ?? null,
+      is_catch_weight: product.isCatchWeight ?? false,
+      taric_code: product.taricCode ?? null,
       updated_at: new Date().toISOString(),
     });
 
@@ -506,6 +511,10 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
         id: isValidUuid(t.id) ? t.id : generateMarketEntityUuid(),
         observation_id: observationId,
         min_quantity: t.minQuantity,
+        tier_quantity_unit: t.tierQuantityUnit || 'unit',
+        tier_price_raw: t.tierPriceRaw ?? null,
+        tax_mode: t.taxMode || observation.taxMode || 'unknown',
+        tax_rate: t.taxRate !== undefined ? t.taxRate : observation.taxRate,
         tier_normalized_price_ex_tax: t.tierNormalizedPriceExTax,
       }));
 
@@ -810,6 +819,8 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       cutSpecification: row.cut_specification || undefined,
       qualityGrade: row.quality_grade || undefined,
       origin: row.origin || undefined,
+      isCatchWeight: Boolean(row.is_catch_weight),
+      taricCode: row.taric_code ?? null,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
@@ -873,12 +884,49 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     };
   }
 
+  public async getTenantConfig(tenantId: string): Promise<MarketTenantConfig | null> {
+    const { data, error } = await this.supabase
+      .from('market_tenant_configs')
+      .select('*')
+      .eq('tenant_id', tenantId)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return null;
+
+    return {
+      id: data.id,
+      tenantId: data.tenant_id,
+      pricingComparisonMode: data.pricing_comparison_mode as PricingComparisonMode,
+      catchWeightPolicy: data.catch_weight_policy as CatchWeightPolicy,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    };
+  }
+
+  public async saveTenantConfig(config: MarketTenantConfig): Promise<void> {
+    const configId = isValidUuid(config.id || '') ? config.id : generateMarketEntityUuid();
+    const { error } = await this.supabase.from('market_tenant_configs').upsert({
+      id: configId,
+      tenant_id: config.tenantId,
+      pricing_comparison_mode: config.pricingComparisonMode,
+      catch_weight_policy: config.catchWeightPolicy,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) throw error;
+  }
+
   private mapTierFromDb(row: any): MarketVolumeTier {
     return {
       id: row.id,
       observationId: row.observation_id,
       minQuantity: Number(row.min_quantity),
-      tierNormalizedPriceExTax: Number(row.tier_normalized_price_ex_tax),
+      tierQuantityUnit: row.tier_quantity_unit || 'unit',
+      tierPriceRaw: parseNullableNumber(row.tier_price_raw),
+      taxMode: row.tax_mode,
+      taxRate: parseNullableNumber(row.tax_rate),
+      tierNormalizedPriceExTax: parseNullableNumber(row.tier_normalized_price_ex_tax),
     };
   }
 

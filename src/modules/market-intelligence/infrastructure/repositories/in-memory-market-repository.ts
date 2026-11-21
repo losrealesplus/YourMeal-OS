@@ -4,6 +4,7 @@ import {
   MarketPriceObservation,
   MarketProduct,
   MarketSource,
+  MarketTenantConfig,
   ProductMapping,
 } from '../../domain/types';
 import { BenchmarkInputObservation } from '../../domain/benchmark-calculator';
@@ -18,6 +19,7 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
   private observations = new Map<string, MarketPriceObservation>();
   private observationFingerprints = new Map<string, string>(); // fingerprint -> observationId
   private mappings = new Map<string, ProductMapping>(); // key: `${tenantId}:${tenantIngredientId}:${marketProductId}`
+  private tenantConfigs = new Map<string, MarketTenantConfig>();
 
   constructor() {
     this.seedDefaultSources();
@@ -304,6 +306,14 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
     }
 
     return results;
+  }
+
+  public async getTenantConfig(tenantId: string): Promise<MarketTenantConfig | null> {
+    return this.tenantConfigs.get(tenantId) || null;
+  }
+
+  public async saveTenantConfig(config: MarketTenantConfig): Promise<void> {
+    this.tenantConfigs.set(config.tenantId, { ...config });
   }
 
   private seedDefaultSources(): void {
