@@ -1,0 +1,745 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "f3a505ba2c05cff29107b568233a077f7e4adc55",
+    "deploymentId": 7743677316,
+    "versionId": "841c4fb0-b459-40aa-9233-01cc6d3c50c7"
+  },
+  "candidateSha": "c60da942f6bbac9cb0378a231458caaf9b55a3ab",
+  "candidatePr": 582,
+  "candidateHeadSha": "bd1028a4e600e75e096ac6df1babb61a4a518bac",
+  "candidateBranch": "feat/market-intelligence-pr5-public-connectors",
+  "productPrs": [
+    576,
+    577,
+    578,
+    579,
+    580,
+    581,
+    582
+  ],
+  "productCommits": [
+    {
+      "sha": "a72368e7f1435d27d504bc8709b80aa9b6f6228e",
+      "parent": "f3a505ba2c05cff29107b568233a077f7e4adc55",
+      "headSha": "344c8ca8cc34f0c0d6887112a9d50de30f41a9ac",
+      "pr": 576,
+      "files": [
+        {
+          "path": "docs/05-architecture/CR_COST_05_CORE_MARKET_CONTRACT.md",
+          "before": null,
+          "after": "242c6ae18ee095db3c7b99047bbc48efe3051911afaf58e7fcf541d74af9fcc7"
+        },
+        {
+          "path": "src/integrations/supabase/types.ts",
+          "before": "bff8bfdd973900410be85cc1ad9344a96616f915bd8e64752c49ae85c44ec602",
+          "after": "eecbc6161bd4d28574494a7e24db3ea1fbeb8689fde10c239d80a811834350e2"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/command-center-actions.ts",
+          "before": null,
+          "after": "eabde6071ddf25f978988892805b0d7137bfbad4b5bcad69a1a060365d6877a2"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-catalog-ingestion-service.spec.ts",
+          "before": "bdc2d68b2dc4331f6ba1fa51328e7528f6577d9dffd8d7f4a052f145d0e6ad9f",
+          "after": "a77d155b82fbea95b969b0161f09f61094c507627367c05f895c4da846d6cc74"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-catalog-ingestion-service.ts",
+          "before": "509cc1450150de14edb1c06e128a88f8385a0516bde932c5c03ac4ce1f5f8e49",
+          "after": "6dbc1f239a40aa718edbdf55766c6959617322d650992366a26ec97ace3edfb0"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/product-mapping-service.spec.ts",
+          "before": "04df79cacac5703d10e908c34d36aa44c87843568400f0289cdfe7beb099b238",
+          "after": "4827b97b20942effcd6d38f1c4b8868a855a1e91210fe7b5b71da317f3bc0005"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/product-mapping-service.ts",
+          "before": "73652d9ecbf307ab807766e70155bef826d1880e2b39cd960743b079a44f1acf",
+          "after": "ae36d4bc4a20c8e280f291a3f8d2d29710691d94669f754697d55c9d540cac87"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/types.ts",
+          "before": "4b4a3a8d4a892f3ff773481b012e7185867dc69b4b09a8e2f4a5829175ec5bb2",
+          "after": "8abde7100d607a2b08d8c2b9dcc23f4901fa043784609b3f73c5bc07d53d2947"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/uuid.ts",
+          "before": null,
+          "after": "ca7a76bcdff5d69f956c2798151ff3a77dec68289bf413d2b35bb055e2f85751"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/cr-cost-05-pr1-integrity.spec.ts",
+          "before": null,
+          "after": "639bb608f877e94c1f2b6358bda968a06f9d92f2231b582bea77d3e93de717c3"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/csv-catalog-parser.ts",
+          "before": "039aecedf688fadf31938eb276cc2e219a855c06d6ae044784a5ea26dbde0146",
+          "after": "9a20b6de1a8a3662945be436550b6d334bac372508e8131aeca1b20cfc593fec"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/in-memory-market-repository.ts",
+          "before": "68b3962fdfdabfa624b4c51a5b295a401620eac61243d0ba50518df92311f803",
+          "after": "45495e1e5d66e9902f4fbe3db24898a48afbff63ccd7a690ea95d6370e8f03c3"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/market-repository-interface.ts",
+          "before": "484c39c526881a27289b0e4885a5b55158078263fa995d4692b5759fc7649e85",
+          "after": "5ca16e0cd0dae721372eaa454a3c6d7ce52346b1fcd1aa9d3fecb6c3d27d5d32"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.spec.ts",
+          "before": "66ca0392570e839d5d495096cc54e18ad94adcd2db985d1dbfc37309dd9a1d8c",
+          "after": "a55bd06a1dc9f270a982f4d3251b62f755ceecebd7df18bdc98bdec50acd856e"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.ts",
+          "before": "1b828d698acbf102535da785b86cc8cb8bc22ad2d4d2fb52c707e21fb68632a1",
+          "after": "60873d1a3f7a973a59dd9c310728aec57cca690972419e32e2443e6cd5b7992b"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/CatalogIngestionDrawer.tsx",
+          "before": "741617382d945b6f6c0f9e0e08dec3dd0f2d50946f4b5266c00f5efaa34f6f4f",
+          "after": "24830726ea7bbd5f5cdb1f7eab2da51b967187a08c12b77194459095f29b465f"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/EconomicCommandCenter.spec.tsx",
+          "before": null,
+          "after": "35dd3b8f9aadf57a6b72f2e761f5db2f63ddbfcc3e9cc39ff5a4148416ec0e9f"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/EconomicCommandCenter.tsx",
+          "before": "9b3909560dbc30bbc3cc4806bb6a548d1edb30713e490ea2dabf38c25b4b651a",
+          "after": "e93965886f106d39edec1150cffcb798f6cfc3f5aeb084f09ff3e697e8201c4d"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/MarketIntelligenceTab.tsx",
+          "before": "50f78138a3d32998987d424cb6a24930cd68fc716278b06b87b59878232aeb68",
+          "after": "b3aaadff8663f638d02ca6e5c0c18f13e3076a04fe99b019e5a24dbb0da7af64"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/ProductMappingQueueDrawer.tsx",
+          "before": "1d520c6432a107d6280f1135af4dbd1117c4d2651a76ba395a0627fa13f4c7ae",
+          "after": "ae63d070ad236e3f5c968ae3f620a3505d98f730c34c3d560b05585df709c97c"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/hooks/use-market-intelligence.ts",
+          "before": "49b385c8c0fda2f41a42c0460649710c14436925531c2297b91551fd98e1bc99",
+          "after": "39526a17564c6208cc0a58812123e0ab81c2c9528d964a3eb8f1354b3c5b2186"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.cost-intelligence.tsx",
+          "before": "4a802cf44b3ca8e901059ec9aa0bf14cb92204dfe272da743f28553caf15cbd7",
+          "after": "e1fd5fc01e7f71e8d92f57202c0b8e8f9952d7b5dddfeff08de1ce1afbde1fd1"
+        },
+        {
+          "path": "supabase/migrations/20261112180000_cr_cost_05_pr1_integrity_and_rls.sql",
+          "before": null,
+          "after": "3ad1fb1e86874293e7d8c89e817e92c99f6accd7a35e018c58a32f55fce97443"
+        },
+        {
+          "path": "supabase/migrations/rollback/20261112180000_cr_cost_05_pr1_integrity_and_rls_down.sql",
+          "before": null,
+          "after": "b0be95682f0d9fe78d90b75b1b56d1fe56ba8fed482b961841c1f82b7c095ad4"
+        }
+      ]
+    },
+    {
+      "sha": "5555be620d91e57bf8f917d5ce0da79a1c627c2c",
+      "parent": "a72368e7f1435d27d504bc8709b80aa9b6f6228e",
+      "headSha": "cf8d4a60d93aa7719c2892020dcf4d0ba1e2356b",
+      "pr": 577,
+      "files": [
+        {
+          "path": "docs/05-architecture/CR_COST_05_CORE_MARKET_CONTRACT.md",
+          "before": "242c6ae18ee095db3c7b99047bbc48efe3051911afaf58e7fcf541d74af9fcc7",
+          "after": "5c3e08c6e57d657bb76ebd2e1d802db63d17c70beee01f6fb8996f502f6b2c16"
+        },
+        {
+          "path": "src/integrations/supabase/types.ts",
+          "before": "eecbc6161bd4d28574494a7e24db3ea1fbeb8689fde10c239d80a811834350e2",
+          "after": "833034d11f9ec3ad3ff479052213d0548ae29bb1a22f8f7bfd10330f44e50fde"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-catalog-ingestion-service.spec.ts",
+          "before": "a77d155b82fbea95b969b0161f09f61094c507627367c05f895c4da846d6cc74",
+          "after": "27b83919b80da56b0874d9a0553335938cf7fe11b948a39018bbfb8577868fcb"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-catalog-ingestion-service.ts",
+          "before": "6dbc1f239a40aa718edbdf55766c6959617322d650992366a26ec97ace3edfb0",
+          "after": "2686f322ffd5093a8c421a69835f39a521f258ed88de918eef0b902196095002"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/product-mapping-service.ts",
+          "before": "ae36d4bc4a20c8e280f291a3f8d2d29710691d94669f754697d55c9d540cac87",
+          "after": "885b68ece14240e36644c7e04c6b9db048f05784041b3c67ec183d807e1b95d4"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/benchmark-calculator.ts",
+          "before": "17feca15dcd78722f15390db6f48155940e19dbbc06cd5af8cc11ba651518d08",
+          "after": "80d565489e7302100f151773e881434f5ce9c4d6d3b3c69ae22fed5ebdbcff84"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/geo-coverage.spec.ts",
+          "before": null,
+          "after": "cc4facbc54aad343899e86e6d4c2ded33249c92e95dcaf6ef76617d6e66b7ba7"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/geo-coverage.ts",
+          "before": null,
+          "after": "d3c4b910c102e302e80d30d9cb4f9164cdd47d77f2f39e5f90ac791d5ceec10d"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/physical-format.spec.ts",
+          "before": null,
+          "after": "56573361d7fcd6809db49a4622d147773d5a2361448c917cb4015db058c64c4c"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/physical-format.ts",
+          "before": null,
+          "after": "17615fef36860ab54118dce48ea18d9f8b021d0b8d5b8bb7825db50e74c354c5"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/price-normalizer.spec.ts",
+          "before": "01d60cc1373d4c5e24797d0dcaeff2f7cea1c00b893cf071f7065a400fbb92d1",
+          "after": "bfe5acaa7f255150ce6d448d14fc10b70fd980f6dbb2244c0199f289e6469b0e"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/price-normalizer.ts",
+          "before": "5f593ccf0789a90c15b01c4d2ae229791c0d2efdfea2149431b829a5d2dd5846",
+          "after": "4d47fc913d387adb1f310c2681f1c9eb1dac5951193c3d7244c3d51a85c51ed8"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/types.ts",
+          "before": "8abde7100d607a2b08d8c2b9dcc23f4901fa043784609b3f73c5bc07d53d2947",
+          "after": "b67b7ea0c9e7dd83feeec0f1893469d420bfe8b06ca6003a41c73f1ddbf8cc89"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/cr-cost-05-pr2-contract.spec.ts",
+          "before": null,
+          "after": "e60cbabef9f2a454ea24740d03fb7ed38e5de7185d82ed45286f139fe7830f5c"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/csv-catalog-parser.ts",
+          "before": "9a20b6de1a8a3662945be436550b6d334bac372508e8131aeca1b20cfc593fec",
+          "after": "e46e976c9e52607a8978e5033536063f24adc10e009a2b50976456e12483072e"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/in-memory-market-repository.ts",
+          "before": "45495e1e5d66e9902f4fbe3db24898a48afbff63ccd7a690ea95d6370e8f03c3",
+          "after": "e95b671c2cc1fcbee09b05533c42e0ecd26dce65b230be365f335beef4817c35"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/market-repository-interface.ts",
+          "before": "5ca16e0cd0dae721372eaa454a3c6d7ce52346b1fcd1aa9d3fecb6c3d27d5d32",
+          "after": "7757c1c14598fcc0931ac43f76a8d4bd64d176a8eb991312b5520634169dcc3a"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.spec.ts",
+          "before": "a55bd06a1dc9f270a982f4d3251b62f755ceecebd7df18bdc98bdec50acd856e",
+          "after": "df1fd9a429444d242fe291bbe1315138d682a3cbe9c4c7c7407b82d36cdc1344"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.ts",
+          "before": "60873d1a3f7a973a59dd9c310728aec57cca690972419e32e2443e6cd5b7992b",
+          "after": "6ad00ffe5039aad4dfd37d2bae3384870d830d826cdbbb352157d423c9ae7e07"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/PriceObservationHistoryModal.tsx",
+          "before": "7431e4fdf94e1c88a5fd2adf86d7e8d6f1ed4eaef76256932aef99e3ea317e41",
+          "after": "d238d1a72befc9166681118b8efa4505ff3cb9a368a93877b51ca890119f03f4"
+        },
+        {
+          "path": "supabase/migrations/20261112200000_cr_cost_05_pr2_physical_geo_fiscal_contract.sql",
+          "before": null,
+          "after": "a26d6c2c3e28fd59a0560dbc9cb95f78c7fcf1309a30f6726e603269f9663337"
+        },
+        {
+          "path": "supabase/migrations/rollback/20261112200000_cr_cost_05_pr2_physical_geo_fiscal_contract_down.sql",
+          "before": null,
+          "after": "db25f5ef0b15c00c8afe789312310a3ebe0e7c1d1efb3f3fa82f9eee7e2be8ff"
+        }
+      ]
+    },
+    {
+      "sha": "0b96726aa6eb22c0e89acf29b0864b20f3d9409c",
+      "parent": "5555be620d91e57bf8f917d5ce0da79a1c627c2c",
+      "headSha": "b74df3ca107c45d0105100372c3d8b19d4925d6b",
+      "pr": 578,
+      "files": [
+        {
+          "path": "docs/05-architecture/CR_COST_05_CORE_MARKET_CONTRACT.md",
+          "before": "5c3e08c6e57d657bb76ebd2e1d802db63d17c70beee01f6fb8996f502f6b2c16",
+          "after": "e0607b8c1e942d136ac88fa114ca03b5448f53fb203555846def9e307953d63f"
+        },
+        {
+          "path": "src/components/admin-shell.tsx",
+          "before": "30a9fdbf1915ade93ba82bbe5d341a3b667cb317b97d73cc51a09933e908902a",
+          "after": "40f18cfa9dfc1424881f7d4ec3a9f0abb3169114a7309a71481d4d6e09eb4ecb"
+        },
+        {
+          "path": "src/integrations/supabase/types.ts",
+          "before": "833034d11f9ec3ad3ff479052213d0548ae29bb1a22f8f7bfd10330f44e50fde",
+          "after": "f80702efc4c6cfecad6942aa7a78acfc3513ea276520886d221bbffebc343f2c"
+        },
+        {
+          "path": "src/lib/operations-departments.ts",
+          "before": "9a87d30020d383dcdc969d6b570468fcfac9d01c62ed8210136d09b6d0f6fb73",
+          "after": "8cfa14b40ceacbd9312d42d87804a8607ba918b29ba8897e7aa39a413e066e98"
+        },
+        {
+          "path": "src/lib/pilot-feature-flags.ts",
+          "before": "68bde5ebcf70d3ce6dee03dc987a49b97c8758f3aaa0af1b762205432faabeca",
+          "after": "6e3c511ce3947d521efbab300f53f5bb4371eeb0c2a14345ac74c0dc8cbd8ca1"
+        },
+        {
+          "path": "src/modules/cost-intelligence/application/decision-intent-service.spec.ts",
+          "before": "9f94b051b476169ea2339dd255bc500347684e8e1d8cf66de1cf218bd836fb93",
+          "after": "620515f9ffe6dee26561bcd6ef4979123bcd0cbf6351e4048b23020e8409021d"
+        },
+        {
+          "path": "src/modules/cost-intelligence/application/decision-intent-service.ts",
+          "before": "6ed95d1e9ea3568b08fb87bdbe2f4aae9aaa1ce31bbf005341fee262e103281a",
+          "after": "2acf088ff03aceb0568fae8086e4f0c3da1432a4779a683057083bf1b790bd23"
+        },
+        {
+          "path": "src/modules/cost-intelligence/application/scenario-management-service.spec.ts",
+          "before": "4cca133dbd6fc8f99a2889a259cc734b3b0a7d85d7ad93ed514d6f0b241e6275",
+          "after": "16d1086d4ff2ec29a18fd0abcb375116f39b766fca75845acfc95ef510322d1a"
+        },
+        {
+          "path": "src/modules/cost-intelligence/application/scenario-management-service.ts",
+          "before": "d695afdab5095c81c82caf02cedbb6ec1c07bc91e0dcf8af26b8643f2889def7",
+          "after": "9e3898340cf7b350aba2fdd9284c6aea7c9e622c9b5b419e97b817f889c7ff7b"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-catalog-ingestion-service.ts",
+          "before": "2686f322ffd5093a8c421a69835f39a521f258ed88de918eef0b902196095002",
+          "after": "dec90d6c45dc95c100f946c12bcfb423f26a62e50b19552e66facb3a9fb7ea39"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/product-mapping-service.ts",
+          "before": "885b68ece14240e36644c7e04c6b9db048f05784041b3c67ec183d807e1b95d4",
+          "after": "26631e9c36684c88387012b6e99394bd5cad9c05d0927f8a1743f89203900ef4"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/benchmark-calculator.ts",
+          "before": "80d565489e7302100f151773e881434f5ce9c4d6d3b3c69ae22fed5ebdbcff84",
+          "after": "774c081bd7f1528fda9876f93df6eaa4d79a6944a7582de09288168042f6cd2b"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/types.ts",
+          "before": "b67b7ea0c9e7dd83feeec0f1893469d420bfe8b06ca6003a41c73f1ddbf8cc89",
+          "after": "483fd4bbc24e615c1b330db903f87b8082d3c6a94fd0fef4f74f6678aec30050"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/cr-cost-05-pr3a-security.spec.ts",
+          "before": null,
+          "after": "c641f232254b88e1c563e17bd81efc7b1d7a7f963a4c8db2f5ef348d72de0b4c"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/in-memory-market-repository.ts",
+          "before": "e95b671c2cc1fcbee09b05533c42e0ecd26dce65b230be365f335beef4817c35",
+          "after": "cab8cb3cb6a4986a5bbd164e3dce20ec811b622b6873a23f46d4bcf0ec5015ad"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/market-repository-interface.ts",
+          "before": "7757c1c14598fcc0931ac43f76a8d4bd64d176a8eb991312b5520634169dcc3a",
+          "after": "cee99c344bf843c3dc0aa2cebf909e926c76556901e510710835af449f345106"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.ts",
+          "before": "6ad00ffe5039aad4dfd37d2bae3384870d830d826cdbbb352157d423c9ae7e07",
+          "after": "8c1303cb796033699ae4bdb868ba4d0a5483811cb602728d6de93a1f28467f6c"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/EconomicCommandCenter.spec.tsx",
+          "before": "35dd3b8f9aadf57a6b72f2e761f5db2f63ddbfcc3e9cc39ff5a4148416ec0e9f",
+          "after": "33fa00ce078de6a23af7eb0fe652230424cc04cdfd58fd314731cb2acec570fe"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/EconomicCommandCenter.tsx",
+          "before": "e93965886f106d39edec1150cffcb798f6cfc3f5aeb084f09ff3e697e8201c4d",
+          "after": "f4da4e7facac430f2d6075874be8d786f296552d52b4f3eb5049420f5671d8de"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/MarketSourceSpreadCard.tsx",
+          "before": "cb2a80cd9f985b36d8bca9b7ad4e794b5a89ccb3310a682d09df433f365e85a2",
+          "after": "e3b774581a7d75902901382c4af01ec394c4871570b974725e2631973c2c870b"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/NegotiationBriefModal.tsx",
+          "before": "0825dbdff4c25cd197d61d8230fba19901f4d505ae322d845b353ac1d3b65763",
+          "after": "1d02fea864a3789c355de01d4ff325f997eeebf823236409e5e7e8e93296b2e9"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.cost-intelligence.tsx",
+          "before": "e1fd5fc01e7f71e8d92f57202c0b8e8f9952d7b5dddfeff08de1ce1afbde1fd1",
+          "after": "7e83a70b6c7feb170ac8541234d32690f3c8a47db0a12136d8fe32c06520712a"
+        },
+        {
+          "path": "supabase/migrations/20261112220000_cr_cost_05_pr3a_multi_tenant_security.sql",
+          "before": null,
+          "after": "5f6700c686495a6735c0676b5a9e39375dad57110908ea3ca0f742a5429b5dd1"
+        },
+        {
+          "path": "supabase/migrations/rollback/20261112220000_cr_cost_05_pr3a_multi_tenant_security_down.sql",
+          "before": null,
+          "after": "89478359b95cd64039fd8f0d6e0a03852846d52f99acd03f31872dcf6a856d90"
+        }
+      ]
+    },
+    {
+      "sha": "04d2c5a1c8792cf7fecb31d74faa7010aabbb991",
+      "parent": "0b96726aa6eb22c0e89acf29b0864b20f3d9409c",
+      "headSha": "9586f7fc26a5a3354e3086984553564d1107ec2b",
+      "pr": 579,
+      "files": [
+        {
+          "path": "docs/05-architecture/CR_COST_05_CORE_MARKET_CONTRACT.md",
+          "before": "e0607b8c1e942d136ac88fa114ca03b5448f53fb203555846def9e307953d63f",
+          "after": "a9b0d1a568ae9a00b77c54a7f9a92bd9bec4699d88e08d98b0d2999e64c525fc"
+        },
+        {
+          "path": "src/integrations/supabase/types.ts",
+          "before": "f80702efc4c6cfecad6942aa7a78acfc3513ea276520886d221bbffebc343f2c",
+          "after": "e271c305df4ae02b5c319f76674be10853a4b9af159189759119e0d716a54bc9"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-catalog-ingestion-service.ts",
+          "before": "dec90d6c45dc95c100f946c12bcfb423f26a62e50b19552e66facb3a9fb7ea39",
+          "after": "9dc75405a91e45da87f0ccf2fb0cd7f34ebe1ec17ce9884d5801699a6664b58d"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/physical-format.ts",
+          "before": "17615fef36860ab54118dce48ea18d9f8b021d0b8d5b8bb7825db50e74c354c5",
+          "after": "c9d27dff71bc44e81caea5d192b459ab377007a70979dd7dc2dcdb06d078a75e"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/price-normalizer.ts",
+          "before": "4d47fc913d387adb1f310c2681f1c9eb1dac5951193c3d7244c3d51a85c51ed8",
+          "after": "290e996fc5e6f6ae8707bec51b84718d08d6e28fe872276395c6852ec94b5e03"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/types.ts",
+          "before": "483fd4bbc24e615c1b330db903f87b8082d3c6a94fd0fef4f74f6678aec30050",
+          "after": "4a41b5d7ede72b9d6c11b40e520f6ee16297d56c122b7c2f925fddc44c97d1ff"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/cr-cost-05-pr2b-tiers-catchweight.spec.ts",
+          "before": null,
+          "after": "c36329833dbe6357e769af2063a2556cc33e2326651999158dcf6d055fb9258a"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/csv-catalog-parser.ts",
+          "before": "e46e976c9e52607a8978e5033536063f24adc10e009a2b50976456e12483072e",
+          "after": "7c0df324f5c93bf2b7f1feb81f10f2e2de69f1a02cb1664af82a6300f7717f08"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/in-memory-market-repository.ts",
+          "before": "cab8cb3cb6a4986a5bbd164e3dce20ec811b622b6873a23f46d4bcf0ec5015ad",
+          "after": "2a4f3cabbfef536630b381f5de45f25a2ee4974dfaddb44049434750a4bfe398"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/market-repository-interface.ts",
+          "before": "cee99c344bf843c3dc0aa2cebf909e926c76556901e510710835af449f345106",
+          "after": "6f5c57b7d104a92c52681f354680d30888d14d2814d805d35c80566271fefa99"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.ts",
+          "before": "8c1303cb796033699ae4bdb868ba4d0a5483811cb602728d6de93a1f28467f6c",
+          "after": "01c80f6e01f71fff32b26102c59ac0516ad1e9c8847d5669c0a33999ddbe816b"
+        },
+        {
+          "path": "src/modules/market-intelligence/presentation/components/PriceObservationHistoryModal.tsx",
+          "before": "d238d1a72befc9166681118b8efa4505ff3cb9a368a93877b51ca890119f03f4",
+          "after": "f8b2fa0fc1977177e21b4483f5848a32951df2599689d88d1c39d6cfb1e4667c"
+        },
+        {
+          "path": "supabase/migrations/20261112230000_cr_cost_05_pr2b_physical_fiscal_tiers.sql",
+          "before": null,
+          "after": "dd5d16d3c69c60321c521ce5bcb428e93a55c56d8f89f213b94a99d5cb81e0e8"
+        },
+        {
+          "path": "supabase/migrations/rollback/20261112230000_cr_cost_05_pr2b_physical_fiscal_tiers_down.sql",
+          "before": null,
+          "after": "7ce3e52663930ab5df256982265d531d46a656181ac493e436ff1fd35dfc8148"
+        }
+      ]
+    },
+    {
+      "sha": "6dad35e4b9e81221b4899c280fb3dd0d6e994728",
+      "parent": "04d2c5a1c8792cf7fecb31d74faa7010aabbb991",
+      "headSha": "0eef373ce2cd1da4d27423927ad8517e636aece8",
+      "pr": 580,
+      "files": [
+        {
+          "path": "docs/05-architecture/CR_COST_05_CORE_MARKET_CONTRACT.md",
+          "before": "a9b0d1a568ae9a00b77c54a7f9a92bd9bec4699d88e08d98b0d2999e64c525fc",
+          "after": "6ca97522ba365af9da5aa82562606835cc664292d79f24e4286674338f7c0d2f"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-benchmark-service.spec.ts",
+          "before": "4ff0b88ed6f221ffe78611937536bf6d5d4087e1eac82963234e256aef0f2b82",
+          "after": "11d6500df740e6fe060aff8f0f650c625cdccbfb7e8323920fef3ee13c536ff4"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-benchmark-service.ts",
+          "before": "79289181529715d7ef286e6e03c749f9144bf528798ba5d8d41554572a0be4b8",
+          "after": "1715fcfa515b86b4f2e8369eedb1e6e29c9dbc218d38417d583905bf0ce35ef6"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/geo-coverage.ts",
+          "before": "d3c4b910c102e302e80d30d9cb4f9164cdd47d77f2f39e5f90ac791d5ceec10d",
+          "after": "d85676c0fb8f6641f9c519cbcccf1ff01c150b416f6549b4887ef8f0cdcaac37"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/offer-comparator.spec.ts",
+          "before": null,
+          "after": "e95aae1b0d920c085e89c07a0c77da555a13e50944d43072ca98fe51dabf1764"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/offer-comparator.ts",
+          "before": null,
+          "after": "0c9cac4315ae1fd3088421ff3535cab8c7fb061ec92d215af7ded217d53a81ac"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/price-normalizer.ts",
+          "before": "290e996fc5e6f6ae8707bec51b84718d08d6e28fe872276395c6852ec94b5e03",
+          "after": "5e46761ea8202228f6047f6a17992a32be8e5e9007ae2191f7c83ed4392c0ea4"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/types.ts",
+          "before": "4a41b5d7ede72b9d6c11b40e520f6ee16297d56c122b7c2f925fddc44c97d1ff",
+          "after": "fab000f8a06162d698b54549ae84eac123d435f91160fcfdca71b727565433e5"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/in-memory-market-repository.ts",
+          "before": "2a4f3cabbfef536630b381f5de45f25a2ee4974dfaddb44049434750a4bfe398",
+          "after": "c586f7af4ddc9beb53d19dba25efc66bada5904ed9678680a449e5d8fa721d07"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/market-repository-interface.ts",
+          "before": "6f5c57b7d104a92c52681f354680d30888d14d2814d805d35c80566271fefa99",
+          "after": "1309dba3e346a7384d37c719ee6bf52f9a81ae14f57bc2f2114abc7e070675c2"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.spec.ts",
+          "before": "df1fd9a429444d242fe291bbe1315138d682a3cbe9c4c7c7407b82d36cdc1344",
+          "after": "5a8b4d07e2c04a83891b88780ecfec7cf975ba2c76b4c47cdde842debe5b567d"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.ts",
+          "before": "01c80f6e01f71fff32b26102c59ac0516ad1e9c8847d5669c0a33999ddbe816b",
+          "after": "c5dc56e85471580cf9df83dc8e3571e39c34d473fb0aef68af21062d0de75754"
+        }
+      ]
+    },
+    {
+      "sha": "5103d9ca79d9fa65154a39bebf7ccf29dddcdf1e",
+      "parent": "6dad35e4b9e81221b4899c280fb3dd0d6e994728",
+      "headSha": "598a804d95ac0e8e73b2a0d9a8c62594c600ee72",
+      "pr": 581,
+      "files": [
+        {
+          "path": "docs/05-architecture/CR_COST_05_CORE_MARKET_CONTRACT.md",
+          "before": "6ca97522ba365af9da5aa82562606835cc664292d79f24e4286674338f7c0d2f",
+          "after": "e4385fbb005687425856a0fc6af229feb43d2b805b5542897ee2c519530e6c61"
+        },
+        {
+          "path": "src/integrations/supabase/types.ts",
+          "before": "e271c305df4ae02b5c319f76674be10853a4b9af159189759119e0d716a54bc9",
+          "after": "682db2d69c4e7b2664f5e488992b4d4f834977b6895ebf747af3086482f27993"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-catalog-ingestion-service.spec.ts",
+          "before": "27b83919b80da56b0874d9a0553335938cf7fe11b948a39018bbfb8577868fcb",
+          "after": "cec8b42c4431bd82aabf511088fb2540de0344fec8d290154008e924cb3be2a6"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-catalog-ingestion-service.ts",
+          "before": "9dc75405a91e45da87f0ccf2fb0cd7f34ebe1ec17ce9884d5801699a6664b58d",
+          "after": "82e95544ed55e6bb219d60b526508dc14a472038ceab8ab7d412e1b2fb048379"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/document-extraction.ts",
+          "before": null,
+          "after": "bf995deccf9cb23bb4448f95e0aa81e2854e6e378ebab58608e6edc87284e159"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/types.ts",
+          "before": "fab000f8a06162d698b54549ae84eac123d435f91160fcfdca71b727565433e5",
+          "after": "5dddf1af627426540e1f44907c2bb7031eec44ecb5200b2fb6aeb573f1b9c273"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/cr-cost-05-pr4-batches-and-audit.spec.ts",
+          "before": null,
+          "after": "65ab3a7dc08b72705b171857b00106a7fa21f5e8dba6396fd1901f06b6c62ef7"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/csv-catalog-parser.ts",
+          "before": "7c0df324f5c93bf2b7f1feb81f10f2e2de69f1a02cb1664af82a6300f7717f08",
+          "after": "07d112e5e915bd20e4d38cf7790a0d74874ded56679b6e3a987a9b95bc40dfc8"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/document-catalog-extractor.spec.ts",
+          "before": null,
+          "after": "4d1490f0aff5211d2c8091f8915dd94ff8e2d6dd08ec5a5d22ca9fc546664185"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/document-catalog-extractor.ts",
+          "before": null,
+          "after": "408b90b7146f951d3a7859cd2386c071bc25440887688fd480a368673b792375"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/open-food-facts-client.spec.ts",
+          "before": null,
+          "after": "45e967f8a95c586801ac50181c5f29a744194281cc687b3c7bae3781f6587582"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/open-food-facts-client.ts",
+          "before": null,
+          "after": "445a212482b5b6d396adad46b0a5df409e53b202352eefd288e2f52f8573676f"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/in-memory-market-repository.ts",
+          "before": "c586f7af4ddc9beb53d19dba25efc66bada5904ed9678680a449e5d8fa721d07",
+          "after": "9d78dc012eeb0e26cbd876548b4436c12cb5e58abc192199486416c2e2d263d1"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/market-repository-interface.ts",
+          "before": "1309dba3e346a7384d37c719ee6bf52f9a81ae14f57bc2f2114abc7e070675c2",
+          "after": "8b78fbe87155a1a87b3b0c05e3edba142262aaa9729474a179b75b282589e306"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.spec.ts",
+          "before": "5a8b4d07e2c04a83891b88780ecfec7cf975ba2c76b4c47cdde842debe5b567d",
+          "after": "bd90335b7629643c85095f0a62e1ab803aea515de15888018d20adcd89b62944"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/supabase-market-repository.ts",
+          "before": "c5dc56e85471580cf9df83dc8e3571e39c34d473fb0aef68af21062d0de75754",
+          "after": "c7c855eda183ab4159e3c7f56ee62d97318892c26e2eaa8af10b6f486d0cea3c"
+        },
+        {
+          "path": "supabase/migrations/20261112240000_cr_cost_05_pr4_ingestion_batches_and_audit.sql",
+          "before": null,
+          "after": "297254ddc0c4e707aabca49b09a74891048729d2f2f4808ea5c5840c20905a3b"
+        },
+        {
+          "path": "supabase/migrations/rollback/20261112240000_cr_cost_05_pr4_ingestion_batches_and_audit_down.sql",
+          "before": null,
+          "after": "f7718e94041bf4c29676c3d0650a650d4edf81b5807bb3d07a72648792035032"
+        }
+      ]
+    },
+    {
+      "sha": "c60da942f6bbac9cb0378a231458caaf9b55a3ab",
+      "parent": "5103d9ca79d9fa65154a39bebf7ccf29dddcdf1e",
+      "headSha": "bd1028a4e600e75e096ac6df1babb61a4a518bac",
+      "pr": 582,
+      "files": [
+        {
+          "path": "docs/05-architecture/CR_COST_05_CORE_MARKET_CONTRACT.md",
+          "before": "e4385fbb005687425856a0fc6af229feb43d2b805b5542897ee2c519530e6c61",
+          "after": "2485b063a51c2a1b8fb954fd17d919d8c7498f942177ffe96b31b79cd191f103"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/connector-ingestion-service.spec.ts",
+          "before": null,
+          "after": "192a4e26933c9cf3c23e37c9a59d38c7d6ccc0d40222e3eee454972041852978"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/connector-ingestion-service.ts",
+          "before": null,
+          "after": "067f1a131dfe0fb160e5a75c695866d2345ac1d239ce0bec8855263b35274c53"
+        },
+        {
+          "path": "src/modules/market-intelligence/application/market-catalog-ingestion-service.ts",
+          "before": "82e95544ed55e6bb219d60b526508dc14a472038ceab8ab7d412e1b2fb048379",
+          "after": "7f52d041b6643fe0d2f719f49a02f15fa47a16f1ccf33029e37d150f400efc14"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/connector-types.ts",
+          "before": null,
+          "after": "ba967fec67ca054d42aab0840926f0be267d31bfcb4784071d61b58b3f174099"
+        },
+        {
+          "path": "src/modules/market-intelligence/domain/types.ts",
+          "before": "5dddf1af627426540e1f44907c2bb7031eec44ecb5200b2fb6aeb573f1b9c273",
+          "after": "f1cfdced7aa8f206657b0e5b06e8c8295b21b4356a38d64b20087edb6666076c"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/connectors/base-http-connector.spec.ts",
+          "before": null,
+          "after": "2876e2d05ae305496534cc8a17f9511409ebb99c4e2da764882315dc374ce12d"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/connectors/base-http-connector.ts",
+          "before": null,
+          "after": "d0430b45f88d55070a3accf72815e3dfbd80810840187a9d1d1e83da1bbedb9e"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/connectors/market-connector-registry.ts",
+          "before": null,
+          "after": "c90ac66f9b2ce7b027d3fd49dac6d02752fe326a1f16a4a1ff287f40d91f47ea"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/connectors/public-connectors.spec.ts",
+          "before": null,
+          "after": "37e1e7b7b00f4e416cfbd6ec6a297bb90e5d54d0192f837689aeb13a900239d2"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/connectors/public-pdf-catalog-connector.ts",
+          "before": null,
+          "after": "75b0085b83b3b4184ec791049a48046b8df324d9b20fa505cb0dba9927de637b"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/connectors/public-structured-feed-connector.ts",
+          "before": null,
+          "after": "330e38e797de5a02f0c823423ab5ee83122a4652cd1f085cc222318f9858355e"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/connectors/restricted-source-policy.spec.ts",
+          "before": null,
+          "after": "463ef8bb61daf76d86b140a33619fdd16137e153a399f02ceb7f70f54ff0ed15"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/connectors/restricted-source-policy.ts",
+          "before": null,
+          "after": "c26fcd6edc6e8c65c27ed7e8b5fdcf6868dd3b12e0ca7f4931d7073216d404b5"
+        },
+        {
+          "path": "src/modules/market-intelligence/infrastructure/repositories/in-memory-market-repository.ts",
+          "before": "9d78dc012eeb0e26cbd876548b4436c12cb5e58abc192199486416c2e2d263d1",
+          "after": "5a34b8460d18e6a388cc679064bc49364f9f58081c66c87d4192870ee365cb21"
+        }
+      ]
+    }
+  ],
+  "governanceBranch": "fix/gate7-separate-authorization-cr-cost-05",
+  "governancePaths": [
+    ".github/workflows/deploy-production.yml",
+    "docs/99-internal/development-journal/2026-11-21-gate7-cr-cost-05-582-reconciliation.md",
+    "scripts/governance/release-b1-spatial-567.spec.mjs",
+    "scripts/governance/release-cr-cost-05-582.json",
+    "scripts/governance/release-cr-cost-05-582.mjs",
+    "scripts/governance/release-cr-cost-05-582.spec.mjs",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "dbMigrationsAppliedAcknowledged": true
+  }
+}

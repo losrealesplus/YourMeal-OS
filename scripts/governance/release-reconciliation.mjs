@@ -1,3 +1,4 @@
+import { assertCrCost05_582Manifest } from "./release-cr-cost-05-582.mjs";
 import { assertSmokeRetry574Manifest } from "./release-smoke-retry-574.mjs";
 import { assertEatClean1A563Manifest } from "./release-eatclean-1a-flow04-563.mjs";
 import { assertB1Spatial567Manifest } from "./release-b1-spatial-567.mjs";
@@ -332,6 +333,7 @@ export function assertReconciliationManifest(manifest, fresh) {
     assertEatClean1A563Manifest(manifest, fresh);
     assertB1Spatial567Manifest(manifest, fresh);
     assertSmokeRetry574Manifest(manifest, fresh);
+    assertCrCost05_582Manifest(manifest, fresh);
     if (fresh.reconciliation.payload?.reconciliationType === "A4B_CLOSED_RELEASE") {
       demand(
         [manifest.reconciliation, manifest.plan.reconciliation].every(
