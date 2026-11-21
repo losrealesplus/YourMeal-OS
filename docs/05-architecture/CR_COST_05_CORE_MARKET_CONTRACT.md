@@ -152,3 +152,36 @@ PR3A establece el blindaje de seguridad y activación sin introducir comparadore
   - Si existen productos privados (`owner_tenant_id IS NOT NULL`), aborta inmediatamente con excepción `restrict_violation` para evitar la pérdida accidental o destrucción silenciosa de catálogos privados de clientes.
   - Al ejecutarse sobre una base de datos sin productos privados, restituye exactamente el baseline de PR2, restaura la restricción global de unicidad de SKUs, revoca privilegios extendidos y elimina las funciones de seguridad de PR3A.
 
+---
+
+## 11. Contrato Físico Extendido, Fiscalidad de Tiers y Configuración por Tenant (PR2B)
+
+PR2B perfecciona la base física y fiscal para la posterior ingesta y cálculo de costes (Bloque 3):
+
+1. **Gestión de Tramos por Volumen (`public.market_volume_tiers`) con Regla D-010:**
+   - Cada escalado registra su propia unidad física (`tier_quantity_unit`), precio bruto (`tier_price_raw`), modo impositivo (`tax_mode`) y tipo de gravamen (`tax_rate`).
+   - Si `tax_mode = 'unknown'` o (`tax_mode IN ('in_tax', 'inc_tax')` y `tax_rate IS NULL`), `tier_normalized_price_ex_tax` permanece estrictamente `NULL` por restricción SQL (`check_mvt_tax_normalization_integrity`), impidiendo fabricar precios netos inventados en los tramos.
+   - **Inmutabilidad estricta:** el trigger `trg_guard_market_volume_tier_immutability()` bloquea cualquier `UPDATE` o `DELETE` sobre tramos de volumen históricos.
+2. **Productos de Peso Variable (*Catch-Weight*):**
+   - La columna `is_catch_weight boolean NOT NULL DEFAULT false` en `market_products` identifica productos cárnicos o pesqueros cuyo empaquetado o pieza no posee peso idéntico pieza a pieza.
+   - En el dominio (`physical-format.ts`), si `is_catch_weight = true` y la política del tenant es `allow_variable_kg`, se permite la variación respecto al peso nominal y se normaliza por €/kg sin rechazar la observación; si la política del tenant es `strict_nominal_pack`, se preserva la tolerancia estricta del 0,5%.
+3. **Clasificación Arancelaria (`taric_code`):**
+   - `taric_code text NULL` (con validación de 4 a 10 dígitos numéricos) permite trazar partidas aduaneras en Canarias (DUA / AIEM / exenciones) a nivel de SKU del Core sin hardcodear tipos ni reglas exclusivas del tenant.
+4. **Configuración de Tenant para Market Intelligence (`public.market_tenant_configs`):**
+   - Configuración multi-tenant aislada mediante RLS:
+     - `pricing_comparison_mode`: `'landed_cost' | 'origin_price'` (por defecto `'landed_cost'`).
+     - `catch_weight_policy`: `'allow_variable_kg' | 'strict_nominal_pack'` (por defecto `'allow_variable_kg'`).
+5. **Ingesta CSV sin Asunciones de Masa:**
+   - El parser y servicio de ingesta rechazan filas sin especificación física explícita con diagnóstico claro (`INVALID_PHYSICAL_SPEC`), eliminando cualquier fallback a 1 kg por defecto.
+
+---
+
+## 12. Política de Rollback Fail-Closed de PR2B
+
+- El script de reversión (`supabase/migrations/rollback/20261112230000_cr_cost_05_pr2b_physical_fiscal_tiers_down.sql`) aplica aborto preventivo (`RAISE EXCEPTION`):
+  - Aborta si existen filas en `market_tenant_configs`.
+  - Aborta si existen productos en `market_products` con `is_catch_weight = true` o `taric_code IS NOT NULL`.
+  - Aborta si existen escalados en `market_volume_tiers` que utilicen las columnas extendidas de PR2B o tengan precios normalizados `NULL` (D-010).
+  - Solo si no existen filas dependientes, retira limpiamente el trigger de inmutabilidad de tiers, la tabla `market_tenant_configs` y las columnas extendidas.
+
+

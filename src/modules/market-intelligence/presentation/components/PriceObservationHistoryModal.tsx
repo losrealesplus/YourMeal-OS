@@ -116,8 +116,12 @@ export function PriceObservationHistoryModal({
                         <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
                           {obs.volumeTiers.map((tier) => (
                             <div key={tier.id} className="flex justify-between bg-white px-2 py-1 rounded border">
-                              <span>Desde {tier.minQuantity} uds:</span>
-                              <span className="font-bold text-indigo-700">{tier.tierNormalizedPriceExTax.toFixed(2)} €</span>
+                              <span>Desde {tier.minQuantity} {tier.tierQuantityUnit || 'uds'}:</span>
+                              <span className="font-bold text-indigo-700">
+                                {tier.tierNormalizedPriceExTax != null
+                                  ? `${tier.tierNormalizedPriceExTax.toFixed(2)} €`
+                                  : 'Pendiente (fiscalidad desconocida)'}
+                              </span>
                             </div>
                           ))}
                         </div>

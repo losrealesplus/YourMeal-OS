@@ -5,6 +5,7 @@
  */
 
 import type {
+  CatchWeightPolicy,
   ContentUnit,
   MeasurementDimension,
   NormalizationBasis,
@@ -45,6 +46,8 @@ export interface PhysicalPackInput {
   observedPriceBasis?: ObservedPriceBasis | null;
   densityKgPerL?: number | null;
   targetDimension?: MeasurementDimension | null;
+  isCatchWeight?: boolean | null;
+  catchWeightPolicy?: CatchWeightPolicy | null;
 }
 
 export interface ResolvedPhysicalPack {
@@ -53,6 +56,7 @@ export interface ResolvedPhysicalPack {
   normalizedUnit: NormalizedUnit;
   measurementDimension: MeasurementDimension;
   normalizationBasis: NormalizationBasis;
+  hasCatchWeightDeviation?: boolean;
 }
 
 function round(val: number, decimals = 6): number {
@@ -274,6 +278,10 @@ export function resolvePhysicalPack(input: PhysicalPackInput): ResolvedPhysicalP
   }
 
   // Validate pack consistency if packCount, unitContent, and netContent are all specified
+  const isCatchWeight = Boolean(input.isCatchWeight);
+  const catchWeightPolicy: CatchWeightPolicy = input.catchWeightPolicy || "allow_variable_kg";
+  let hasCatchWeightDeviation = false;
+
   if (
     input.packCount != null &&
     input.unitContentQty != null &&
@@ -291,10 +299,16 @@ export function resolvePhysicalPack(input: PhysicalPackInput): ResolvedPhysicalP
     const expectedNetStd = input.packCount * input.unitContentQty * innerSpec.factorToStandard;
     const declaredNetStd = input.netContentQty * netSpec.factorToStandard;
     const tolerance = Math.max(0.0001, expectedNetStd * 0.005);
-    if (Math.abs(expectedNetStd - declaredNetStd) > tolerance) {
-      throw new Error(
-        `Pack consistency mismatch: ${input.packCount} x ${input.unitContentQty} ${input.unitContentUnit} (${round(expectedNetStd, 4)} ${innerSpec.standardUnit}) contradicts netContent (${round(declaredNetStd, 4)} ${netSpec.standardUnit}).`,
-      );
+    const diff = Math.abs(expectedNetStd - declaredNetStd);
+
+    if (diff > tolerance) {
+      if (isCatchWeight && catchWeightPolicy === "allow_variable_kg") {
+        hasCatchWeightDeviation = true;
+      } else {
+        throw new Error(
+          `Pack consistency mismatch: ${input.packCount} x ${input.unitContentQty} ${input.unitContentUnit} (${round(expectedNetStd, 4)} ${innerSpec.standardUnit}) contradicts netContent (${round(declaredNetStd, 4)} ${netSpec.standardUnit}).`,
+        );
+      }
     }
   }
 
@@ -394,6 +408,7 @@ export function resolvePhysicalPack(input: PhysicalPackInput): ResolvedPhysicalP
         normalizedUnit: "EUR_PER_KG",
         measurementDimension: "mass",
         normalizationBasis,
+        hasCatchWeightDeviation,
       };
     }
     throw new Error(
@@ -407,5 +422,6 @@ export function resolvePhysicalPack(input: PhysicalPackInput): ResolvedPhysicalP
     normalizedUnit: spec.normalizedUnit,
     measurementDimension: spec.dimension,
     normalizationBasis,
+    hasCatchWeightDeviation,
   };
 }
