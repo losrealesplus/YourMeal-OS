@@ -137,7 +137,7 @@ test("CR-COST-05 #582: static configuration invariants", () => {
   assert.deepEqual(r.productPrs, [576, 577, 578, 579, 580, 581, 582]);
   assert.equal(r.productCommits.length, 7);
   assert.equal(productPaths.length, 73);
-  assert.equal(r.governancePaths.length, 9);
+  assert.equal(r.governancePaths.length, 10);
   assert.equal(r.constraints.productionSqlAuthorized, false);
   assert.equal(r.constraints.migrationExecutionAuthorized, false);
   assert.equal(r.constraints.productionWorkerApprovalGranted, false);
@@ -284,4 +284,64 @@ test("CR-COST-05 #582: routeExactInterval routes baseline f3a505ba exclusively t
       ),
     /Exact interval|CR-COST-05|Git|fatal/,
   );
+});
+
+test("CR-COST-05 #582: supports sequential governance PRs (PR #583 + terminal PR #584)", () => {
+  const s = snapshot(true);
+  const secondGovSha = "3".repeat(40);
+  const secondGovCommit = {
+    sha: secondGovSha,
+    parent: finalSha,
+    pr: 584,
+    headSha: "4".repeat(40),
+    files: [
+      {
+        path: "scripts/governance/release-cr-cost-05-582.json",
+        before: "a".repeat(64),
+        after: "c".repeat(64),
+      },
+      {
+        path: "scripts/governance/release-cr-cost-05-582.mjs",
+        before: "a".repeat(64),
+        after: "c".repeat(64),
+      },
+    ],
+  };
+  s.commits.push(secondGovCommit);
+  s.diff.commits.push(secondGovSha);
+  s.targetSha = secondGovSha;
+  s.currentMainSha = secondGovSha;
+  s.remediation = humanPr(584, secondGovSha, "4".repeat(40), "fix/gate7-cr-cost-05-total-paths-83");
+
+  const payload = crCost05_582Payload(s, policy);
+  assert.equal(payload.governancePr, 584);
+  assert.equal(payload.finalSourceSha, secondGovSha);
+
+  const ctx = {
+    repository: r.repository,
+    ref: "refs/heads/main",
+    sha: secondGovSha,
+    runId: "999003",
+    attempt: "1",
+    event: "workflow_dispatch",
+  };
+  const run = {
+    id: 999003,
+    run_attempt: 1,
+    event: "workflow_dispatch",
+    head_branch: "main",
+    head_sha: secondGovSha,
+    path: ".github/workflows/deploy-production.yml",
+    actor: { id: r.reviewerId },
+    triggering_actor: { id: r.reviewerId },
+  };
+
+  const res = authorizeCrCost05_582(
+    s,
+    { mode: "normal", reason: "Multi-stage governance update" },
+    ctx,
+    run,
+    policy,
+  );
+  assert.equal(res.reconciled, true);
 });

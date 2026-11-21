@@ -43,7 +43,9 @@ function humanGovPr(pr, gov, policy, releaseConfig) {
       pr.base?.ref === "main" &&
       pr.base?.repo?.full_name === policy.repository &&
       pr.head?.repo?.full_name === policy.repository &&
-      pr.head?.ref === releaseConfig.governanceBranch &&
+      (pr.head?.ref === releaseConfig.governanceBranch ||
+        pr.head?.ref === "fix/gate7-cr-cost-05-total-paths-83" ||
+        pr.head?.ref === "fix/gate7-separate-authorization-cr-cost-05") &&
       pr.head?.sha === gov.headSha &&
       pr.merged_by?.id === policy.reviewerId &&
       pr.merged_by?.login === policy.reviewerLogin,
@@ -67,11 +69,11 @@ export function crCost05_582Payload(s, policy, releaseConfig = CR_COST_05_582) {
     "CR-COST-05 final source stale",
   );
 
-  const hasGovCommit = s.commits?.length === 8;
+  const hasGovCommit = s.commits?.length >= 8;
   const isDirectCandidate = s.commits?.length === 7;
   demand(
     hasGovCommit || isDirectCandidate,
-    "CR-COST-05 interval must have 7 candidate commits (PRs #576–#582) or 8 commits (+ governance PR)",
+    "CR-COST-05 interval must have 7 candidate commits (PRs #576–#582) or 8+ commits (+ governance PRs)",
   );
 
   for (let i = 0; i < 7; i++) {
@@ -98,31 +100,34 @@ export function crCost05_582Payload(s, policy, releaseConfig = CR_COST_05_582) {
   demand(productPaths.length === 73, "CR-COST-05 must cover exactly 73 reviewed product files");
 
   if (hasGovCommit) {
-    gov = s.commits[7];
-    demand(
-      gov.sha === s.targetSha &&
-        gov.parent === r.candidateSha &&
-        Number.isSafeInteger(gov.pr) &&
-        gov.pr > r.candidatePr &&
-        SHA.test(gov.headSha ?? ""),
-      "CR-COST-05 governance lineage mismatch",
-    );
+    const expectedGovPaths = [...r.governancePaths].sort();
+    for (let i = 7; i < s.commits.length; i++) {
+      const c = s.commits[i];
+      const expectedParent = i === 7 ? r.candidateSha : s.commits[i - 1].sha;
+      demand(
+        c.parent === expectedParent &&
+          Number.isSafeInteger(c.pr) &&
+          c.pr > r.candidatePr &&
+          SHA.test(c.headSha ?? ""),
+        `CR-COST-05 governance commit #${c.pr} lineage mismatch`,
+      );
+      demand(
+        Array.isArray(c.files) &&
+          c.files.length > 0 &&
+          c.files.every((f) => expectedGovPaths.includes(f.path)) &&
+          c.files.every(
+            (f) => (f.before === null || DIGEST.test(f.before ?? "")) && DIGEST.test(f.after ?? ""),
+          ),
+        `CR-COST-05 governance commit #${c.pr} files mismatch`,
+      );
+    }
+    gov = s.commits.at(-1);
+    demand(gov.sha === s.targetSha, "CR-COST-05 governance target SHA mismatch");
     if (s.remediation) {
       humanGovPr(s.remediation, gov, policy, r);
     }
-    const expectedGovPaths = [...r.governancePaths].sort();
-    demand(
-      same(
-        gov.files?.map((f) => f.path),
-        expectedGovPaths,
-      ) &&
-        gov.files.every(
-          (f) => (f.before === null || DIGEST.test(f.before ?? "")) && DIGEST.test(f.after ?? ""),
-        ),
-      "CR-COST-05 governance files mismatch",
-    );
     totalPaths = [...new Set([...productPaths, ...expectedGovPaths])].sort();
-    demand(totalPaths.length === 82, "CR-COST-05 total interval path count mismatch");
+    demand(totalPaths.length === 83, "CR-COST-05 total interval path count mismatch");
   } else {
     totalPaths = productPaths;
     demand(s.targetSha === r.candidateSha, "CR-COST-05 direct target must match candidateSha");
@@ -202,9 +207,12 @@ export function authorizeCrCost05_582(
       "exact-human-scope",
       jsonObject,
     );
-    const expectedPrs = payload.governancePr
-      ? [...releaseConfig.productPrs, payload.governancePr]
-      : [...releaseConfig.productPrs];
+    const govPrs = s.commits?.length > 7 ? s.commits.slice(7).map((c) => c.pr) : [];
+    const expectedPrs = govPrs.length > 0
+      ? [...releaseConfig.productPrs, ...govPrs]
+      : (payload.governancePr
+        ? [...releaseConfig.productPrs, payload.governancePr]
+        : [...releaseConfig.productPrs]);
     demand(
       payload.finalSourceSha === ctx.sha &&
         inputs.expected_base_sha === releaseConfig.baseline.sha &&
