@@ -14,20 +14,37 @@ export interface IMarketIntelligenceRepository {
   getSourceByName(name: string): Promise<MarketSource | null>;
   saveSource(source: MarketSource): Promise<void>;
 
-  getEstablishmentsBySource(sourceId: string): Promise<MarketEstablishment[]>;
+  getEstablishmentsBySource(
+    sourceId: string,
+    tenantId?: string | null
+  ): Promise<MarketEstablishment[]>;
   saveEstablishment(establishment: MarketEstablishment): Promise<void>;
 
-  getCoveragesBySource(sourceId: string): Promise<MarketDeliveryCoverage[]>;
+  getCoveragesBySource(
+    sourceId: string,
+    tenantId?: string | null
+  ): Promise<MarketDeliveryCoverage[]>;
   saveCoverage(coverage: MarketDeliveryCoverage): Promise<void>;
 
   getProductById(id: string): Promise<MarketProduct | null>;
-  getProductsBySource(sourceId: string): Promise<MarketProduct[]>;
-  findProductBySku(sourceId: string, sku: string): Promise<MarketProduct | null>;
-  findProductByName(sourceId: string, rawName: string): Promise<MarketProduct | null>;
+  getProductsBySource(sourceId: string, tenantId?: string | null): Promise<MarketProduct[]>;
+  findProductBySku(
+    sourceId: string,
+    sku: string,
+    tenantId?: string | null
+  ): Promise<MarketProduct | null>;
+  findProductByName(
+    sourceId: string,
+    rawName: string,
+    tenantId?: string | null
+  ): Promise<MarketProduct | null>;
   saveProduct(product: MarketProduct): Promise<void>;
 
   getObservationById(id: string): Promise<MarketPriceObservation | null>;
-  getObservationsByProduct(productId: string): Promise<MarketPriceObservation[]>;
+  getObservationsByProduct(
+    productId: string,
+    tenantId?: string | null
+  ): Promise<MarketPriceObservation[]>;
   findObservationByFingerprint(fingerprint: string): Promise<MarketPriceObservation | null>;
   saveObservation(observation: MarketPriceObservation, fingerprint: string): Promise<void>;
   updateObservationValidity(

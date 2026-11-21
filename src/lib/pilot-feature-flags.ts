@@ -18,6 +18,8 @@ export const PILOT_ADMIN_MODULE_FLAGS = {
   production: "admin_module_production",
   routes: "admin_module_routes",
   designSystem: "admin_module_design_system",
+  costIntelligence: "admin_module_cost_intelligence",
+  marketIntelligence: "admin_module_market_intelligence",
 } as const;
 
 export type PilotAdminModuleFlag =

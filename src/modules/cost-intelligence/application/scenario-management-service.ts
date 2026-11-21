@@ -7,6 +7,8 @@
 
 import { ServiceContext } from "@/services/types";
 import { DomainError, permissionDenied } from "@/domain/errors";
+import { FeatureFlagService } from "@/services/feature-flag-service";
+import { PILOT_ADMIN_MODULE_FLAGS } from "@/lib/pilot-feature-flags";
 import { CostBaselineSnapshot, HypotheticalVariables, ScenarioResult } from "../domain/types";
 import { CostSimulationScenarioRecord, ScenarioPresetType, ScenarioStatus } from "../domain/scenario-types";
 import { ScenarioRepository, SupabaseScenarioRepository } from "../infrastructure/scenario-repository";
@@ -42,7 +44,21 @@ export class ScenarioManagementService {
   constructor(
     private readonly repositoryFactory: (ctx: ServiceContext) => ScenarioRepository = (ctx) =>
       new SupabaseScenarioRepository(ctx.supabase),
+    private readonly isModuleEnabled: (ctx: ServiceContext) => Promise<boolean> = async (ctx) => {
+      if (typeof ctx.supabase?.from !== "function") return true;
+      return FeatureFlagService.isEnabled(ctx, PILOT_ADMIN_MODULE_FLAGS.costIntelligence);
+    },
   ) {}
+
+  private async assertCostIntelligenceModuleEnabled(ctx: ServiceContext): Promise<void> {
+    const enabled = await this.isModuleEnabled(ctx);
+    if (!enabled) {
+      throw new DomainError(
+        "PERMISSION_DENIED",
+        "El módulo Cost Intelligence está desactivado para este tenant (modo solo lectura).",
+      );
+    }
+  }
 
   /**
    * Builds and persists a simulated scenario against a frozen baseline snapshot.
@@ -53,6 +69,7 @@ export class ScenarioManagementService {
   ): Promise<CostSimulationScenarioRecord> {
     assertTenant(ctx);
     assertCostIntelligencePermission(ctx);
+    await this.assertCostIntelligenceModuleEnabled(ctx);
 
     const repo = this.repositoryFactory(ctx);
     const tempId = `scenario-${Date.now()}`;
@@ -109,6 +126,7 @@ export class ScenarioManagementService {
   ): Promise<void> {
     assertTenant(ctx);
     assertCostIntelligencePermission(ctx);
+    await this.assertCostIntelligenceModuleEnabled(ctx);
 
     const repo = this.repositoryFactory(ctx);
     await repo.archiveScenario(scenarioId, ctx.tenantId);

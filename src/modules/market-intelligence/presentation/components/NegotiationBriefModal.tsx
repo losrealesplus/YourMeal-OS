@@ -51,7 +51,7 @@ export function NegotiationBriefModal({
   };
 
   const variancePct = brief.varianceAnalysis.marketVariancePct;
-  const isOverpaying = variancePct > 0;
+  const isOverpaying = variancePct != null && variancePct > 0;
 
   const getSourceTypeLabel = (type: string) => {
     switch (type) {
@@ -84,15 +84,21 @@ export function NegotiationBriefModal({
                 </DialogDescription>
               </div>
             </div>
-            <Badge
-              className={
-                isOverpaying
-                  ? 'bg-rose-100 text-rose-800 text-xs font-mono border-rose-200'
-                  : 'bg-emerald-100 text-emerald-800 text-xs font-mono border-emerald-200'
-              }
-            >
-              {isOverpaying ? `+${variancePct.toFixed(1)}% Sobreprecio vs Mercado` : `${variancePct.toFixed(1)}% en Rango de Mercado`}
-            </Badge>
+            {variancePct != null ? (
+              <Badge
+                className={
+                  isOverpaying
+                    ? 'bg-rose-100 text-rose-800 text-xs font-mono border-rose-200'
+                    : 'bg-emerald-100 text-emerald-800 text-xs font-mono border-emerald-200'
+                }
+              >
+                {isOverpaying ? `+${variancePct.toFixed(1)}% Sobreprecio vs Mercado` : `${variancePct.toFixed(1)}% en Rango de Mercado`}
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-xs font-mono text-slate-500">
+                Pendiente de Datos
+              </Badge>
+            )}
           </div>
         </DialogHeader>
 
@@ -122,7 +128,9 @@ export function NegotiationBriefModal({
                 </Badge>
               </div>
               <div className="font-mono text-lg font-bold text-indigo-700">
-                {brief.benchmarkPriceExTax.toFixed(2)} €/{brief.unit}
+                {brief.benchmarkPriceExTax != null
+                  ? `${brief.benchmarkPriceExTax.toFixed(2)} €/${brief.unit}`
+                  : 'Pendiente'}
               </div>
               <div className="text-[11px] text-slate-400">
                 Comparabilidad: {brief.varianceAnalysis.confidenceSummary}
@@ -137,12 +145,14 @@ export function NegotiationBriefModal({
                 </Badge>
               </div>
               <div className="font-mono text-lg font-bold text-emerald-700">
-                {brief.potentialAnnualSavingsEur > 0
+                {brief.potentialAnnualSavingsEur != null && brief.potentialAnnualSavingsEur > 0
                   ? `${brief.potentialAnnualSavingsEur.toFixed(2)} €`
-                  : '0,00 €'}
+                  : brief.potentialAnnualSavingsEur != null
+                  ? '0,00 €'
+                  : 'Sin volumen'}
               </div>
               <div className="text-[11px] text-emerald-600">
-                Consumo: {brief.consumptionVolume} {brief.unit}/año
+                Consumo: {brief.consumptionVolume != null ? `${brief.consumptionVolume} ${brief.unit}/año` : 'No documentado'}
               </div>
             </div>
           </div>

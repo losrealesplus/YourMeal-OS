@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 export interface MarketSourceSpreadCardProps {
   ingredientName: string;
   components: BenchmarkComponent[];
-  benchmarkPriceExTax: number;
+  benchmarkPriceExTax: number | null;
   effectiveWacExTax?: number;
   unit?: string;
   className?: string;
@@ -85,7 +85,9 @@ export function MarketSourceSpreadCard({
               Dispersión: {spreadPct.toFixed(1)}%
             </Badge>
             <Badge className="font-mono text-xs bg-slate-900 text-white">
-              Benchmark [OBSERVADO]: {benchmarkPriceExTax.toFixed(2)} €/{unit}
+              {benchmarkPriceExTax != null
+                ? `Benchmark [OBSERVADO]: ${benchmarkPriceExTax.toFixed(2)} €/${unit}`
+                : 'Benchmark: Pendiente'}
             </Badge>
           </div>
         </div>
@@ -101,7 +103,7 @@ export function MarketSourceSpreadCard({
               const isFloor = comp.normalizedPriceExTax === minPrice;
               const isCeiling = comp.normalizedPriceExTax === maxPrice;
               const diffVsBenchmark =
-                benchmarkPriceExTax > 0
+                benchmarkPriceExTax != null && benchmarkPriceExTax > 0
                   ? ((comp.normalizedPriceExTax - benchmarkPriceExTax) / benchmarkPriceExTax) * 100
                   : 0;
 

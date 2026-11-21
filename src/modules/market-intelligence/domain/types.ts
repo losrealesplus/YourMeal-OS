@@ -219,6 +219,7 @@ export interface MarketDeliveryCoverage {
 export interface MarketProduct {
   id: string;
   sourceId: string;
+  ownerTenantId?: string | null;
   externalSku?: string;
   gtin?: string | null;
   rawName: string;
@@ -391,18 +392,26 @@ export interface BenchmarkComponent {
   isPromo: boolean;
 }
 
+export type BenchmarkStatus =
+  | 'COMPUTED'
+  | 'PENDING_NORMALIZATION'
+  | 'NO_VALID_OBSERVATIONS';
+
 export interface BenchmarkCalculation {
   tenantIngredientId: string;
   tenantIngredientName: string;
   calculatedAt: string;
   canonicalUnit: NormalizedUnit;
-  benchmarkPriceExTax: number;
-  minPriceExTax: number;
-  maxPriceExTax: number;
-  dispersionSpreadPct: number;
+  benchmarkStatus?: BenchmarkStatus;
+  benchmarkPriceExTax: number | null;
+  minPriceExTax: number | null;
+  maxPriceExTax: number | null;
+  dispersionSpreadPct: number | null;
   observationsCount: number;
   highComparabilityCount: number;
   components: BenchmarkComponent[];
+  historicalReferences?: BenchmarkComponent[];
+  diagnosticNote?: string | null;
 }
 
 export interface VarianceAnalysis {
@@ -411,11 +420,11 @@ export interface VarianceAnalysis {
   unit: NormalizedUnit;
   effectiveWacExTax: number;
   currentInvoicedPriceExTax?: number;
-  benchmarkPriceExTax: number;
-  marketVariancePct: number; // (WAC - Benchmark) / Benchmark * 100
-  supplierPriceGapEur: number; // Invoiced - Benchmark
-  annualSpendAtRiskEur?: number;
-  status: 'FAVORABLE' | 'AT_PAR' | 'UNFAVORABLE_OVERPAYING';
+  benchmarkPriceExTax: number | null;
+  marketVariancePct: number | null; // (WAC - Benchmark) / Benchmark * 100
+  supplierPriceGapEur: number | null; // Invoiced - Benchmark
+  annualSpendAtRiskEur?: number | null;
+  status: 'FAVORABLE' | 'AT_PAR' | 'UNFAVORABLE_OVERPAYING' | 'PENDING_DATA';
   confidenceSummary: ComparabilityGrade;
 }
 
@@ -435,11 +444,11 @@ export interface NegotiationBrief {
   targetSupplierName?: string;
   currentInvoicedPriceExTax: number;
   effectiveWacExTax: number;
-  consumptionVolume: number;
+  consumptionVolume: number | null;
   unit: StandardUnit;
-  projectedAnnualSpendEur: number;
-  benchmarkPriceExTax: number;
-  potentialAnnualSavingsEur: number;
+  projectedAnnualSpendEur: number | null;
+  benchmarkPriceExTax: number | null;
+  potentialAnnualSavingsEur: number | null;
   targetRenegotiationPriceExTax: number;
   varianceAnalysis: VarianceAnalysis;
   observableComponents: BenchmarkComponent[];

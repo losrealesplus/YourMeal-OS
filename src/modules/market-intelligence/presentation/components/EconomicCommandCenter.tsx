@@ -91,6 +91,7 @@ export interface EconomicCommandCenterProps {
   canEditDishes?: boolean;
   onRefreshData?: () => Promise<void>;
   onOpenMacroSimulator?: () => void;
+  isCostIntelligenceEnabled?: boolean;
 }
 
 export function EconomicCommandCenter({
@@ -106,7 +107,10 @@ export function EconomicCommandCenter({
   canEditDishes = true,
   onRefreshData,
   onOpenMacroSimulator,
+  isCostIntelligenceEnabled,
 }: EconomicCommandCenterProps) {
+  const costModuleActive = isCostIntelligenceEnabled ?? true;
+
   const {
     sources,
     marketProducts,
@@ -352,6 +356,12 @@ export function EconomicCommandCenter({
 
   const handleSaveDecisionIntent = async (op: EconomicOpportunity) => {
     if (!tenantId) return;
+    if (!costModuleActive) {
+      toast.error(
+        "El módulo Cost Intelligence está desactivado para este restaurante (modo solo lectura).",
+      );
+      return;
+    }
     if (!intentRationale.trim()) {
       toast.error("Describe la justificación de la decisión antes de guardar.");
       return;
@@ -422,6 +432,30 @@ export function EconomicCommandCenter({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Banner de Módulo Desactivado (Solo Lectura) */}
+      {!costModuleActive && (
+        <div className="p-3.5 rounded-lg border border-amber-300 bg-amber-50/90 text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
+          <div className="flex items-start sm:items-center gap-2.5">
+            <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+            <div>
+              <span className="font-semibold">
+                Inteligencia de Costes en Modo Solo Lectura (Desactivado)
+              </span>
+              <p className="text-amber-900/90 text-[11px] mt-0.5">
+                El módulo está desactivado para este restaurante. El feed de oportunidades y cálculos de mercado se
+                muestra con fines de consulta histórica. El registro de nuevas decisiones de gestión está deshabilitado.
+              </p>
+            </div>
+          </div>
+          <Badge
+            variant="outline"
+            className="text-[10px] font-semibold bg-white text-amber-800 border-amber-400 shrink-0 self-start sm:self-auto"
+          >
+            Solo Lectura
+          </Badge>
+        </div>
+      )}
+
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* 1. COMMAND STRIP: TRIAGE EJECUTIVO DE ATENCIÓN Y ACCIÓN             */}
       {/* ─────────────────────────────────────────────────────────────────── */}
@@ -865,8 +899,23 @@ export function EconomicCommandCenter({
                     <div className="flex justify-end pt-1">
                       <Button
                         size="sm"
-                        onClick={() => handleOpenDecisionForm(op)}
-                        className="h-8 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+                        onClick={() => {
+                          if (!costModuleActive) {
+                            toast.error(
+                              "El módulo Cost Intelligence está desactivado para este restaurante (modo solo lectura).",
+                            );
+                            return;
+                          }
+                          handleOpenDecisionForm(op);
+                        }}
+                        disabled={!costModuleActive}
+                        title={!costModuleActive ? "Módulo desactivado: solo lectura" : undefined}
+                        className={cn(
+                          "h-8 text-xs font-semibold shadow-xs",
+                          costModuleActive
+                            ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                            : "bg-muted text-muted-foreground cursor-not-allowed",
+                        )}
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
                         Registrar Decisión de Gestión
@@ -963,8 +1012,9 @@ export function EconomicCommandCenter({
                     <Button
                       size="sm"
                       onClick={() => handleSaveDecisionIntent(op)}
-                      disabled={isSubmittingDecision}
-                      className="h-7 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
+                      disabled={isSubmittingDecision || !costModuleActive}
+                      title={!costModuleActive ? "Módulo desactivado: solo lectura" : undefined}
+                      className="h-7 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
                     >
                       {isSubmittingDecision ? "Guardando..." : "Confirmar y Guardar Decisión"}
                     </Button>

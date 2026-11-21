@@ -53,7 +53,7 @@ export class ProductMappingService {
 
     const allProducts: MarketProduct[] = [];
     for (const s of sources) {
-      const prods = await this.repository.getProductsBySource(s.id);
+      const prods = await this.repository.getProductsBySource(s.id, tenantId);
       allProducts.push(...prods);
     }
 
@@ -137,6 +137,10 @@ export class ProductMappingService {
     const product = await this.repository.getProductById(marketProductId);
     if (!product) {
       throw new Error(`Market product not found: ${marketProductId}`);
+    }
+
+    if (product.ownerTenantId != null && product.ownerTenantId !== tenantId) {
+      throw new Error(`Cannot map product ${marketProductId}: private product owned by another tenant (${product.ownerTenantId})`);
     }
 
     const nowIso = new Date().toISOString();

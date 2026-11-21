@@ -49,9 +49,17 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
     this.sources.set(source.id, { ...source });
   }
 
-  public async getEstablishmentsBySource(sourceId: string): Promise<MarketEstablishment[]> {
+  public async getEstablishmentsBySource(
+    sourceId: string,
+    tenantId?: string | null
+  ): Promise<MarketEstablishment[]> {
     return Array.from(this.establishments.values()).filter(
-      (e) => e.sourceId === sourceId && e.isActive
+      (e) =>
+        e.sourceId === sourceId &&
+        e.isActive &&
+        (tenantId === undefined ||
+          e.ownerTenantId == null ||
+          (tenantId != null && e.ownerTenantId === tenantId))
     );
   }
 
@@ -59,8 +67,17 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
     this.establishments.set(establishment.id, { ...establishment });
   }
 
-  public async getCoveragesBySource(sourceId: string): Promise<MarketDeliveryCoverage[]> {
-    return Array.from(this.coverages.values()).filter((c) => c.sourceId === sourceId);
+  public async getCoveragesBySource(
+    sourceId: string,
+    tenantId?: string | null
+  ): Promise<MarketDeliveryCoverage[]> {
+    return Array.from(this.coverages.values()).filter(
+      (c) =>
+        c.sourceId === sourceId &&
+        (tenantId === undefined ||
+          c.ownerTenantId == null ||
+          (tenantId != null && c.ownerTenantId === tenantId))
+    );
   }
 
   public async saveCoverage(coverage: MarketDeliveryCoverage): Promise<void> {
@@ -71,23 +88,73 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
     return this.products.get(id) || null;
   }
 
-  public async getProductsBySource(sourceId: string): Promise<MarketProduct[]> {
-    return Array.from(this.products.values()).filter((p) => p.sourceId === sourceId);
+  public async getProductsBySource(
+    sourceId: string,
+    tenantId?: string | null
+  ): Promise<MarketProduct[]> {
+    return Array.from(this.products.values()).filter(
+      (p) =>
+        p.sourceId === sourceId &&
+        (tenantId === undefined ||
+          p.ownerTenantId == null ||
+          (tenantId != null && p.ownerTenantId === tenantId))
+    );
   }
 
-  public async findProductBySku(sourceId: string, sku: string): Promise<MarketProduct | null> {
+  public async findProductBySku(
+    sourceId: string,
+    sku: string,
+    tenantId?: string | null
+  ): Promise<MarketProduct | null> {
+    // If tenantId is specified, check for tenant-private SKU first, then fallback to public SKU
+    if (tenantId != null) {
+      for (const product of this.products.values()) {
+        if (
+          product.sourceId === sourceId &&
+          product.externalSku === sku &&
+          product.ownerTenantId === tenantId
+        ) {
+          return product;
+        }
+      }
+    }
+
     for (const product of this.products.values()) {
-      if (product.sourceId === sourceId && product.externalSku === sku) {
+      if (
+        product.sourceId === sourceId &&
+        product.externalSku === sku &&
+        product.ownerTenantId == null
+      ) {
         return product;
       }
     }
     return null;
   }
 
-  public async findProductByName(sourceId: string, rawName: string): Promise<MarketProduct | null> {
+  public async findProductByName(
+    sourceId: string,
+    rawName: string,
+    tenantId?: string | null
+  ): Promise<MarketProduct | null> {
     const clean = rawName.trim().toLowerCase();
+    if (tenantId != null) {
+      for (const product of this.products.values()) {
+        if (
+          product.sourceId === sourceId &&
+          product.rawName.toLowerCase() === clean &&
+          product.ownerTenantId === tenantId
+        ) {
+          return product;
+        }
+      }
+    }
+
     for (const product of this.products.values()) {
-      if (product.sourceId === sourceId && product.rawName.toLowerCase() === clean) {
+      if (
+        product.sourceId === sourceId &&
+        product.rawName.toLowerCase() === clean &&
+        product.ownerTenantId == null
+      ) {
         return product;
       }
     }
@@ -102,8 +169,17 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
     return this.observations.get(id) || null;
   }
 
-  public async getObservationsByProduct(productId: string): Promise<MarketPriceObservation[]> {
-    return Array.from(this.observations.values()).filter((o) => o.marketProductId === productId);
+  public async getObservationsByProduct(
+    productId: string,
+    tenantId?: string | null
+  ): Promise<MarketPriceObservation[]> {
+    return Array.from(this.observations.values()).filter(
+      (o) =>
+        o.marketProductId === productId &&
+        (tenantId === undefined ||
+          o.ownerTenantId == null ||
+          (tenantId != null && o.ownerTenantId === tenantId))
+    );
   }
 
   public async findObservationByFingerprint(
@@ -200,15 +276,24 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
       const product = this.products.get(mapping.marketProductId);
       if (!product) continue;
 
+      // Invariant: product must be Core Public or owned by this tenant
+      if (product.ownerTenantId != null && product.ownerTenantId !== tenantId) {
+        continue;
+      }
+
       const source = this.sources.get(product.sourceId);
       if (!source || !source.isActive) continue;
 
       const productObs = Array.from(this.observations.values())
-        .filter((o) => o.marketProductId === product.id)
+        .filter(
+          (o) =>
+            o.marketProductId === product.id &&
+            (o.ownerTenantId == null || o.ownerTenantId === tenantId)
+        )
         .sort((a, b) => new Date(b.observedAt).getTime() - new Date(a.observedAt).getTime());
 
       if (productObs.length > 0) {
-        // Take latest active observation
+        // Take latest active observation for benchmark calculation input
         results.push({
           source,
           product,
