@@ -724,7 +724,7 @@
       ]
     }
   ],
-  "governanceBranch": "fix/gate7-separate-authorization-cr-cost-05",
+  "governanceBranch": "fix/gate7-cr-cost-05-total-paths-83",
   "governancePaths": [
     ".github/workflows/deploy-production.yml",
     "docs/99-internal/development-journal/2026-11-21-gate7-cr-cost-05-582-reconciliation.md",
@@ -734,7 +734,8 @@
     "scripts/governance/release-cr-cost-05-582.spec.mjs",
     "scripts/governance/release-json.spec.mjs",
     "scripts/governance/release-plan.mjs",
-    "scripts/governance/release-reconciliation.mjs"
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-smoke-retry-574.spec.mjs"
   ],
   "constraints": {
     "productionSqlAuthorized": false,
