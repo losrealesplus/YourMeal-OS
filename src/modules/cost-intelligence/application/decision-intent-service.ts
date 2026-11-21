@@ -8,6 +8,8 @@
 
 import { ServiceContext } from "@/services/types";
 import { DomainError, permissionDenied } from "@/domain/errors";
+import { FeatureFlagService } from "@/services/feature-flag-service";
+import { PILOT_ADMIN_MODULE_FLAGS } from "@/lib/pilot-feature-flags";
 import {
   CostDecisionIntentRecord,
   DecisionIntentStatus,
@@ -45,7 +47,21 @@ export class DecisionIntentService {
   constructor(
     private readonly repositoryFactory: (ctx: ServiceContext) => ScenarioRepository = (ctx) =>
       new SupabaseScenarioRepository(ctx.supabase),
+    private readonly isModuleEnabled: (ctx: ServiceContext) => Promise<boolean> = async (ctx) => {
+      if (typeof ctx.supabase?.from !== "function") return true;
+      return FeatureFlagService.isEnabled(ctx, PILOT_ADMIN_MODULE_FLAGS.costIntelligence);
+    },
   ) {}
+
+  private async assertCostIntelligenceModuleEnabled(ctx: ServiceContext): Promise<void> {
+    const enabled = await this.isModuleEnabled(ctx);
+    if (!enabled) {
+      throw new DomainError(
+        "PERMISSION_DENIED",
+        "El módulo Cost Intelligence está desactivado para este tenant (modo solo lectura).",
+      );
+    }
+  }
 
   /**
    * Records a qualitative decision intent taken by an operator based on simulation findings.
@@ -56,6 +72,7 @@ export class DecisionIntentService {
   ): Promise<CostDecisionIntentRecord> {
     assertTenant(ctx);
     assertCostIntelligencePermission(ctx);
+    await this.assertCostIntelligenceModuleEnabled(ctx);
 
     if (!input.rationale || input.rationale.trim().length === 0) {
       throw new DomainError("INVALID_STATE", "Rationale is required to document a decision intent.");
@@ -112,6 +129,7 @@ export class DecisionIntentService {
   ): Promise<CostDecisionIntentRecord> {
     assertTenant(ctx);
     assertCostIntelligencePermission(ctx);
+    await this.assertCostIntelligenceModuleEnabled(ctx);
 
     const repo = this.repositoryFactory(ctx);
     return repo.updateIntentStatus(intentId, ctx.tenantId, status);

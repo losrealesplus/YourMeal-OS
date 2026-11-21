@@ -49,6 +49,7 @@ type NavItem = {
   icon: typeof LayoutGrid;
   exact?: boolean;
   visible: boolean;
+  badge?: string;
 };
 
 export function AdminShell({ children }: { children: ReactNode }) {
@@ -195,6 +196,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       labelKey: "costIntelligence",
       icon: TrendingUp,
       visible: can("inventory.operate") || can("accounting.operate") || showAllOps,
+      badge: !moduleFlags[PILOT_ADMIN_MODULE_FLAGS.costIntelligence] ? "Solo lectura" : undefined,
     },
     {
       to: "/admin/reports",
@@ -285,15 +287,22 @@ export function AdminShell({ children }: { children: ReactNode }) {
         to={item.to}
         onClick={() => setMoreOpen(false)}
         className={cn(
-          "flex items-center gap-3 rounded-xl text-sm font-medium transition-colors",
+          "flex items-center gap-3 rounded-xl text-sm font-medium transition-colors justify-between",
           dense ? "px-3 py-2.5" : "px-3 py-2",
           active
             ? "bg-primary/10 text-primary"
             : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
         )}
       >
-        <Icon className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
-        <span>{label}</span>
+        <div className="flex items-center gap-3 min-w-0">
+          <Icon className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
+          <span className="truncate">{label}</span>
+        </div>
+        {item.badge ? (
+          <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-100/90 text-amber-800 border border-amber-300 shrink-0 leading-none">
+            {item.badge}
+          </span>
+        ) : null}
       </Link>
     );
   }

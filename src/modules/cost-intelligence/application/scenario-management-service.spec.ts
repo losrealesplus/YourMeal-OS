@@ -137,4 +137,63 @@ describe("ScenarioManagementService (CR-COST-03)", () => {
     expect(listArchived).toHaveLength(1);
     expect(listArchived[0].status).toBe("archived");
   });
+
+  it("throws DomainError when Cost Intelligence module is disabled for tenant upon creating scenario", async () => {
+    const { repo } = createMockRepo();
+    const service = new ScenarioManagementService(
+      () => repo,
+      async () => false, // module disabled
+    );
+    const ctx = createMockCtx();
+
+    await expect(
+      service.createAndSimulateScenario(ctx, {
+        name: "Test Scenario",
+        baselineSnapshot: sampleBaseline,
+        appliedVariables: {},
+      }),
+    ).rejects.toThrow("El módulo Cost Intelligence está desactivado para este tenant");
+  });
+
+  it("throws DomainError when Cost Intelligence module is disabled for tenant upon archiving scenario", async () => {
+    const { repo } = createMockRepo();
+    const service = new ScenarioManagementService(
+      () => repo,
+      async () => false, // module disabled
+    );
+    const ctx = createMockCtx();
+
+    await expect(service.archiveScenario(ctx, "sc-123")).rejects.toThrow(
+      "El módulo Cost Intelligence está desactivado para este tenant",
+    );
+  });
+
+  it("allows reading historical scenarios even when Cost Intelligence module is disabled", async () => {
+    const { repo, storedScenarios } = createMockRepo();
+    storedScenarios.push({
+      id: "sc-historical-1",
+      tenantId: "tenant-eatclean-1",
+      name: "Historical Scenario",
+      presetType: "custom",
+      baselineSnapshotId: "snap-01",
+      baselineSnapshot: sampleBaseline,
+      appliedVariables: {},
+      status: "simulated",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    const service = new ScenarioManagementService(
+      () => repo,
+      async () => false, // module disabled
+    );
+    const ctx = createMockCtx();
+
+    const list = await service.listScenarios(ctx);
+    expect(list).toHaveLength(1);
+    expect(list[0].name).toBe("Historical Scenario");
+
+    const single = await service.getScenario(ctx, "sc-historical-1");
+    expect(single).not.toBeNull();
+    expect(single?.id).toBe("sc-historical-1");
+  });
 });

@@ -331,4 +331,41 @@ describe("EconomicCommandCenter & CatalogIngestionDrawer (CR-COST-05 PR1 Integri
       ownerTenantId: null,
     });
   });
+
+  it("renders read-only banner and marks decision button as disabled when isCostIntelligenceEnabled is false", () => {
+    mockUseMarketIntelligence.mockReturnValue({
+      sources: [],
+      marketProducts: [],
+      mappings: [],
+      benchmarksByIngredient: new Map(),
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+      ingestionService: {} as never,
+      mappingService: {} as never,
+      generateNegotiationBrief: vi.fn(),
+    });
+
+    const html = renderToString(
+      <EconomicCommandCenter
+        tenantId="11111111-1111-4111-8111-111111111111"
+        tenantName="EatClean"
+        userId="22222222-2222-4222-8222-222222222222"
+        isCostIntelligenceEnabled={false}
+        ingredients={[
+          {
+            id: "33333333-3333-4333-8333-333333333333",
+            name: "Pechuga de Pollo",
+            unit: "kg",
+            cost: 6.4,
+            annualVolume: 500,
+          },
+        ]}
+        dishes={[]}
+      />,
+    );
+
+    expect(html).toContain("Inteligencia de Costes en Modo Solo Lectura (Desactivado)");
+    expect(html).toContain("Solo Lectura");
+  });
 });

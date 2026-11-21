@@ -32,6 +32,8 @@ import { EconomicCommandCenter } from "@/modules/market-intelligence/presentatio
 import { IndirectCostQuickEditModal } from "@/modules/market-intelligence/presentation/components/IndirectCostQuickEditModal";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
+import { usePilotAdminModuleFlags } from "@/hooks/use-pilot-admin-module-flags";
+import { PILOT_ADMIN_MODULE_FLAGS } from "@/lib/pilot-feature-flags";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import { AdminHeader, PanelCard, SectionTitle, StatusChip } from "@/components/admin";
@@ -110,6 +112,11 @@ function formatPercent(pct: number): string {
 export function CostIntelligenceCockpitPage() {
   const { user, tenantId, roles, isSaasAdmin } = useAuth();
   const { can } = useCan();
+  const { flags: moduleFlags, ready: flagsReady } = usePilotAdminModuleFlags();
+  const isCostIntelligenceEnabled = flagsReady
+    ? Boolean(moduleFlags[PILOT_ADMIN_MODULE_FLAGS.costIntelligence])
+    : true;
+
   const [activeTab, setActiveTab] = useState<
     | "command_center"
     | "simulator"
@@ -360,6 +367,13 @@ export function CostIntelligenceCockpitPage() {
     e.preventDefault();
     if (!user || !tenantId) return;
 
+    if (!isCostIntelligenceEnabled) {
+      toast.error(
+        "El módulo Cost Intelligence está desactivado para este restaurante (modo solo lectura).",
+      );
+      return;
+    }
+
     if (!scenarioName.trim()) {
       toast.error("El nombre del escenario es obligatorio.");
       return;
@@ -399,6 +413,13 @@ export function CostIntelligenceCockpitPage() {
   async function handleSaveDecisionIntent(e: React.FormEvent) {
     e.preventDefault();
     if (!user || !tenantId) return;
+
+    if (!isCostIntelligenceEnabled) {
+      toast.error(
+        "El módulo Cost Intelligence está desactivado para este restaurante (modo solo lectura).",
+      );
+      return;
+    }
 
     if (!intentRationale.trim()) {
       toast.error("Por favor, describe el motivo cualitativo de la decisión.");
@@ -491,6 +512,8 @@ export function CostIntelligenceCockpitPage() {
           <Button
             size="sm"
             onClick={() => setIsSaveScenarioOpen(true)}
+            disabled={!isCostIntelligenceEnabled}
+            title={!isCostIntelligenceEnabled ? "Módulo desactivado: solo lectura" : undefined}
             className="gap-1.5 text-xs h-8"
           >
             <Save className="h-3.5 w-3.5" />
@@ -498,6 +521,31 @@ export function CostIntelligenceCockpitPage() {
           </Button>
         </div>
       </div>
+
+      {/* Banner de Módulo Desactivado (Solo Lectura) */}
+      {!isCostIntelligenceEnabled && (
+        <div className="p-4 rounded-xl border border-amber-300 bg-amber-50/90 text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-start sm:items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+            <div>
+              <span className="font-semibold text-sm">
+                Módulo en Modo Solo Lectura (Desactivado)
+              </span>
+              <p className="text-xs text-amber-900/90 mt-0.5">
+                El módulo de Inteligencia de Costes está inactivo para este restaurante. El histórico
+                de escenarios, escandallos y decisiones permanece visible para consulta y análisis, pero la
+                creación de nuevos escenarios y el registro de nuevas decisiones están congelados.
+              </p>
+            </div>
+          </div>
+          <Badge
+            variant="outline"
+            className="text-xs font-semibold bg-white text-amber-800 border-amber-400 shrink-0 self-start sm:self-auto"
+          >
+            Solo Lectura
+          </Badge>
+        </div>
+      )}
 
       {/* Primary Navigation Tabs */}
       <div className="flex border-b border-border gap-2 overflow-x-auto text-xs">
@@ -580,6 +628,7 @@ export function CostIntelligenceCockpitPage() {
         <EconomicCommandCenter
           tenantId={tenantId}
           tenantName={user?.user_metadata?.company_name || "Restaurante"}
+          isCostIntelligenceEnabled={isCostIntelligenceEnabled}
           userId={user?.id}
           userName={user?.email || "Gerente"}
           canPublishPublic={isSaasAdmin}
@@ -802,6 +851,8 @@ export function CostIntelligenceCockpitPage() {
               </div>
               <Button
                 onClick={() => setIsIntentDialogOpen(true)}
+                disabled={!isCostIntelligenceEnabled}
+                title={!isCostIntelligenceEnabled ? "Módulo desactivado: solo lectura" : undefined}
                 className="w-full mt-2 gap-2 text-xs"
                 variant="default"
               >
@@ -1504,7 +1555,7 @@ export function CostIntelligenceCockpitPage() {
               <Button type="button" variant="outline" onClick={() => setIsSaveScenarioOpen(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={busy}>
+              <Button type="submit" disabled={busy || !isCostIntelligenceEnabled}>
                 Guardar en Base de Datos
               </Button>
             </DialogFooter>
@@ -1578,7 +1629,7 @@ export function CostIntelligenceCockpitPage() {
               <Button type="button" variant="outline" onClick={() => setIsIntentDialogOpen(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={busy}>
+              <Button type="submit" disabled={busy || !isCostIntelligenceEnabled}>
                 Guardar Decisión en Audit Trail
               </Button>
             </DialogFooter>

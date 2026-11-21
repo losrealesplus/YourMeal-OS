@@ -116,4 +116,61 @@ describe("DecisionIntentService (CR-COST-03)", () => {
     const updated = await service.updateIntentStatus(ctx, intent.id, "completed_manually");
     expect(updated.status).toBe("completed_manually");
   });
+
+  it("throws DomainError when Cost Intelligence module is disabled upon recording intent", async () => {
+    const { repo } = createMockRepo();
+    const service = new DecisionIntentService(
+      () => repo,
+      async () => false, // module disabled
+    );
+    const ctx = createMockCtx();
+
+    await expect(
+      service.recordDecisionIntent(ctx, {
+        scenarioId: "sc-001",
+        intentType: "renegotiate_supplier",
+        rationale: "Negociar con proveedor",
+      }),
+    ).rejects.toThrow("El módulo Cost Intelligence está desactivado para este tenant");
+  });
+
+  it("throws DomainError when Cost Intelligence module is disabled upon updating intent status", async () => {
+    const { repo } = createMockRepo();
+    const service = new DecisionIntentService(
+      () => repo,
+      async () => false, // module disabled
+    );
+    const ctx = createMockCtx();
+
+    await expect(
+      service.updateIntentStatus(ctx, "intent-001", "completed_manually"),
+    ).rejects.toThrow("El módulo Cost Intelligence está desactivado para este tenant");
+  });
+
+  it("allows reading historical decision intents even when module is disabled", async () => {
+    const { repo, storedIntents } = createMockRepo();
+    storedIntents.push({
+      id: "intent-hist-1",
+      tenantId: "tenant-eatclean-1",
+      scenarioId: "sc-001",
+      intentType: "accept_margin_compression",
+      rationale: "Histórico congelado",
+      status: "pending_action",
+      recordedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    const service = new DecisionIntentService(
+      () => repo,
+      async () => false, // module disabled
+    );
+    const ctx = createMockCtx();
+
+    const intents = await service.listIntentsForTenant(ctx);
+    expect(intents).toHaveLength(1);
+    expect(intents[0].rationale).toBe("Histórico congelado");
+
+    const scenarioIntents = await service.listIntentsForScenario(ctx, "sc-001");
+    expect(scenarioIntents).toHaveLength(1);
+  });
 });
