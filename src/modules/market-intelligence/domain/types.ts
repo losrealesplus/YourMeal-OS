@@ -271,10 +271,56 @@ export interface MarketTenantConfig {
   updatedAt?: string;
 }
 
+export type MarketBatchType =
+  | 'csv_catalog'
+  | 'b2b_invoice_pdf'
+  | 'b2b_document_image'
+  | 'manual_entry'
+  | 'authorized_feed';
+
+export type MarketBatchStatus =
+  | 'processing'
+  | 'completed'
+  | 'partial_quarantine'
+  | 'failed'
+  | 'revoked';
+
+export interface MarketCatalogIngestionBatch {
+  id: string;
+  ownerTenantId?: string | null;
+  sourceId: string;
+  batchType: MarketBatchType;
+  fileName?: string | null;
+  fileMimeType?: string | null;
+  fileChecksumSha256?: string | null;
+  totalRows: number;
+  validRows: number;
+  quarantinedRows: number;
+  createdCount: number;
+  updatedCount: number;
+  status: MarketBatchStatus;
+  quarantinePayload: Array<Record<string, unknown>>;
+  importedBy: string;
+  createdAt: string;
+  revokedAt?: string | null;
+  revokedBy?: string | null;
+  revocationReason?: string | null;
+}
+
+export interface RevokeBatchResult {
+  batchId: string;
+  status: 'revoked';
+  revokedAt: string;
+  revokedBy: string;
+  revocationReason: string;
+  affectedObservationsCount: number;
+}
+
 export interface MarketPriceObservation {
   id: string;
   marketProductId: string;
   ownerTenantId?: string | null;
+  ingestionBatchId?: string | null;
   observedAt: string;
   validFrom?: string;
   validTo?: string | null;

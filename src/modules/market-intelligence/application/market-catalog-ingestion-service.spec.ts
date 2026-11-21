@@ -241,4 +241,163 @@ GM-001,Harina Trigo 1kg,1.20,kg,0.04,1kg
     expect(result.normalizedPriceExTax).toBe(10.0);
     expect(result.normalizationStatus).toBe("computed");
   });
+
+  it("ingests CSV with automatic batch creation, volume tiers, and auditable batch record", async () => {
+    const csvWithTiers = `
+source_name,product_name,raw_price,quantity,unit,tax_mode,tax_rate,tier_1_qty,tier_1_price,tier_2_qty,tier_2_price
+Makro,Lomo de Cerdo Extra,10.00,1,kg,ex_tax,0.0,10,9.00,50,8.00
+    `.trim();
+
+    const report = await service.ingestCsv(csvWithTiers, {
+      importedBy: "11111111-1111-4111-8111-111111111111",
+      fileName: "makro_lomo_tiers.csv",
+    });
+
+    expect(report.validCount).toBe(1);
+    expect(report.batchId).toBeDefined();
+
+    const batch = await repository.getBatchById(report.batchId!);
+    expect(batch).toBeDefined();
+    expect(batch?.batchType).toBe("csv_catalog");
+    expect(batch?.status).toBe("completed");
+    expect(batch?.totalRows).toBe(1);
+    expect(batch?.validRows).toBe(1);
+
+    const prods = await repository.getProductsBySource("src-makro");
+    const obs = await repository.getObservationsByProduct(prods[0].id);
+    expect(obs[0].ingestionBatchId).toBe(report.batchId);
+    expect(obs[0].volumeTiers).toHaveLength(2);
+    expect(obs[0].volumeTiers?.[0].minQuantity).toBe(10);
+    expect(obs[0].volumeTiers?.[0].tierPriceRaw).toBe(9.0);
+    expect(obs[0].volumeTiers?.[1].minQuantity).toBe(50);
+    expect(obs[0].volumeTiers?.[1].tierPriceRaw).toBe(8.0);
+  });
+
+  it("deduplicates observations using real document date (observed_at) instead of ingest execution date", async () => {
+    const csvDay1 = `
+source_name,product_name,raw_price,quantity,unit,tax_mode,observed_at
+Makro,Queso Manchego 1kg,14.50,1,kg,ex_tax,2026-10-15
+    `.trim();
+
+    // Re-importing on a different moment with same observed_at
+    const csvDay2 = `
+source_name,product_name,raw_price,quantity,unit,tax_mode,observed_at
+Makro,Queso Manchego 1kg,14.50,1,kg,ex_tax,2026-10-15
+    `.trim();
+
+    const report1 = await service.ingestCsv(csvDay1, {
+      importedBy: "user-1",
+    });
+    expect(report1.createdObservationsCount).toBe(1);
+
+    const report2 = await service.ingestCsv(csvDay2, {
+      importedBy: "user-1",
+    });
+    expect(report2.createdObservationsCount).toBe(0);
+    expect(report2.updatedObservationsCount).toBe(1);
+
+    const prods = await repository.getProductsBySource("src-makro");
+    const obs = await repository.getObservationsByProduct(prods[0].id);
+    expect(obs).toHaveLength(1);
+    expect(obs[0].observedAt).toBe("2026-10-15T12:00:00.000Z");
+  });
+
+  it("ingests B2B document extraction and quarantines low-confidence or malformed lines", async () => {
+    const extractionResult = {
+      fileChecksumSha256: "b".repeat(64),
+      header: {
+        documentNumber: "FAC-2026-0042",
+        documentDate: "2026-10-20",
+        issuerTaxId: "B-35999888",
+        issuerName: "Distribuciones Hosteleras SL",
+        currency: "EUR",
+      },
+      lines: [
+        {
+          lineNumber: 1,
+          rawText: "DIS-01 Solomillo 12 kg 18.50 3%",
+          sku: "DIS-01",
+          productName: "Solomillo de Ternera",
+          quantity: 12,
+          unit: "kg",
+          rawPrice: 18.5,
+          taxRate: 0.03,
+          confidence: 0.95,
+        },
+        {
+          lineNumber: 2,
+          rawText: "DIS-02 Línea Ilegible 5 kg 12.00",
+          sku: "DIS-02",
+          productName: "Línea Ilegible Borrosa",
+          quantity: 5,
+          unit: "kg",
+          rawPrice: 12.0,
+          confidence: 0.55, // Low OCR confidence -> must be quarantined!
+        },
+        {
+          lineNumber: 3,
+          rawText: "DIS-03 Precio Cero 1 kg 0.00",
+          sku: "DIS-03",
+          productName: "Precio Cero Inválido",
+          quantity: 1,
+          unit: "kg",
+          rawPrice: 0,
+          confidence: 0.99, // High confidence but price zero -> must be quarantined!
+        },
+      ],
+      rawText: "RAW_TEXT_INVOICE",
+      fileName: "factura_ternera.pdf",
+      mimeType: "application/pdf" as const,
+    };
+
+    const report = await service.ingestDocument(extractionResult, {
+      importedBy: "user-chef-1",
+      fileName: "factura_ternera.pdf",
+      batchType: "b2b_invoice_pdf",
+      defaultSourceId: "src-makro",
+    });
+
+    expect(report.totalRows).toBe(3);
+    expect(report.validCount).toBe(1);
+    expect(report.quarantinedCount).toBe(2);
+    expect(report.createdObservationsCount).toBe(1);
+
+    const batch = await repository.getBatchById(report.batchId!);
+    expect(batch?.status).toBe("partial_quarantine");
+    expect(batch?.quarantinedRows).toBe(2);
+    expect(batch?.quarantinePayload).toHaveLength(2);
+  });
+
+  it("revokes batch observations safely (soft-revocation neutralizing them from benchmark)", async () => {
+    const csv = `
+source_name,product_name,raw_price,quantity,unit,tax_mode
+Makro,Aceite Girasol 25L,35.00,25,l,ex_tax
+    `.trim();
+
+    const report = await service.ingestCsv(csv, {
+      importedBy: "admin-1",
+      fileName: "lote_a_revocar.csv",
+    });
+    expect(report.batchId).toBeDefined();
+
+    const prods = await repository.getProductsBySource("src-makro");
+    let obs = await repository.getObservationsByProduct(prods[0].id);
+    expect(obs[0].qualityStatus).toBe("OBSERVED");
+
+    const revokeResult = await service.revokeBatch(
+      { userId: "admin-1", isSaasAdmin: true },
+      report.batchId!,
+      "Lote cargado por duplicado en fecha errónea"
+    );
+
+    expect(revokeResult.batchId).toBe(report.batchId);
+    expect(revokeResult.affectedObservationsCount).toBe(1);
+
+    const batch = await repository.getBatchById(report.batchId!);
+    expect(batch?.status).toBe("revoked");
+
+    obs = await repository.getObservationsByProduct(prods[0].id);
+    expect(obs[0].qualityStatus).toBe("LOW_CONFIDENCE");
+    expect(obs[0].validTo).toBe(obs[0].validFrom);
+  });
 });
