@@ -728,4 +728,6 @@ export interface MarketOfferRanking {
   savingsExplanation: string;
 }
 
+export * from './connector-types';
+
 

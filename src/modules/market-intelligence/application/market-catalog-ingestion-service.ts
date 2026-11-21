@@ -43,6 +43,7 @@ import {
   DocumentExtractionResult,
   validateExtractedLine,
 } from "../domain/document-extraction";
+import { ConnectorFetchResult } from "../domain/connector-types";
 import { CsvCatalogParser, RawCsvRow } from "../infrastructure/csv-catalog-parser";
 import { IMarketIntelligenceRepository } from "../infrastructure/repositories/market-repository-interface";
 import { IOpenFoodFactsClient } from "../infrastructure/open-food-facts-client";
@@ -330,6 +331,152 @@ export class MarketCatalogIngestionService {
         defaultObservedAt: extraction.header.documentDate || options.defaultObservedAt,
       },
       preQuarantined,
+    );
+  }
+
+  /**
+   * CR-COST-05 PR5: Ingests normalized observation results from isolated market connectors (Block 5).
+   * Supports fail-closed batch recording on structural errors and partial quarantine for ambiguous rows.
+   */
+  public async ingestConnectorResult(
+    fetchResult: ConnectorFetchResult,
+    options: IngestionOptions,
+  ): Promise<IngestionReport> {
+    const nowIso = new Date().toISOString();
+    const batchId = options.batchId || generateMarketEntityUuid();
+    const ownerTenantId = options.ownerTenantId ?? null;
+    const batchType: MarketBatchType = options.batchType || "authorized_feed";
+    const sourceId = options.defaultSourceId || "src-makro";
+
+    const quarantinedRows: QuarantinedRow[] = (fetchResult.quarantinedItems || []).map((q, idx) => ({
+      lineNumber: idx + 1,
+      rawLine: q.rawLine || JSON.stringify(q.item || {}),
+      reason: q.reason || "Línea de conector no válida.",
+      fields: {
+        product_name: q.item?.productName || "",
+        raw_price: String(q.item?.rawPrice ?? ""),
+        quantity: String(q.item?.quantity ?? ""),
+        unit: q.item?.unit || "",
+        rejection_code: q.rejectionCode || "UNKNOWN",
+      },
+    }));
+
+    // Fail-closed structural failure: 0 valid items or explicit connector failure
+    if (!fetchResult.success || fetchResult.items.length === 0) {
+      const failureReason =
+        fetchResult.failureReason || "Fallo estructural en conector: 0 registros válidos.";
+
+      quarantinedRows.unshift({
+        lineNumber: 0,
+        rawLine: fetchResult.sourceUrl || options.fileName || "connector-payload",
+        reason: failureReason,
+        fields: {
+          error: failureReason,
+          source_url: fetchResult.sourceUrl || "",
+          document_hash: fetchResult.documentHash || "",
+        },
+      });
+
+      const failedBatch: MarketCatalogIngestionBatch = {
+        id: batchId,
+        ownerTenantId,
+        sourceId,
+        batchType,
+        fileName: options.fileName || null,
+        fileMimeType: options.fileMimeType || "application/json",
+        fileChecksumSha256: fetchResult.documentHash || null,
+        totalRows: quarantinedRows.length,
+        validRows: 0,
+        quarantinedRows: quarantinedRows.length,
+        createdCount: 0,
+        updatedCount: 0,
+        status: "failed",
+        quarantinePayload: quarantinedRows.map((q) => ({
+          lineNumber: q.lineNumber,
+          rawLine: ownerTenantId ? q.rawLine : undefined,
+          reason: q.reason,
+          fields: q.fields,
+        })),
+        importedBy: options.importedBy,
+        createdAt: nowIso,
+      };
+
+      await this.repository.createBatch(failedBatch);
+
+      return {
+        batchId,
+        batchStatus: "failed",
+        totalRows: quarantinedRows.length,
+        validCount: 0,
+        quarantinedCount: quarantinedRows.length,
+        createdObservationsCount: 0,
+        updatedObservationsCount: 0,
+        quarantinedRows,
+      };
+    }
+
+    // Convert valid items to RawCsvRow format for unified normalization and persistence
+    const rows: RawCsvRow[] = fetchResult.items.map((item, idx) => {
+      const data: Record<string, string> = {
+        source_name: options.defaultSourceId || sourceId,
+        observed_at: item.observedAt || options.defaultObservedAt || nowIso.slice(0, 10),
+        product_name: item.productName,
+        raw_price: String(item.rawPrice),
+        quantity: String(item.quantity ?? 1),
+        unit: item.unit || "ud",
+        gtin: item.gtin || "",
+        external_sku: item.sku || "",
+        currency: item.currency || "EUR",
+        tax_mode: item.taxMode || "unknown",
+        tax_rate: item.taxRate !== undefined ? String(item.taxRate) : "",
+        tax_regime: item.taxRegime || "",
+        aiem_status: item.aiemStatus || "",
+        aiem_rate: item.aiemRate !== undefined ? String(item.aiemRate) : "",
+        aiem_amount_raw: item.aiemAmountRaw !== undefined ? String(item.aiemAmountRaw) : "",
+        freight_inclusion: item.freightInclusion || "",
+        freight_cost_raw:
+          item.freightCostRaw !== undefined ? String(item.freightCostRaw) : "",
+        free_freight_min_order_amount:
+          item.freeFreightMinOrderAmount !== undefined
+            ? String(item.freeFreightMinOrderAmount)
+            : "",
+        thermal_state: item.thermalState || "",
+        is_catch_weight: item.isCatchWeight ? "true" : "false",
+        taric_code: item.taricCode || "",
+        region_code: item.regionCode || options.defaultRegion || "",
+        brand: item.brand || "",
+        origin: item.origin || "",
+      };
+
+      if (item.volumeTiers && item.volumeTiers.length > 0) {
+        item.volumeTiers.forEach((tier, tIdx) => {
+          const slot = tIdx + 1;
+          data[`tier_${slot}_qty`] = String(tier.minQuantity);
+          data[`tier_${slot}_price`] = String(tier.tierPriceRaw);
+        });
+      }
+
+      return {
+        lineNumber: idx + 1,
+        rawLine: JSON.stringify(item.rawPayload || item),
+        data,
+      };
+    });
+
+    return this.processRows(
+      rows,
+      {
+        ...options,
+        batchId,
+        batchType,
+        captureMethod: options.captureMethod || "authorized_feed",
+        fileName: options.fileName || "connector-feed",
+        fileMimeType: options.fileMimeType || "application/json",
+        fileChecksumSha256: fetchResult.documentHash || options.fileChecksumSha256,
+        defaultSourceId: sourceId,
+        defaultRegion: options.defaultRegion,
+      },
+      quarantinedRows,
     );
   }
 
