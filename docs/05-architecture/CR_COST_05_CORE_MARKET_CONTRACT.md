@@ -215,5 +215,40 @@ El Bloque 3 (`OfferComparator` y `MarketBenchmarkService`) transforma los datos 
 6. **Carga Agregada sin Consultas N+1:**
    - `getComparisonInputsForIngredients` en la interfaz del repositorio unifica en una sola pasada la carga de mappings, productos, fuentes, coberturas de entrega y escalados por volumen para múltiples ingredientes, preservando el aislamiento multi-tenant (`owner_tenant_id IS NULL` vs `owner_tenant_id = tenantId`).
 
+## 14. Ingesta Segura, Lotes Auditables, PDF/Fotos B2B, Revocación y Enriquecimiento OFF (Bloque 4 · PR4)
+
+El Bloque 4 institucionaliza la canalización segura de catálogos mayoristas, albaranes y facturas B2B hacia el motor de inteligencia de mercado de **YourMealOS Core**, garantizando trazabilidad completa de cada dato incorporado:
+
+1. **Tabla de Lotes Auditables (`market_catalog_ingestion_batches`):**
+   - Registra cada lote de importación con su tipo (`csv_catalog`, `b2b_invoice_pdf`, `b2b_document_image`, `manual_entry`, `authorized_feed`), estado del ciclo de vida (`processing`, `completed`, `partial_quarantine`, `failed`, `revoked`), suma de verificación `file_checksum_sha256` para deduplicación exacta de ficheros, contadores de filas procesadas/válidas/en cuarentena, número y fecha documental, usuario importador y tenant propietario (`owner_tenant_id`).
+   - Las observaciones en `market_price_observations` se vinculan mediante la clave foránea nullable `ingestion_batch_id REFERENCES market_catalog_ingestion_batches(id) ON DELETE SET NULL`.
+
+2. **Detección Anti-Alucinación en Extracción Documental (Regla D-010):**
+   - La ingesta de documentos no estructurados (PDF de facturas, fotos de albaranes) pasa por el validador determinista `validateExtractedLine`:
+     - **Confianza OCR mínima (70%):** Cualquier línea con nivel de confianza inferior al 70% (`confidence < 0.70`) es rechazada y derivada a la carga de cuarentena (`quarantine_payload`) con diagnóstico en español.
+     - **Precios e importes:** Precios negativos o iguales a cero son rechazados inmediatamente.
+     - **Magnitud física no negociable:** Se prohíbe terminantemente asumir cantidades o unidades por defecto (p. ej. asumir 1 kg). Toda línea debe declarar explícitamente cantidad positiva y unidad física normalizable.
+     - **Tipos impositivos acotados:** Se exige que el tipo impositivo esté en el rango permitido `[0.0, 0.30]`.
+     - **Validación GS1:** Los códigos de barras GTIN/EAN-13 son verificados algorítmicamente mediante el cálculo del dígito de control Modulo-10.
+
+3. **Huella Idempotente con Fecha Real de Observación (`observed_at`):**
+   - El fingerprint SHA-256 de cada observación incorpora la fecha real del documento comercial (`observed_at` / fecha de factura o albarán) en lugar de la fecha de ejecución de la ingesta en servidor.
+   - Si una factura de octubre de 2026 se re-importa en noviembre, el sistema detecta la observación existente y actualiza su ventana de vigencia o carga sin crear duplicados artificiales diarios.
+
+4. **Soporte de Escalas por Volumen en Catálogos CSV:**
+   - Se reconocen cabeceras para tramos de volumen (`tier_1_qty`, `tier_1_price`, `tramo_1_cantidad`, etc.), persistiendo automáticamente las escalas en `market_volume_tiers` asociadas a la observación correspondiente.
+
+5. **Procedimiento de Revocación de Lotes (`revokeBatch`):**
+   - Ante errores contables o documentos cancelados por proveedores, un usuario con permisos autorizados (`is_saas_admin` para lotes públicos o miembro con acceso a `cost_intelligence` para lotes de su propio tenant) puede solicitar la revocación del lote.
+   - Dado que `market_price_observations` protege la inmutabilidad de sus registros frente a borrados mediante el trigger `trg_guard_market_observation_immutability`, la revocación se realiza de manera **soft-revocation (fail-closed)**:
+     - El lote pasa a estado `revoked` registrando `revoked_at`, `revoked_by` y `revocation_reason`.
+     - Todas las observaciones vinculadas a dicho lote ven expirada su validez fijando `valid_to = valid_from`, y su calidad se degrada a `quality_status = 'LOW_CONFIDENCE'`.
+     - De este modo, quedan automáticamente excluidas de futuros cálculos de `BenchmarkCalculator` y recomendaciones de `OfferComparator`, preservando a la vez el histórico inmutable para auditorías financieras.
+
+6. **Enriquecimiento Físico con Open Food Facts (OFF):**
+   - Se conecta opcionalmente mediante `OpenFoodFactsClient` con caché en memoria (TTL 24h) y control de timeout (AbortController).
+   - **Invariante Absoluto:** OFF se emplea **únicamente** como enriquecedor de catálogo físico (peso neto, peso escurrido, formato de presentación enlatado/botella/bolsa, marca comercial y país de origen). Queda **estrictamente prohibido** extraer, inferir o registrar precios, fiscalidad o costes logísticos desde fuentes públicas colaborativas.
+
+
 
 

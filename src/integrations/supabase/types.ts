@@ -1630,6 +1630,87 @@ export type Database = {
           },
         ]
       }
+      market_catalog_ingestion_batches: {
+        Row: {
+          batch_type: string
+          created_at: string
+          created_count: number
+          file_checksum_sha256: string | null
+          file_mime_type: string | null
+          file_name: string | null
+          id: string
+          imported_by: string
+          owner_tenant_id: string | null
+          quarantine_payload: Json
+          quarantined_rows: number
+          revocation_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          source_id: string
+          status: string
+          total_rows: number
+          updated_count: number
+          valid_rows: number
+        }
+        Insert: {
+          batch_type: string
+          created_at?: string
+          created_count?: number
+          file_checksum_sha256?: string | null
+          file_mime_type?: string | null
+          file_name?: string | null
+          id?: string
+          imported_by: string
+          owner_tenant_id?: string | null
+          quarantine_payload?: Json
+          quarantined_rows?: number
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          source_id: string
+          status?: string
+          total_rows?: number
+          updated_count?: number
+          valid_rows?: number
+        }
+        Update: {
+          batch_type?: string
+          created_at?: string
+          created_count?: number
+          file_checksum_sha256?: string | null
+          file_mime_type?: string | null
+          file_name?: string | null
+          id?: string
+          imported_by?: string
+          owner_tenant_id?: string | null
+          quarantine_payload?: Json
+          quarantined_rows?: number
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          source_id?: string
+          status?: string
+          total_rows?: number
+          updated_count?: number
+          valid_rows?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_catalog_ingestion_batches_owner_tenant_id_fkey"
+            columns: ["owner_tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_catalog_ingestion_batches_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "market_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_price_observations: {
         Row: {
           aiem_amount_raw: number | null
@@ -1648,6 +1729,7 @@ export type Database = {
           freight_inclusion: string
           id: string
           imported_by: string | null
+          ingestion_batch_id: string | null
           location_name: string
           market_product_id: string
           min_order_qty: number | null
@@ -1700,6 +1782,7 @@ export type Database = {
           freight_inclusion?: string
           id?: string
           imported_by?: string | null
+          ingestion_batch_id?: string | null
           location_name?: string
           market_product_id: string
           min_order_qty?: number | null
@@ -1752,6 +1835,7 @@ export type Database = {
           freight_inclusion?: string
           id?: string
           imported_by?: string | null
+          ingestion_batch_id?: string | null
           location_name?: string
           market_product_id?: string
           min_order_qty?: number | null
@@ -1788,6 +1872,13 @@ export type Database = {
           validity_source?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "market_price_observations_ingestion_batch_id_fkey"
+            columns: ["ingestion_batch_id"]
+            isOneToOne: false
+            referencedRelation: "market_catalog_ingestion_batches"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "market_price_observations_establishment_id_fkey"
             columns: ["establishment_id"]

@@ -1,5 +1,6 @@
 import {
   ComparisonInputObservation,
+  MarketCatalogIngestionBatch,
   MarketDeliveryCoverage,
   MarketEstablishment,
   MarketPriceObservation,
@@ -54,6 +55,13 @@ export interface IMarketIntelligenceRepository {
     validTo: string,
     rawPayload?: Record<string, unknown>
   ): Promise<void>;
+
+  // Ingestion Batches & Revocation (PR4)
+  createBatch(batch: MarketCatalogIngestionBatch): Promise<void>;
+  getBatchById(batchId: string): Promise<MarketCatalogIngestionBatch | null>;
+  getBatchesByTenant(tenantId: string | null): Promise<MarketCatalogIngestionBatch[]>;
+  updateBatchProgress(batchId: string, updates: Partial<MarketCatalogIngestionBatch>): Promise<void>;
+  revokeBatchObservations(batchId: string, reason: string): Promise<{ affectedObservations: number }>;
 
   getMappingsByTenant(tenantId: string): Promise<ProductMapping[]>;
   getMappingsForIngredient(

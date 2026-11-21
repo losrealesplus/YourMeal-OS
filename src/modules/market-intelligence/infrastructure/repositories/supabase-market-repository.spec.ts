@@ -483,4 +483,140 @@ describe('SupabaseMarketRepository', () => {
     expect(items[0].observation.volumeTiers?.[0].minQuantity).toBe(20);
     expect(items[0].coverages).toHaveLength(1);
   });
+
+  it('handles batch lifecycle: createBatch, getBatchById, getBatchesByTenant, updateBatchProgress', async () => {
+    const mockBatchRow = {
+      id: 'batch-uuid-1234',
+      owner_tenant_id: 't-123',
+      batch_type: 'b2b_invoice_pdf',
+      status: 'processing',
+      source_id: 'src-1',
+      file_name: 'factura_makro.pdf',
+      file_checksum_sha256: 'a'.repeat(64),
+      total_rows: 10,
+      processed_rows: 5,
+      quarantined_rows: 1,
+      quarantine_payload: [{ lineNumber: 3, reason: 'Low OCR' }],
+      document_date: '2026-11-15',
+      document_number: 'FAC-999',
+      imported_by: 'usr-1',
+      created_at: '2026-11-20T10:00:00Z',
+      updated_at: '2026-11-20T10:00:00Z',
+    };
+
+    const insertMock = vi.fn().mockResolvedValue({ error: null });
+    const updateEqMock = vi.fn().mockResolvedValue({ error: null });
+    const updateMock = vi.fn().mockReturnValue({ eq: updateEqMock });
+    const selectSingleMock = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({ data: mockBatchRow, error: null }),
+      }),
+    });
+    const selectListMock = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        order: vi.fn().mockResolvedValue({ data: [mockBatchRow], error: null }),
+      }),
+    });
+
+    const mockSupabase = {
+      from: vi.fn((table: string) => {
+        if (table === 'market_catalog_ingestion_batches') {
+          return {
+            insert: insertMock,
+            update: updateMock,
+            select: vi.fn((cols: string) => ({
+              eq: vi.fn((col: string, val: string) => ({
+                single: vi.fn().mockResolvedValue({ data: mockBatchRow, error: null }),
+                maybeSingle: vi.fn().mockResolvedValue({ data: mockBatchRow, error: null }),
+                order: vi.fn().mockResolvedValue({ data: [mockBatchRow], error: null }),
+              })),
+            })),
+          };
+        }
+        return {};
+      }),
+    } as any;
+
+    const repo = new SupabaseMarketRepository(mockSupabase);
+
+    await repo.createBatch({
+      id: 'batch-uuid-1234',
+      ownerTenantId: 't-123',
+      batchType: 'b2b_invoice_pdf',
+      status: 'processing',
+      sourceId: 'src-1',
+      fileName: 'factura_makro.pdf',
+      fileChecksumSha256: 'a'.repeat(64),
+      totalRows: 10,
+      validRows: 0,
+      quarantinedRows: 0,
+      createdCount: 0,
+      updatedCount: 0,
+      quarantinePayload: [],
+      importedBy: 'usr-1',
+      createdAt: '2026-11-20T10:00:00Z',
+    });
+
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'batch-uuid-1234',
+        owner_tenant_id: 't-123',
+        batch_type: 'b2b_invoice_pdf',
+        status: 'processing',
+      })
+    );
+
+    const fetched = await repo.getBatchById('batch-uuid-1234');
+    expect(fetched).toBeDefined();
+    expect(fetched?.id).toBe('batch-uuid-1234');
+    expect(fetched?.batchType).toBe('b2b_invoice_pdf');
+
+    const tenantBatches = await repo.getBatchesByTenant('t-123');
+    expect(tenantBatches).toHaveLength(1);
+    expect(tenantBatches[0].id).toBe('batch-uuid-1234');
+
+    await repo.updateBatchProgress('batch-uuid-1234', {
+      validRows: 10,
+      status: 'completed',
+    });
+    expect(updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        valid_rows: 10,
+        status: 'completed',
+      })
+    );
+  });
+
+  it('revokes batch observations safely via soft-revocation', async () => {
+    const obsRows = [
+      { id: 'obs-1', valid_from: '2026-11-01', raw_payload: {} },
+      { id: 'obs-2', valid_from: '2026-11-02', raw_payload: null },
+    ];
+    const updateObsEq = vi.fn().mockResolvedValue({ error: null });
+    const updateObs = vi.fn().mockReturnValue({ eq: updateObsEq });
+
+    const mockSupabase = {
+      from: vi.fn((table: string) => {
+        if (table === 'market_price_observations') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: obsRows, error: null }),
+            }),
+            update: updateObs,
+          };
+        }
+        return {};
+      }),
+    } as any;
+
+    const repo = new SupabaseMarketRepository(mockSupabase);
+    const result = await repo.revokeBatchObservations('batch-123', 'Documento cancelado por error contable');
+
+    expect(result.affectedObservations).toBe(2);
+    expect(updateObs).toHaveBeenCalledWith(
+      expect.objectContaining({
+        quality_status: 'LOW_CONFIDENCE',
+      })
+    );
+  });
 });

@@ -1,7 +1,8 @@
 /**
- * CR-COST-05: Market Catalog Ingestion Service (PR1 + Block 2)
+ * CR-COST-05: Market Catalog Ingestion Service (PR1, Block 2, Block 4)
  * Validates, normalizes, fingerprints and persists price catalog observations
- * with full physical pack, geographic/coverage, and fiscal metadata.
+ * with full physical pack, geographic/coverage, fiscal metadata, auditable batches,
+ * document extractions (PDF/photos), volume tiers, Open Food Facts enrichment, and safe revocation.
  */
 
 import { PriceNormalizer } from "../domain/price-normalizer";
@@ -15,8 +16,12 @@ import {
   ContentUnit,
   DeliveryCoverageState,
   FreightInclusion,
+  MarketBatchStatus,
+  MarketBatchType,
+  MarketCatalogIngestionBatch,
   MarketPriceObservation,
   MarketProduct,
+  MarketVolumeTier,
   MinOrderUnit,
   NormalizationStatus,
   ObservedChannel,
@@ -26,6 +31,7 @@ import {
   PromotionStatus,
   QualityStatus,
   RegionCode,
+  RevokeBatchResult,
   TaxInclusion,
   TaxMode,
   TaxRateSource,
@@ -33,19 +39,32 @@ import {
   ThermalState,
   ValiditySource,
 } from "../domain/types";
+import {
+  DocumentExtractionResult,
+  validateExtractedLine,
+} from "../domain/document-extraction";
 import { CsvCatalogParser, RawCsvRow } from "../infrastructure/csv-catalog-parser";
 import { IMarketIntelligenceRepository } from "../infrastructure/repositories/market-repository-interface";
+import { IOpenFoodFactsClient } from "../infrastructure/open-food-facts-client";
 import { generateMarketEntityUuid } from "../domain/uuid";
 
 export interface IngestionOptions {
+  batchId?: string;
+  batchType?: MarketBatchType;
   fileName?: string;
+  fileMimeType?: string;
+  fileChecksumSha256?: string;
   importedBy: string; // User UUID
   captureMethod?: CaptureMethod;
   defaultRegion?: RegionCode;
   defaultSourceId?: string;
+  defaultObservedAt?: string;
   ownerTenantId?: string | null;
   catchWeightPolicy?: CatchWeightPolicy;
   pricingComparisonMode?: PricingComparisonMode;
+  chunkSize?: number;
+  offClient?: IOpenFoodFactsClient;
+  enrichWithOff?: boolean;
 }
 
 export interface QuarantinedRow {
@@ -56,6 +75,8 @@ export interface QuarantinedRow {
 }
 
 export interface IngestionReport {
+  batchId?: string;
+  batchStatus?: MarketBatchStatus;
   totalRows: number;
   validCount: number;
   quarantinedCount: number;
@@ -82,6 +103,7 @@ export interface ManualMarketEntryInput {
   drainedWeightUnit?: "kg" | "g" | null;
   densityKgPerL?: number | null;
   observedPriceBasis?: ObservedPriceBasis;
+  observedAt?: string;
   taxMode?: TaxMode;
   taxInclusion?: TaxInclusion;
   taxRate?: number | null;
@@ -123,6 +145,13 @@ export interface ManualMarketEntryInput {
   netDrainedQuantity?: number;
   isCatchWeight?: boolean;
   taricCode?: string | null;
+  volumeTiers?: Array<{
+    minQuantity: number;
+    tierPriceRaw: number;
+    tierQuantityUnit?: string;
+    taxMode?: TaxMode;
+    taxRate?: number | null;
+  }>;
 }
 
 const FORBIDDEN_PUBLIC_RAW_PAYLOAD_KEYS = new Set([
@@ -207,11 +236,101 @@ export class MarketCatalogIngestionService {
   constructor(private readonly repository: IMarketIntelligenceRepository) {}
 
   /**
-   * Ingests a CSV/TSV price catalog string.
+   * Ingests a CSV/TSV price catalog string with full batch auditing.
    */
   public async ingestCsv(csvContent: string, options: IngestionOptions): Promise<IngestionReport> {
     const parseResult = CsvCatalogParser.parse(csvContent);
-    return this.processRows(parseResult.rows, options);
+    const checksum =
+      options.fileChecksumSha256 || (await this.sha256Hex(csvContent));
+    return this.processRows(parseResult.rows, {
+      ...options,
+      batchType: options.batchType || "csv_catalog",
+      fileChecksumSha256: checksum,
+      fileMimeType: options.fileMimeType || "text/csv",
+    });
+  }
+
+  /**
+   * Ingests commercial documents extracted from PDF or images (invoices, delivery notes, quotes).
+   */
+  public async ingestDocument(
+    extraction: DocumentExtractionResult,
+    options: IngestionOptions,
+  ): Promise<IngestionReport> {
+    const batchType: MarketBatchType =
+      extraction.mimeType === "application/pdf"
+        ? "b2b_invoice_pdf"
+        : "b2b_document_image";
+
+    const rows: RawCsvRow[] = [];
+    const preQuarantined: QuarantinedRow[] = [];
+
+    for (const line of extraction.lines) {
+      const validation = validateExtractedLine(line);
+      if (!validation.isValid) {
+        preQuarantined.push({
+          lineNumber: line.lineNumber,
+          rawLine: line.rawText,
+          reason: validation.reason || "Línea documental rechazada por validación previa.",
+          fields: {
+            product_name: line.productName,
+            raw_price: String(line.rawPrice),
+            quantity: String(line.quantity),
+            unit: line.unit,
+            confidence: String(line.confidence),
+          },
+        });
+        continue;
+      }
+
+      rows.push({
+        lineNumber: line.lineNumber,
+        rawLine: line.rawText,
+        data: {
+          source_name: extraction.header.sourceNameOrId || options.defaultSourceId || "",
+          observed_at: extraction.header.documentDate || options.defaultObservedAt || "",
+          product_name: line.productName,
+          raw_price: String(line.rawPrice),
+          quantity: String(line.quantity),
+          unit: line.unit,
+          gtin: line.gtin || "",
+          external_sku: line.sku || "",
+          currency: extraction.header.currency || "EUR",
+          tax_mode: line.taxMode || "unknown",
+          tax_rate: line.taxRate !== undefined ? String(line.taxRate) : "",
+          tax_regime: line.taxRegime || "",
+          aiem_status: line.aiemStatus || "",
+          aiem_rate: line.aiemRate !== undefined ? String(line.aiemRate) : "",
+          aiem_amount_raw: line.aiemAmountRaw !== undefined ? String(line.aiemAmountRaw) : "",
+          freight_inclusion: extraction.header.freightInclusion || "",
+          freight_cost_raw:
+            extraction.header.freightCostRaw !== undefined
+              ? String(extraction.header.freightCostRaw)
+              : "",
+          free_freight_min_order_amount:
+            extraction.header.freeFreightMinOrderAmount !== undefined
+              ? String(extraction.header.freeFreightMinOrderAmount)
+              : "",
+          thermal_state: line.thermalState || "",
+          is_catch_weight: line.isCatchWeight ? "true" : "false",
+          taric_code: line.taricCode || "",
+        },
+      });
+    }
+
+    return this.processRows(
+      rows,
+      {
+        ...options,
+        batchType,
+        fileName: extraction.fileName,
+        fileMimeType: extraction.mimeType,
+        fileChecksumSha256: extraction.fileChecksumSha256,
+        defaultSourceId: extraction.header.sourceNameOrId || options.defaultSourceId,
+        defaultObservedAt: extraction.header.documentDate || options.defaultObservedAt,
+      },
+      preQuarantined,
+    );
   }
 
   /**
@@ -228,6 +347,17 @@ export class MarketCatalogIngestionService {
     const qtyFallback = entry.quantity ?? entry.netContentQty ?? entry.unitContentQty ?? undefined;
     const unitFallback = entry.unit ?? entry.netContentUnit ?? entry.unitContentUnit ?? "";
 
+    const tierRows: Record<string, string> = {};
+    if (entry.volumeTiers && entry.volumeTiers.length > 0) {
+      entry.volumeTiers.forEach((tier, idx) => {
+        const slot = idx + 1;
+        tierRows[`tier_${slot}_qty`] = String(tier.minQuantity);
+        tierRows[`tier_${slot}_price`] = String(tier.tierPriceRaw);
+        if (tier.tierQuantityUnit) tierRows.tier_quantity_unit = tier.tierQuantityUnit;
+        if (tier.taxMode) tierRows.tier_tax_mode = tier.taxMode;
+      });
+    }
+
     const row: RawCsvRow = {
       lineNumber: 1,
       rawLine: JSON.stringify(entry),
@@ -239,6 +369,7 @@ export class MarketCatalogIngestionService {
         quantity: qtyFallback !== undefined ? String(qtyFallback) : "",
         unit: unitFallback,
         gtin: entry.gtin ?? "",
+        observed_at: entry.observedAt || options.defaultObservedAt || "",
         pack_presentation: entry.packPresentation ?? "",
         pack_count: entry.packCount != null ? String(entry.packCount) : "",
         unit_content_qty: entry.unitContentQty != null ? String(entry.unitContentQty) : "",
@@ -302,11 +433,13 @@ export class MarketCatalogIngestionService {
             : entry.netDrainedQuantity != null
               ? String(entry.netDrainedQuantity)
               : "",
+        ...tierRows,
       },
     };
 
     const report = await this.processRows([row], {
       ...options,
+      batchType: "manual_entry",
       captureMethod: "assisted_entry",
     });
 
@@ -317,8 +450,8 @@ export class MarketCatalogIngestionService {
     const source =
       (await this.repository.getSourceById(entry.sourceIdOrName)) ||
       (await this.repository.getSourceByName(entry.sourceIdOrName));
-    const product = await this.repository.findProductByName(source!.id, entry.productName);
-    const observations = await this.repository.getObservationsByProduct(product!.id);
+    const product = await this.repository.findProductByName(source!.id, entry.productName, options.ownerTenantId);
+    const observations = await this.repository.getObservationsByProduct(product!.id, options.ownerTenantId);
     const latest = [...observations].sort(
       (a, b) => new Date(b.observedAt).getTime() - new Date(a.observedAt).getTime(),
     )[0];
@@ -330,11 +463,77 @@ export class MarketCatalogIngestionService {
     };
   }
 
+  /**
+   * Non-destructive soft-revocation of an erroneous or disputed ingestion batch.
+   * Expires observation validity and sets quality_status = 'LOW_CONFIDENCE',
+   * safely neutralizing the batch from benchmarks without violating PostgreSQL append-only triggers.
+   */
+  public async revokeBatch(
+    ctx: { tenantId?: string; userId: string; isSaasAdmin?: boolean },
+    batchId: string,
+    reason: string,
+  ): Promise<RevokeBatchResult> {
+    if (!reason || !reason.trim()) {
+      throw new Error("Se requiere un motivo de revocación válido.");
+    }
+    const batch = await this.repository.getBatchById(batchId);
+    if (!batch) {
+      throw new Error(`Lote no encontrado: ${batchId}`);
+    }
+
+    // Access check:
+    if (batch.ownerTenantId === null) {
+      if (!ctx.isSaasAdmin) {
+        throw new Error(
+          "Solo administradores de plataforma (SaaS Admin) pueden revocar lotes públicos compartidos.",
+        );
+      }
+    } else {
+      if (ctx.tenantId !== batch.ownerTenantId && !ctx.isSaasAdmin) {
+        throw new Error("Acceso denegado: no puedes revocar lotes pertenecientes a otro tenant.");
+      }
+    }
+
+    if (batch.status === "revoked") {
+      return {
+        batchId,
+        status: "revoked",
+        revokedAt: batch.revokedAt || new Date().toISOString(),
+        revokedBy: batch.revokedBy || ctx.userId,
+        revocationReason: batch.revocationReason || reason,
+        affectedObservationsCount: 0,
+      };
+    }
+
+    const nowIso = new Date().toISOString();
+    const { affectedObservations } = await this.repository.revokeBatchObservations(
+      batchId,
+      reason.trim(),
+    );
+
+    await this.repository.updateBatchProgress(batchId, {
+      status: "revoked",
+      revokedAt: nowIso,
+      revokedBy: ctx.userId,
+      revocationReason: reason.trim(),
+    });
+
+    return {
+      batchId,
+      status: "revoked",
+      revokedAt: nowIso,
+      revokedBy: ctx.userId,
+      revocationReason: reason.trim(),
+      affectedObservationsCount: affectedObservations,
+    };
+  }
+
   private async processRows(
     rows: RawCsvRow[],
     options: IngestionOptions,
+    initialQuarantined: QuarantinedRow[] = [],
   ): Promise<IngestionReport> {
-    const quarantinedRows: QuarantinedRow[] = [];
+    const quarantinedRows: QuarantinedRow[] = [...initialQuarantined];
     let validCount = 0;
     let createdCount = 0;
     let updatedCount = 0;
@@ -347,12 +546,43 @@ export class MarketCatalogIngestionService {
     }
 
     const nowIso = new Date().toISOString();
+    const batchId = options.batchId || generateMarketEntityUuid();
+    const ownerTenantId = options.ownerTenantId ?? null;
+    const batchType: MarketBatchType = options.batchType || "csv_catalog";
 
+    // 1. Initialize Batch in Repository for Complete Auditability
+    const initialBatch: MarketCatalogIngestionBatch = {
+      id: batchId,
+      ownerTenantId,
+      sourceId: options.defaultSourceId || sources[0]?.id || "src-makro",
+      batchType,
+      fileName: options.fileName || null,
+      fileMimeType: options.fileMimeType || "text/csv",
+      fileChecksumSha256: options.fileChecksumSha256 || null,
+      totalRows: rows.length + initialQuarantined.length,
+      validRows: 0,
+      quarantinedRows: initialQuarantined.length,
+      createdCount: 0,
+      updatedCount: 0,
+      status: "processing",
+      quarantinePayload: initialQuarantined.map((q) => ({
+        lineNumber: q.lineNumber,
+        rawLine: ownerTenantId ? q.rawLine : undefined,
+        reason: q.reason,
+        fields: q.fields,
+      })),
+      importedBy: options.importedBy,
+      createdAt: nowIso,
+    };
+    await this.repository.createBatch(initialBatch);
+
+    let firstMatchedSourceId: string | undefined;
+
+    // 2. Iterate and Normalize Rows
     for (const row of rows) {
       const data = row.data;
-      const ownerTenantId = options.ownerTenantId ?? null;
 
-      // 1. Validate mandatory core fields
+      // Validate mandatory core fields
       const sourceNameRaw = data.source_name || options.defaultSourceId;
       const productName = data.product_name;
       const rawPriceStr = data.raw_price?.replace(",", ".");
@@ -372,13 +602,14 @@ export class MarketCatalogIngestionService {
         quarantinedRows.push({
           lineNumber: row.lineNumber,
           rawLine: row.rawLine,
-          reason: "INVALID_PHYSICAL_SPEC: Missing or invalid physical measurement specification (quantity/pack dimensions and unit required; defaulting to 1 kg is strictly prohibited).",
+          reason:
+            "INVALID_PHYSICAL_SPEC: Missing or invalid physical measurement specification (quantity/pack dimensions and unit required; defaulting to 1 kg is strictly prohibited).",
           fields: data,
         });
         continue;
       }
 
-      // 2. Resolve source
+      // Resolve source
       const cleanSourceKey = sourceNameRaw.trim().toLowerCase();
       let matchedSource = sourceMap.get(cleanSourceKey);
       if (!matchedSource) {
@@ -400,7 +631,11 @@ export class MarketCatalogIngestionService {
         continue;
       }
 
-      // 3. Parse numeric & physical fields (keeping unknown values strictly null)
+      if (!firstMatchedSourceId) {
+        firstMatchedSourceId = matchedSource.id;
+      }
+
+      // Parse numeric & physical fields
       const rawPrice = parseFloat(rawPriceStr);
       if (isNaN(rawPrice) || rawPrice <= 0) {
         quarantinedRows.push({
@@ -469,7 +704,7 @@ export class MarketCatalogIngestionService {
         continue;
       }
 
-      // 4. Resolve tax mode and documented tax rate (NEVER infer default 0.07 rate)
+      // Resolve tax mode and documented tax rate (never infer default rate)
       const taxMode = resolveTaxModeInput(data.tax_mode, undefined, matchedSource.defaultTaxMode);
       const taxRateParsed = parseOptionalFloat(data.tax_rate);
       if (Number.isNaN(taxRateParsed)) {
@@ -555,7 +790,7 @@ export class MarketCatalogIngestionService {
         continue;
       }
 
-      // 5. Normalize Price (respecting taxMode='unknown' or missing inc_tax rate -> null)
+      // Normalize Price
       let normalizedResult;
       try {
         normalizedResult = PriceNormalizer.normalize({
@@ -587,48 +822,79 @@ export class MarketCatalogIngestionService {
         continue;
       }
 
-      // 6. Resolve / Create Market Product in Core
+      // Resolve or Create Market Product in Core
       const externalSku = data.external_sku || this.generateSku(matchedSource.id, productName);
       let marketProduct = await this.repository.findProductBySku(matchedSource.id, externalSku, ownerTenantId);
 
       if (!marketProduct) {
-        marketProduct = {
+        let brand = data.brand || undefined;
+        let packPres = (data.pack_presentation as PackPresentation) || null;
+        let pNetQty = netContentQty;
+        let pNetUnit = (data.net_content_unit as ContentUnit) || null;
+        let pDrainedQty = drainedWeightQty;
+        let pDrainedUnit: 'kg' | 'g' | null =
+          data.drained_weight_unit === "kg" || data.drained_weight_unit === "g"
+            ? (data.drained_weight_unit as 'kg' | 'g')
+            : null;
+        let origin = data.origin || undefined;
+
+        // Open Food Facts enrichment (Physical & Descriptive ONLY)
+        if (options.enrichWithOff && options.offClient && gtinResult.gtin) {
+          try {
+            const offData = await options.offClient.fetchProductByGtin(gtinResult.gtin);
+            if (offData) {
+              if (!brand && offData.brand) brand = offData.brand;
+              if (!packPres && offData.packPresentation) packPres = offData.packPresentation;
+              if (!pNetQty && offData.netContentQty) {
+                pNetQty = offData.netContentQty;
+                pNetUnit = offData.netContentUnit || pNetUnit;
+              }
+              if (!pDrainedQty && offData.drainedWeightQty) {
+                pDrainedQty = offData.drainedWeightQty;
+                pDrainedUnit = offData.drainedWeightUnit || pDrainedUnit;
+              }
+              if (!origin && offData.origin) origin = offData.origin;
+            }
+          } catch {
+            // OFF is fail-safe; network timeouts do not block catalog creation
+          }
+        }
+
+        const newProduct: MarketProduct = {
           id: generateMarketEntityUuid(),
           sourceId: matchedSource.id,
           ownerTenantId,
           externalSku,
           gtin: gtinResult.gtin,
           rawName: productName,
-          brand: data.brand || undefined,
+          brand,
           category: data.category || "General Food",
           thermalState: this.inferThermalState(data.thermal_state, productName),
           measurementDimension: normalizedResult.measurementDimension,
           standardQuantity: normalizedResult.standardQuantity,
           standardUnit: normalizedResult.standardUnit,
-          packPresentation: (data.pack_presentation as PackPresentation) || null,
+          packPresentation: packPres,
           packCount,
           unitContentQty,
           unitContentUnit: (data.unit_content_unit as ContentUnit) || null,
-          netContentQty,
-          netContentUnit: (data.net_content_unit as ContentUnit) || null,
-          drainedWeightQty,
-          drainedWeightUnit:
-            data.drained_weight_unit === "kg" || data.drained_weight_unit === "g"
-              ? data.drained_weight_unit
-              : null,
+          netContentQty: pNetQty,
+          netContentUnit: pNetUnit,
+          drainedWeightQty: pDrainedQty,
+          drainedWeightUnit: pDrainedUnit,
           densityKgPerL,
           cutSpecification: data.cut_spec || undefined,
           qualityGrade: data.quality_grade || "standard",
-          origin: data.origin || undefined,
+          origin,
           isCatchWeight,
           taricCode,
           createdAt: nowIso,
           updatedAt: nowIso,
         };
-        await this.repository.saveProduct(marketProduct);
+        await this.repository.saveProduct(newProduct);
+        marketProduct = newProduct;
       }
 
-      // 7. Deduplication & Idempotent Fingerprint
+      // Deduplication & Idempotent Fingerprint with Real Document Observation Date
       const regionCode: RegionCode =
         (data.region_code as RegionCode) || options.defaultRegion || matchedSource.defaultRegion;
       const locationName = data.location_name || "Central Warehouse";
@@ -639,7 +905,11 @@ export class MarketCatalogIngestionService {
       const currency = (data.currency?.trim().toUpperCase() || "EUR").slice(0, 3);
       const aiemStatus: AiemStatus = (data.aiem_status as AiemStatus) || "unknown";
 
-      const observedDateStr = nowIso.slice(0, 10);
+      // Real Document Date Support (avoids false duplicates upon re-import on subsequent days)
+      const declaredDate = (data.observed_at || options.defaultObservedAt || nowIso.slice(0, 10)).trim();
+      const observedDateStr =
+        declaredDate.length >= 10 ? declaredDate.slice(0, 10) : nowIso.slice(0, 10);
+
       const fingerprint = await this.computeFingerprint({
         sourceId: matchedSource.id,
         sku: externalSku,
@@ -663,6 +933,7 @@ export class MarketCatalogIngestionService {
 
       const rawPayload = sanitizeRawPayloadForScope(
         {
+          batchId,
           fileName: options.fileName || null,
           lineNumber: row.lineNumber,
           ...(ownerTenantId ? { rawLine: row.rawLine } : {}),
@@ -680,6 +951,47 @@ export class MarketCatalogIngestionService {
       const validitySource: ValiditySource =
         (data.validity_source as ValiditySource) ||
         (hasDeclaredValidTo ? "source_declared" : "inferred_default");
+
+      // Parse Volume Tiers (Block 2B / D-010 compliant)
+      const volumeTiers: MarketVolumeTier[] = [];
+      const tierSpecs = [
+        { qty: data.tier_1_qty, price: data.tier_1_price },
+        { qty: data.tier_2_qty, price: data.tier_2_price },
+        { qty: data.tier_3_qty, price: data.tier_3_price },
+      ];
+      for (const spec of tierSpecs) {
+        const minQty = parseOptionalFloat(spec.qty);
+        const tierPrice = parseOptionalFloat(spec.price);
+        if (minQty && minQty > 0 && tierPrice && tierPrice > 0) {
+          const tierTaxMode = resolveTaxModeInput(
+            data.tier_tax_mode || data.tax_mode,
+            undefined,
+            matchedSource.defaultTaxMode,
+          );
+          let tierNormalizedPriceExTax: number | null = null;
+          if (tierTaxMode === "ex_tax") {
+            const divisor =
+              normalizedResult.standardQuantity > 0 ? normalizedResult.standardQuantity : 1;
+            tierNormalizedPriceExTax = Number((tierPrice / divisor).toFixed(4));
+          } else if (tierTaxMode === "inc_tax" && taxRateParsed !== null) {
+            const netTier = tierPrice / (1 + taxRateParsed);
+            const divisor =
+              normalizedResult.standardQuantity > 0 ? normalizedResult.standardQuantity : 1;
+            tierNormalizedPriceExTax = Number((netTier / divisor).toFixed(4));
+          }
+
+          volumeTiers.push({
+            id: generateMarketEntityUuid(),
+            observationId: "",
+            minQuantity: minQty,
+            tierQuantityUnit: (data.tier_quantity_unit || data.min_order_unit || "unit") as any,
+            tierPriceRaw: tierPrice,
+            taxMode: tierTaxMode,
+            taxRate: taxRateParsed,
+            tierNormalizedPriceExTax,
+          });
+        }
+      }
 
       const existingObservation = await this.repository.findObservationByFingerprint(fingerprint);
 
@@ -707,7 +1019,8 @@ export class MarketCatalogIngestionService {
           id: generateMarketEntityUuid(),
           marketProductId: marketProduct.id,
           ownerTenantId,
-          observedAt: nowIso,
+          ingestionBatchId: batchId,
+          observedAt: `${observedDateStr}T12:00:00.000Z`,
           validFrom: data.valid_from || observedDateStr,
           validTo: nextValidTo,
           validitySource,
@@ -755,6 +1068,7 @@ export class MarketCatalogIngestionService {
           qualityStatus,
           rawPayload,
           importedBy: options.importedBy,
+          volumeTiers: volumeTiers.length > 0 ? volumeTiers : undefined,
           createdAt: nowIso,
         };
 
@@ -765,8 +1079,40 @@ export class MarketCatalogIngestionService {
       validCount++;
     }
 
+    // 3. Close and Persist Batch Outcome
+    const totalProcessed = rows.length + initialQuarantined.length;
+    const finalStatus: MarketBatchStatus =
+      quarantinedRows.length === 0
+        ? "completed"
+        : validCount > 0
+          ? "partial_quarantine"
+          : "failed";
+
+    const sanitizedQuarantine = sanitizeRawPayloadForScope(
+      quarantinedRows.map((q) => ({
+        lineNumber: q.lineNumber,
+        rawLine: ownerTenantId ? q.rawLine : undefined,
+        reason: q.reason,
+        fields: q.fields,
+      })) as any,
+      ownerTenantId,
+    ) as any;
+
+    await this.repository.updateBatchProgress(batchId, {
+      totalRows: totalProcessed,
+      validRows: validCount,
+      quarantinedRows: quarantinedRows.length,
+      createdCount,
+      updatedCount,
+      status: finalStatus,
+      quarantinePayload: sanitizedQuarantine || [],
+      sourceId: firstMatchedSourceId || initialBatch.sourceId,
+    });
+
     return {
-      totalRows: rows.length,
+      batchId,
+      batchStatus: finalStatus,
+      totalRows: totalProcessed,
       validCount,
       quarantinedCount: quarantinedRows.length,
       createdObservationsCount: createdCount,

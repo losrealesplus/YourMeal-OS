@@ -1,5 +1,6 @@
 import {
   ComparisonInputObservation,
+  MarketCatalogIngestionBatch,
   MarketDeliveryCoverage,
   MarketEstablishment,
   MarketPriceObservation,
@@ -19,6 +20,7 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
   private products = new Map<string, MarketProduct>();
   private observations = new Map<string, MarketPriceObservation>();
   private observationFingerprints = new Map<string, string>(); // fingerprint -> observationId
+  private batches = new Map<string, MarketCatalogIngestionBatch>();
   private mappings = new Map<string, ProductMapping>(); // key: `${tenantId}:${tenantIngredientId}:${marketProductId}`
   private tenantConfigs = new Map<string, MarketTenantConfig>();
 
@@ -223,6 +225,67 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
       validTo,
       ...(sanitizedPayload !== undefined ? { rawPayload: sanitizedPayload } : {}),
     });
+  }
+
+  // --------------------------------------------------------------------------
+  // Batches (PR4)
+  // --------------------------------------------------------------------------
+
+  public async createBatch(batch: MarketCatalogIngestionBatch): Promise<void> {
+    this.batches.set(batch.id, { ...batch });
+  }
+
+  public async getBatchById(batchId: string): Promise<MarketCatalogIngestionBatch | null> {
+    return this.batches.get(batchId) || null;
+  }
+
+  public async getBatchesByTenant(tenantId: string | null): Promise<MarketCatalogIngestionBatch[]> {
+    return Array.from(this.batches.values())
+      .filter((b) => (tenantId === null ? b.ownerTenantId == null : b.ownerTenantId === tenantId))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  public async updateBatchProgress(
+    batchId: string,
+    updates: Partial<MarketCatalogIngestionBatch>
+  ): Promise<void> {
+    const existing = this.batches.get(batchId);
+    if (!existing) {
+      throw new Error(`MarketCatalogIngestionBatch not found: ${batchId}`);
+    }
+    this.batches.set(batchId, { ...existing, ...updates });
+  }
+
+  public async revokeBatchObservations(
+    batchId: string,
+    reason: string
+  ): Promise<{ affectedObservations: number }> {
+    let count = 0;
+    const nowIso = new Date().toISOString();
+    for (const [id, obs] of this.observations.entries()) {
+      if (obs.ingestionBatchId === batchId) {
+        count++;
+        const expiredValidTo = obs.validFrom || obs.observedAt.slice(0, 10);
+        const existingPayload = obs.rawPayload || {};
+        const updatedPayload = sanitizeRawPayloadForScope(
+          {
+            ...existingPayload,
+            revocation: {
+              revokedAt: nowIso,
+              reason,
+            },
+          },
+          obs.ownerTenantId
+        );
+        this.observations.set(id, {
+          ...obs,
+          validTo: expiredValidTo,
+          qualityStatus: 'LOW_CONFIDENCE',
+          rawPayload: updatedPayload,
+        });
+      }
+    }
+    return { affectedObservations: count };
   }
 
   public async getMappingsByTenant(tenantId: string): Promise<ProductMapping[]> {

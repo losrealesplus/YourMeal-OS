@@ -19,6 +19,9 @@ import {
   DeliveryCoverageState,
   FreightInclusion,
   FulfillmentMode,
+  MarketBatchStatus,
+  MarketBatchType,
+  MarketCatalogIngestionBatch,
   MarketDeliveryCoverage,
   MarketEstablishment,
   MarketPriceObservation,
@@ -454,6 +457,7 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       id: observationId,
       market_product_id: observation.marketProductId,
       owner_tenant_id: ownerTenantId,
+      ingestion_batch_id: observation.ingestionBatchId ?? null,
       establishment_id: observation.establishmentId ?? null,
       fingerprint,
       observed_at: observation.observedAt,
@@ -553,6 +557,136 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       .eq('id', observationId);
 
     if (error) throw error;
+  }
+
+  // --------------------------------------------------------------------------
+  // Batches (PR4)
+  // --------------------------------------------------------------------------
+
+  public async createBatch(batch: MarketCatalogIngestionBatch): Promise<void> {
+    const { error } = await this.supabase
+      .from('market_catalog_ingestion_batches')
+      .insert({
+        id: batch.id,
+        owner_tenant_id: batch.ownerTenantId ?? null,
+        source_id: batch.sourceId,
+        batch_type: batch.batchType,
+        file_name: batch.fileName ?? null,
+        file_mime_type: batch.fileMimeType ?? null,
+        file_checksum_sha256: batch.fileChecksumSha256 ?? null,
+        total_rows: batch.totalRows,
+        valid_rows: batch.validRows,
+        quarantined_rows: batch.quarantinedRows,
+        created_count: batch.createdCount,
+        updated_count: batch.updatedCount,
+        status: batch.status,
+        quarantine_payload: (batch.quarantinePayload as any) || [],
+        imported_by: batch.importedBy,
+        created_at: batch.createdAt,
+      });
+
+    if (error) throw error;
+  }
+
+  public async getBatchById(batchId: string): Promise<MarketCatalogIngestionBatch | null> {
+    const { data, error } = await this.supabase
+      .from('market_catalog_ingestion_batches')
+      .select('*')
+      .eq('id', batchId)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return null;
+    return this.mapBatchFromDb(data);
+  }
+
+  public async getBatchesByTenant(tenantId: string | null): Promise<MarketCatalogIngestionBatch[]> {
+    let query = this.supabase
+      .from('market_catalog_ingestion_batches')
+      .select('*');
+
+    if (tenantId) {
+      query = query.eq('owner_tenant_id', tenantId);
+    } else {
+      query = query.is('owner_tenant_id', null);
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map((r) => this.mapBatchFromDb(r));
+  }
+
+  public async updateBatchProgress(
+    batchId: string,
+    updates: Partial<MarketCatalogIngestionBatch>
+  ): Promise<void> {
+    const patch: Record<string, unknown> = {};
+    if (updates.totalRows !== undefined) patch.total_rows = updates.totalRows;
+    if (updates.validRows !== undefined) patch.valid_rows = updates.validRows;
+    if (updates.quarantinedRows !== undefined) patch.quarantined_rows = updates.quarantinedRows;
+    if (updates.createdCount !== undefined) patch.created_count = updates.createdCount;
+    if (updates.updatedCount !== undefined) patch.updated_count = updates.updatedCount;
+    if (updates.status !== undefined) patch.status = updates.status;
+    if (updates.quarantinePayload !== undefined) {
+      patch.quarantine_payload = updates.quarantinePayload;
+    }
+    if (updates.revokedAt !== undefined) patch.revoked_at = updates.revokedAt;
+    if (updates.revokedBy !== undefined) patch.revoked_by = updates.revokedBy;
+    if (updates.revocationReason !== undefined) patch.revocation_reason = updates.revocationReason;
+
+    const { error } = await this.supabase
+      .from('market_catalog_ingestion_batches')
+      .update(patch)
+      .eq('id', batchId);
+
+    if (error) throw error;
+  }
+
+  public async revokeBatchObservations(
+    batchId: string,
+    reason: string
+  ): Promise<{ affectedObservations: number }> {
+    const { data: obsList, error: listErr } = await this.supabase
+      .from('market_price_observations')
+      .select('id, valid_from, observed_at, raw_payload, owner_tenant_id')
+      .eq('ingestion_batch_id', batchId);
+
+    if (listErr) throw listErr;
+    if (!obsList || obsList.length === 0) {
+      return { affectedObservations: 0 };
+    }
+
+    const nowIso = new Date().toISOString();
+    let affectedCount = 0;
+
+    for (const obs of obsList) {
+      const expiredValidTo = obs.valid_from || obs.observed_at.slice(0, 10);
+      const existingPayload = (obs.raw_payload as Record<string, unknown>) || {};
+      const updatedPayload = sanitizeRawPayloadForScope(
+        {
+          ...existingPayload,
+          revocation: {
+            revokedAt: nowIso,
+            reason,
+          },
+        },
+        obs.owner_tenant_id
+      );
+
+      const { error: updErr } = await this.supabase
+        .from('market_price_observations')
+        .update({
+          valid_to: expiredValidTo,
+          quality_status: 'LOW_CONFIDENCE',
+          raw_payload: updatedPayload,
+        })
+        .eq('id', obs.id);
+
+      if (updErr) throw updErr;
+      affectedCount++;
+    }
+
+    return { affectedObservations: affectedCount };
   }
 
   // --------------------------------------------------------------------------
@@ -969,6 +1103,7 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       id: row.id,
       marketProductId: row.market_product_id,
       ownerTenantId: row.owner_tenant_id ?? null,
+      ingestionBatchId: row.ingestion_batch_id || undefined,
       observedAt: row.observed_at,
       validFrom: row.valid_from || undefined,
       validTo: row.valid_to ?? null,
@@ -1018,6 +1153,30 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       importedBy: row.imported_by || undefined,
       volumeTiers: tiers.length > 0 ? tiers : undefined,
       createdAt: row.created_at,
+    };
+  }
+
+  private mapBatchFromDb(row: any): MarketCatalogIngestionBatch {
+    return {
+      id: row.id,
+      ownerTenantId: row.owner_tenant_id ?? null,
+      sourceId: row.source_id,
+      batchType: row.batch_type as MarketBatchType,
+      fileName: row.file_name ?? null,
+      fileMimeType: row.file_mime_type ?? null,
+      fileChecksumSha256: row.file_checksum_sha256 ?? null,
+      totalRows: row.total_rows ?? 0,
+      validRows: row.valid_rows ?? 0,
+      quarantinedRows: row.quarantined_rows ?? 0,
+      createdCount: row.created_count ?? 0,
+      updatedCount: row.updated_count ?? 0,
+      status: row.status as MarketBatchStatus,
+      quarantinePayload: Array.isArray(row.quarantine_payload) ? row.quarantine_payload : [],
+      importedBy: row.imported_by,
+      createdAt: row.created_at,
+      revokedAt: row.revoked_at ?? null,
+      revokedBy: row.revoked_by ?? null,
+      revocationReason: row.revocation_reason ?? null,
     };
   }
 
