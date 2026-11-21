@@ -184,4 +184,36 @@ PR2B perfecciona la base física y fiscal para la posterior ingesta y cálculo d
   - Aborta si existen escalados en `market_volume_tiers` que utilicen las columnas extendidas de PR2B o tengan precios normalizados `NULL` (D-010).
   - Solo si no existen filas dependientes, retira limpiamente el trigger de inmutabilidad de tiers, la tabla `market_tenant_configs` y las columnas extendidas.
 
+---
+
+## 13. Contrato de Comparación, Landed Cost y Ranking Explicable (Bloque 3 · PR3)
+
+El Bloque 3 (`OfferComparator` y `MarketBenchmarkService`) transforma los datos observables en una recomendación de compra ejecutable, transparente y protegida contra engaños comerciales:
+
+1. **Contexto de Comparación (`ComparisonContext`):**
+   - Evalúa ofertas en función del destino del restaurante (`targetLocation: DeliveryTargetQuery` que distingue islas canarias y península), el tamaño de lote solicitado (`batchQuantity` y `batchUnit`), el estado térmico (`targetThermalState`: `fresh`, `frozen`, `ambient`, `dry`) y la configuración del tenant (`pricingComparisonMode`: `landed_cost` vs `origin_price`).
+   - Aplica automáticamente el escalado de volumen (`market_volume_tiers`) que califique para el lote solicitado. Si el tier tiene `tax_mode = 'unknown'` o precio normalizado nulo bajo la regla D-010, se prohíbe inventar un precio neto con descuento y se toma el precio base observable con aviso de incertidumbre (`UNQUANTIFIED_SURCHARGE`).
+2. **Cálculo de Landed Cost vs Origin Price:**
+   - En modo `landed_cost`, imputa el sobrecoste logístico unitario (`freightCostRaw / batchQuantity`) o aplica flete gratuito si el importe del pedido supera el umbral documentado (`freeFreightMinOrderAmount`).
+   - En modo `origin_price`, compara estrictamente la tarifa ex-tax en origen del proveedor.
+3. **Compuertas Anti-Engaño para Oferta Recomendada (`Top 1`):**
+   - Una oferta **queda inhabilitada para ser declarada como `Top 1`** si presenta alguna de las siguientes condiciones de incertidumbre o inviabilidad:
+     1. Cobertura geográfica fuera de zona o no confirmada documentalmente (`UNVERIFIED_GEO_COVERAGE`).
+     2. Observación caducada (`valid_to < now()`) o con antigüedad superior al umbral de frescura (por defecto 14 días).
+     3. Fiscalidad de la oferta no resuelta (`tax_mode = 'unknown'` o precio ex-tax nulo bajo D-010).
+     4. Pedido mínimo inalcanzable (`min_order_qty > batchQuantity`) o incompatibilidad de dimensión física/térmica.
+     5. En modo `landed_cost`, portes excluidos o desconocidos sin cuantificar (`UNKNOWN_FREIGHT`).
+   - Si ninguna oferta cumple todos los requisitos para `Top 1`, se devuelve `top1 = null` con diagnóstico explicativo en español, y se entregan las mejores candidatas en `alternatives` con sus banderas de incertidumbre (`uncertaintyFlags`).
+4. **Ranking Top 1 + 2 Alternativas y Jerarquía de Desempate:**
+   - Las ofertas elegibles se ordenan por coste comparable efectivo. Ante empates o diferencias inferiores a 0.0001 €/ud, se desempata en este orden estricto:
+     1. Menor número de banderas de incertidumbre.
+     2. Mayor frescura (observación más reciente).
+     3. Mayor equivalencia de producto (`HIGH` > `MEDIUM` > `LOW`).
+     4. Canal mayorista preferente (`b2b_wholesale` > `cash_carry` > `regional_specialist` > `retail_ceiling`).
+5. **Regla de No Inventar Ahorros con Incertidumbre:**
+   - El ahorro garantizado frente al coste medio ponderado (WAC) del restaurante solo se cuantifica (`savingsConfidence = 'VERIFIED'`) cuando la oferta ganadora posee 0 banderas de incertidumbre y precio fiscal/logístico cerrado. Si existen incertidumbres (p. ej. AIEM pendiente o portes estimados), se etiqueta como `savingsConfidence = 'UNCERTAIN'` y se omite el ahorro artificial en euros.
+6. **Carga Agregada sin Consultas N+1:**
+   - `getComparisonInputsForIngredients` en la interfaz del repositorio unifica en una sola pasada la carga de mappings, productos, fuentes, coberturas de entrega y escalados por volumen para múltiples ingredientes, preservando el aislamiento multi-tenant (`owner_tenant_id IS NULL` vs `owner_tenant_id = tenantId`).
+
+
 

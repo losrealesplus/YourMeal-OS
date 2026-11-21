@@ -331,4 +331,156 @@ describe('SupabaseMarketRepository', () => {
     });
     expect(insertCovMock).toHaveBeenCalledTimes(1);
   });
+
+  it('fetches comparison inputs with volume tiers and delivery coverages without N+1 queries', async () => {
+    const mockMappings = [
+      {
+        id: 'map-1',
+        tenant_id: 't-1',
+        tenant_ingredient_id: 'ing-1',
+        market_product_id: 'prod-1',
+        match_confidence: 0.9,
+        match_status: 'confirmed',
+        comparability_grade: 'HIGH',
+      },
+    ];
+
+    const mockProducts = [
+      {
+        id: 'prod-1',
+        source_id: 'src-1',
+        raw_name: 'Pechuga Pollo',
+        category: 'Aves',
+        thermal_state: 'fresh',
+        standard_quantity: 1.0,
+        standard_unit: 'kg',
+        owner_tenant_id: null,
+        created_at: '2026-01-01T00:00:00Z',
+        updated_at: '2026-01-01T00:00:00Z',
+      },
+    ];
+
+    const mockSources = [
+      {
+        id: 'src-1',
+        name: 'Makro',
+        source_type: 'b2b_wholesale',
+        default_tax_mode: 'ex_tax',
+        default_region: 'ES_TENERIFE_TF',
+        is_active: true,
+        created_at: '2026-01-01T00:00:00Z',
+        updated_at: '2026-01-01T00:00:00Z',
+      },
+    ];
+
+    const mockCoverages = [
+      {
+        id: 'cov-1',
+        source_id: 'src-1',
+        country_code: 'ES',
+        region_code: 'ES_TENERIFE_TF',
+        coverage_status: 'documented_available',
+        fulfillment_mode: 'delivery',
+        created_at: '2026-01-01T00:00:00Z',
+        updated_at: '2026-01-01T00:00:00Z',
+      },
+    ];
+
+    const mockObs = [
+      {
+        id: 'obs-1',
+        market_product_id: 'prod-1',
+        owner_tenant_id: null,
+        observed_at: '2026-11-20T10:00:00Z',
+        price_raw: '10.50',
+        currency: 'EUR',
+        tax_mode: 'ex_tax',
+        tax_rate: '0.0',
+        normalized_price_ex_tax: '5.25',
+        normalized_unit: 'EUR_PER_KG',
+        promotion_status: 'standard',
+        region_code: 'ES_TENERIFE_TF',
+        quality_status: 'VERIFIED',
+        capture_method: 'assisted_entry',
+        created_at: '2026-11-20T10:00:00Z',
+      },
+    ];
+
+    const mockTiers = [
+      {
+        id: 'tier-1',
+        observation_id: 'obs-1',
+        min_quantity: '20',
+        tier_quantity_unit: 'kg',
+        tier_price_raw: '9.00',
+        tax_mode: 'ex_tax',
+        tax_rate: '0.0',
+        tier_normalized_price_ex_tax: '4.50',
+        created_at: '2026-11-20T10:00:00Z',
+      },
+    ];
+
+    const mockSupabase = {
+      from: vi.fn((table: string) => {
+        if (table === 'product_mappings') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            in: vi.fn().mockReturnThis(),
+            neq: vi.fn().mockResolvedValue({ data: mockMappings, error: null }),
+          };
+        }
+        if (table === 'market_products') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            in: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
+          };
+        }
+        if (table === 'market_sources') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            in: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockResolvedValue({ data: mockSources, error: null }),
+          };
+        }
+        if (table === 'market_delivery_coverages') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            in: vi.fn().mockReturnThis(),
+            or: vi.fn().mockResolvedValue({ data: mockCoverages, error: null }),
+          };
+        }
+        if (table === 'market_price_observations') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            in: vi.fn().mockReturnThis(),
+            or: vi.fn().mockReturnThis(),
+            order: vi.fn().mockResolvedValue({ data: mockObs, error: null }),
+          };
+        }
+        if (table === 'market_volume_tiers') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            in: vi.fn().mockReturnThis(),
+            order: vi.fn().mockResolvedValue({ data: mockTiers, error: null }),
+          };
+        }
+        return {
+          select: vi.fn().mockResolvedValue({ data: [], error: null }),
+        };
+      }),
+    } as any;
+
+    const repo = new SupabaseMarketRepository(mockSupabase);
+    const inputsMap = await repo.getComparisonInputsForIngredients('t-1', ['ing-1']);
+
+    expect(inputsMap.has('ing-1')).toBe(true);
+    const items = inputsMap.get('ing-1')!;
+    expect(items).toHaveLength(1);
+    expect(items[0].source.name).toBe('Makro');
+    expect(items[0].product.rawName).toBe('Pechuga Pollo');
+    expect(items[0].observation.volumeTiers).toHaveLength(1);
+    expect(items[0].observation.volumeTiers?.[0].minQuantity).toBe(20);
+    expect(items[0].coverages).toHaveLength(1);
+  });
 });

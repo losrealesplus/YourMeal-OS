@@ -533,3 +533,153 @@ export interface EconomicOpportunity {
   };
 }
 
+// ============================================================================
+// CR-COST-05 Bloque 3: Offer Comparison, Landed Cost & Explainable Ranking
+// ============================================================================
+
+export type FreightStatus =
+  | 'included'
+  | 'surcharged'
+  | 'free_threshold_reached'
+  | 'unknown_freight';
+
+export interface DeliveryTargetQuery {
+  countryCode: string; // ISO 3166-1 alpha-2, e.g. 'ES', 'PT'
+  regionCode?: RegionCode | null;
+  subdivisionCode?: string | null;
+  provinceCode?: string | null;
+  islandCode?: string | null;
+  postalCode?: string | null;
+  allowPickup?: boolean;
+}
+
+export interface ComparisonInputObservation {
+  source: MarketSource;
+  product: MarketProduct;
+  observation: MarketPriceObservation;
+  mapping: ProductMapping;
+  coverages?: MarketDeliveryCoverage[];
+}
+
+export type OfferUncertaintyFlag =
+  | 'UNKNOWN_FREIGHT'
+  | 'UNQUANTIFIED_SURCHARGE'
+  | 'AIEM_INCLUSION_UNKNOWN'
+  | 'STALE_OBSERVATION'
+  | 'UNVERIFIED_GEO_COVERAGE'
+  | 'ESTIMATED_QUALITY'
+  | 'PROMOTIONAL_TEMPORARY'
+  | 'MIN_ORDER_QTY_TIGHT';
+
+export type DisqualificationReason =
+  | 'OUT_OF_GEOGRAPHIC_COVERAGE'
+  | 'UNRESOLVED_TAX_MODE'
+  | 'EXPIRED_OR_STALE_OBSERVATION'
+  | 'INCOMPATIBLE_UNIT_OR_DIMENSION'
+  | 'MIN_ORDER_QTY_EXCEEDED'
+  | 'UNKNOWN_FREIGHT_IN_LANDED_COST'
+  | 'CATCH_WEIGHT_DEVIATION_DISALLOWED'
+  | 'THERMAL_STATE_INCOMPATIBLE'
+  | 'COMPARABILITY_GRADE_EXCLUDED';
+
+export interface DisqualifiedOffer {
+  observationId: string;
+  sourceId: string;
+  sourceName: string;
+  productName: string;
+  reason: DisqualificationReason;
+  diagnosticNote: string;
+}
+
+export interface ComparisonContext {
+  targetLocation?: DeliveryTargetQuery;
+  batchQuantity?: number;
+  batchUnit?: string;
+  targetThermalState?: ThermalState;
+  comparisonMode?: PricingComparisonMode;
+  catchWeightPolicy?: CatchWeightPolicy;
+  referenceDate?: Date;
+  maxFreshnessDays?: number;
+}
+
+export interface RankedMarketOffer {
+  observationId: string;
+  sourceId: string;
+  sourceName: string;
+  sourceType: SourceType;
+  channelType?: SourceChannelType | null;
+  productId: string;
+  rawName: string;
+  brand?: string | null;
+  origin?: string | null;
+  thermalState?: ThermalState;
+  comparabilityGrade: ComparabilityGrade;
+
+  // Applied tier (if applicable)
+  appliedTier?: MarketVolumeTier | null;
+  effectiveQuantityUnit: string;
+
+  // Price components
+  originPriceExTax: number;
+  freightSurchargePerUnit: number;
+  landedCostExTax: number;
+  effectiveComparablePriceExTax: number;
+
+  // Fiscal & Freight details
+  taxMode: TaxMode;
+  taxRate: number | null;
+  taxRegime?: TaxRegime;
+  aiemStatus?: AiemStatus;
+  freightStatus: FreightStatus;
+
+  // Geographic & Delivery
+  deliveryCoverageState: DeliveryCoverageState;
+  fulfillmentMode?: FulfillmentMode;
+
+  // Timestamps & Quality
+  observedAt: string;
+  validTo?: string | null;
+  qualityStatus: QualityStatus;
+  isStale: boolean;
+  isPromo: boolean;
+
+  // Uncertainty flags & reasons
+  uncertaintyFlags: OfferUncertaintyFlag[];
+  isEligibleTop1: boolean;
+  ineligibilityReason?: string;
+
+  // Scoring for tie-break
+  tieBreakScore: number;
+  explanationNote: string;
+}
+
+export interface MarketOfferRanking {
+  tenantIngredientId: string;
+  tenantIngredientName: string;
+  calculatedAt: string;
+  comparisonMode: PricingComparisonMode;
+  batchQuantity: number | null;
+  batchUnit: string;
+  canonicalUnit: NormalizedUnit;
+
+  // Top 1 Recommended Offer
+  top1: RankedMarketOffer | null;
+  top1Explanation: string;
+
+  // Next Best Alternatives (up to 2-3)
+  alternatives: RankedMarketOffer[];
+
+  // Disqualified Offers
+  disqualifiedOffers: DisqualifiedOffer[];
+  totalObservationsEvaluated: number;
+
+  // Honest Savings Evaluation
+  tenantWacExTax: number | null;
+  savingsVsWacEurPerUnit: number | null;
+  savingsVsWacPct: number | null;
+  savingsVsAlternativeEurPerUnit: number | null;
+  savingsConfidence: 'VERIFIED' | 'UNCERTAIN' | 'NOT_COMPUTABLE';
+  savingsExplanation: string;
+}
+
+

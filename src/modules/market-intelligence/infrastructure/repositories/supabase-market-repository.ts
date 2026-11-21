@@ -13,6 +13,7 @@ import {
   CatchWeightPolicy,
   ChannelKind,
   ComparabilityGrade,
+  ComparisonInputObservation,
   ContentUnit,
   CoverageStatus,
   DeliveryCoverageState,
@@ -720,6 +721,142 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     }
 
     return results;
+  }
+
+  public async getComparisonInputsForIngredients(
+    tenantId: string,
+    ingredientIds: string[]
+  ): Promise<Map<string, ComparisonInputObservation[]>> {
+    const resultMap = new Map<string, ComparisonInputObservation[]>();
+    for (const id of ingredientIds) {
+      resultMap.set(id, []);
+    }
+
+    if (ingredientIds.length === 0) return resultMap;
+
+    // 1. Fetch confirmed mappings for requested ingredients
+    const { data: mappingsData, error: mapErr } = await this.supabase
+      .from('product_mappings')
+      .select('*')
+      .eq('tenant_id', tenantId)
+      .in('tenant_ingredient_id', ingredientIds)
+      .eq('match_status', 'confirmed')
+      .neq('comparability_grade', 'UNKNOWN');
+
+    if (mapErr) throw mapErr;
+    if (!mappingsData || mappingsData.length === 0) return resultMap;
+
+    // 2. Fetch market products
+    const productIds = Array.from(new Set(mappingsData.map((m) => m.market_product_id)));
+    const { data: productsData, error: prodErr } = await this.supabase
+      .from('market_products')
+      .select('*')
+      .in('id', productIds);
+
+    if (prodErr) throw prodErr;
+    if (!productsData || productsData.length === 0) return resultMap;
+
+    const allowedProducts = productsData.filter(
+      (p) => p.owner_tenant_id == null || p.owner_tenant_id === tenantId
+    );
+    if (allowedProducts.length === 0) return resultMap;
+
+    const allowedProductIds = allowedProducts.map((p) => p.id);
+    const productsMap = new Map(allowedProducts.map((p) => [p.id, this.mapProductFromDb(p)]));
+
+    // 3. Fetch active sources
+    const sourceIds = Array.from(new Set(allowedProducts.map((p) => p.source_id)));
+    const { data: sourcesData, error: srcErr } = await this.supabase
+      .from('market_sources')
+      .select('*')
+      .in('id', sourceIds)
+      .eq('is_active', true);
+
+    if (srcErr) throw srcErr;
+    if (!sourcesData || sourcesData.length === 0) return resultMap;
+    const sourcesMap = new Map((sourcesData || []).map((s) => [s.id, this.mapSourceFromDb(s)]));
+
+    // 4. Fetch coverages for these sources
+    const { data: coveragesData, error: covErr } = await this.supabase
+      .from('market_delivery_coverages')
+      .select('*')
+      .in('source_id', sourceIds)
+      .or(`owner_tenant_id.is.null,owner_tenant_id.eq.${tenantId}`);
+
+    if (covErr) throw covErr;
+    const coveragesBySource = new Map<string, MarketDeliveryCoverage[]>();
+    for (const c of coveragesData || []) {
+      const mapped = this.mapCoverageFromDb(c);
+      const list = coveragesBySource.get(c.source_id) || [];
+      list.push(mapped);
+      coveragesBySource.set(c.source_id, list);
+    }
+
+    // 5. Fetch price observations
+    const { data: obsData, error: obsErr } = await this.supabase
+      .from('market_price_observations')
+      .select('*')
+      .in('market_product_id', allowedProductIds)
+      .or(`owner_tenant_id.is.null,owner_tenant_id.eq.${tenantId}`)
+      .order('observed_at', { ascending: false });
+
+    if (obsErr) throw obsErr;
+
+    // 6. Fetch volume tiers for these observations
+    const obsIds = (obsData || []).map((o) => o.id);
+    const tiersByObs = new Map<string, MarketVolumeTier[]>();
+    if (obsIds.length > 0) {
+      const { data: tiersData, error: tierErr } = await this.supabase
+        .from('market_volume_tiers')
+        .select('*')
+        .in('observation_id', obsIds)
+        .order('min_quantity', { ascending: true });
+
+      if (tierErr) throw tierErr;
+      for (const t of tiersData || []) {
+        const mappedTier = this.mapTierFromDb(t);
+        const list = tiersByObs.get(t.observation_id) || [];
+        list.push(mappedTier);
+        tiersByObs.set(t.observation_id, list);
+      }
+    }
+
+    // Group observations with tiers by product
+    const obsByProduct = new Map<string, MarketPriceObservation[]>();
+    for (const o of obsData || []) {
+      const tiers = tiersByObs.get(o.id) || [];
+      const mappedObs = this.mapObservationFromDb(o, tiers);
+      const list = obsByProduct.get(o.market_product_id) || [];
+      list.push(mappedObs);
+      obsByProduct.set(o.market_product_id, list);
+    }
+
+    // 7. Group mappings by ingredient and assemble ComparisonInputObservation[]
+    for (const rawMap of mappingsData) {
+      const mapping = this.mapMappingFromDb(rawMap);
+      const product = productsMap.get(mapping.marketProductId);
+      if (!product) continue;
+
+      const source = sourcesMap.get(product.sourceId);
+      if (!source) continue;
+
+      const coverages = coveragesBySource.get(source.id) || [];
+      const observations = obsByProduct.get(product.id) || [];
+
+      const currentList = resultMap.get(mapping.tenantIngredientId) || [];
+      for (const obs of observations) {
+        currentList.push({
+          source,
+          product,
+          observation: obs,
+          mapping,
+          coverages,
+        });
+      }
+      resultMap.set(mapping.tenantIngredientId, currentList);
+    }
+
+    return resultMap;
   }
 
   // --------------------------------------------------------------------------
