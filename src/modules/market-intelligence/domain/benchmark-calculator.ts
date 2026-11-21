@@ -2,11 +2,18 @@
  * CR-COST-05: Market Benchmark & Negotiation Intelligence Engine
  * Pure mathematical engine for computing comparability-weighted medians,
  * price variances, annual spend risk, and structured negotiation briefs.
+ *
+ * PR3A Invariants (D-010 + Human Decisions 1-5):
+ * - No synthetic volume fallback (eliminate ?? 1000)
+ * - Observations with unknown tax / pending normalization are never treated as current price
+ * - Prior computable observations are placed strictly into historicalReferences with diagnostics
+ * - If prior observation is expired, return PENDING_NORMALIZATION without comparable price
  */
 
 import {
   BenchmarkCalculation,
   BenchmarkComponent,
+  BenchmarkStatus,
   ComparabilityGrade,
   MarketPriceObservation,
   MarketProduct,
@@ -51,25 +58,148 @@ export class BenchmarkCalculator {
     referenceDate: Date = new Date()
   ): BenchmarkCalculation {
     if (inputs.length === 0) {
-      throw new Error(`No market observations provided for ingredient ${ingredient.name}`);
+      return {
+        tenantIngredientId: ingredient.id,
+        tenantIngredientName: ingredient.name,
+        calculatedAt: referenceDate.toISOString(),
+        canonicalUnit: 'EUR_PER_KG',
+        benchmarkStatus: 'NO_VALID_OBSERVATIONS',
+        benchmarkPriceExTax: null,
+        minPriceExTax: null,
+        maxPriceExTax: null,
+        dispersionSpreadPct: null,
+        observationsCount: 0,
+        highComparabilityCount: 0,
+        components: [],
+        historicalReferences: [],
+        diagnosticNote: `No market observations provided for ingredient ${ingredient.name}`,
+      };
     }
 
-    const computableInputs = inputs.filter(
-      (item) =>
-        item.observation.normalizedPriceExTax !== null &&
-        Number.isFinite(item.observation.normalizedPriceExTax)
-    );
+    // Group observations by product ID to detect pending normalization on the latest observation
+    const inputsByProduct = new Map<string, BenchmarkInputObservation[]>();
+    for (const item of inputs) {
+      const list = inputsByProduct.get(item.product.id) || [];
+      list.push(item);
+      inputsByProduct.set(item.product.id, list);
+    }
 
-    if (computableInputs.length === 0) {
-      throw new Error(
-        `No computable ex-tax market observations provided for ingredient ${ingredient.name}`
+    const activeComputableInputs: BenchmarkInputObservation[] = [];
+    const historicalReferences: BenchmarkComponent[] = [];
+    const diagnosticNotes: string[] = [];
+
+    for (const productInputs of inputsByProduct.values()) {
+      // Sort newest to oldest
+      productInputs.sort(
+        (a, b) =>
+          new Date(b.observation.observedAt).getTime() -
+          new Date(a.observation.observedAt).getTime()
       );
+
+      const latestItem = productInputs[0];
+      const isLatestComputable =
+        latestItem.observation.normalizedPriceExTax !== null &&
+        Number.isFinite(latestItem.observation.normalizedPriceExTax) &&
+        latestItem.observation.taxMode !== 'unknown';
+
+      if (isLatestComputable) {
+        activeComputableInputs.push(latestItem);
+      } else {
+        // Human Decision 4: Latest observation is pending normalization / unknown tax
+        // Look for the last prior computable observation for this product
+        const priorComputableItem = productInputs.slice(1).find(
+          (item) =>
+            item.observation.normalizedPriceExTax !== null &&
+            Number.isFinite(item.observation.normalizedPriceExTax) &&
+            item.observation.taxMode !== 'unknown'
+        );
+
+        if (priorComputableItem) {
+          const priorObs = priorComputableItem.observation;
+          const observedDate = new Date(priorObs.observedAt);
+          const ageDays = (referenceDate.getTime() - observedDate.getTime()) / (1000 * 3600 * 24);
+          const isStale =
+            ageDays > 14 ||
+            priorObs.qualityStatus === 'STALE' ||
+            (priorObs.validTo != null && new Date(priorObs.validTo).getTime() < referenceDate.getTime());
+
+          const sourceWeight = this.SOURCE_WEIGHTS[priorComputableItem.source.sourceType] ?? 0.5;
+          const compWeight = this.COMPARABILITY_WEIGHTS[priorComputableItem.mapping.comparabilityGrade] ?? 0.0;
+          const freshnessFactor = isStale ? 0.5 : 1.0;
+          const finalWeight = this.round(sourceWeight * compWeight * freshnessFactor, 4);
+
+          historicalReferences.push({
+            observationId: priorObs.id,
+            sourceId: priorComputableItem.source.id,
+            sourceName: priorComputableItem.source.name,
+            sourceType: priorComputableItem.source.sourceType,
+            rawName: priorComputableItem.product.rawName,
+            regionCode: priorObs.regionCode,
+            observedAt: priorObs.observedAt,
+            rawPrice: priorObs.priceRaw,
+            taxMode: priorObs.taxMode,
+            taxRate: priorObs.taxRate,
+            normalizedPriceExTax: priorObs.normalizedPriceExTax as number,
+            normalizedUnit: priorObs.normalizedUnit,
+            comparabilityGrade: priorComputableItem.mapping.comparabilityGrade,
+            weight: finalWeight,
+            isStale,
+            isPromo:
+              priorObs.promotionStatus === 'temporary_discount' ||
+              priorObs.promotionStatus === 'clearance' ||
+              priorObs.qualityStatus === 'PROMOTIONAL',
+          });
+
+          if (isStale) {
+            diagnosticNotes.push(
+              `Producto "${latestItem.product.rawName}": observación más reciente (${latestItem.observation.observedAt.slice(0, 10)}) pendiente de normalización fiscal. La referencia previa (${priorObs.observedAt.slice(0, 10)}) está caducada y no es computable como precio actual.`
+            );
+          } else {
+            diagnosticNotes.push(
+              `Producto "${latestItem.product.rawName}": observación más reciente (${latestItem.observation.observedAt.slice(0, 10)}) pendiente de normalización fiscal. La referencia previa (${priorObs.observedAt.slice(0, 10)}) se conserva únicamente como referencia histórica y no como precio actual.`
+            );
+          }
+        } else {
+          diagnosticNotes.push(
+            `Producto "${latestItem.product.rawName}": observación más reciente (${latestItem.observation.observedAt.slice(0, 10)}) pendiente de normalización fiscal. No existe observación previa computable.`
+          );
+        }
+      }
     }
 
-    const canonicalUnit = computableInputs[0].observation.normalizedUnit;
+    // Determine canonical unit from first available observation
+    const canonicalUnit: NormalizedUnit =
+      activeComputableInputs[0]?.observation.normalizedUnit ||
+      historicalReferences[0]?.normalizedUnit ||
+      inputs[0].observation.normalizedUnit ||
+      'EUR_PER_KG';
+
+    // If no active computable inputs remain:
+    if (activeComputableInputs.length === 0) {
+      const benchmarkStatus: BenchmarkStatus =
+        diagnosticNotes.length > 0 ? 'PENDING_NORMALIZATION' : 'NO_VALID_OBSERVATIONS';
+
+      return {
+        tenantIngredientId: ingredient.id,
+        tenantIngredientName: ingredient.name,
+        calculatedAt: referenceDate.toISOString(),
+        canonicalUnit,
+        benchmarkStatus,
+        benchmarkPriceExTax: null,
+        minPriceExTax: null,
+        maxPriceExTax: null,
+        dispersionSpreadPct: null,
+        observationsCount: inputs.length,
+        highComparabilityCount: 0,
+        components: [],
+        historicalReferences,
+        diagnosticNote: diagnosticNotes.join(' ') || 'Sin observaciones computables disponibles.',
+      };
+    }
+
     const components: BenchmarkComponent[] = [];
 
-    for (const item of computableInputs) {
+    for (const item of activeComputableInputs) {
       const { source, product, observation, mapping } = item;
 
       if (observation.normalizedUnit !== canonicalUnit) {
@@ -117,9 +247,24 @@ export class BenchmarkCalculator {
     const activeComponents = components.filter((c) => c.weight > 0);
 
     if (activeComponents.length === 0) {
-      throw new Error(
-        `All provided market observations have zero comparability weight for ingredient ${ingredient.name}`
-      );
+      return {
+        tenantIngredientId: ingredient.id,
+        tenantIngredientName: ingredient.name,
+        calculatedAt: referenceDate.toISOString(),
+        canonicalUnit,
+        benchmarkStatus: 'NO_VALID_OBSERVATIONS',
+        benchmarkPriceExTax: null,
+        minPriceExTax: null,
+        maxPriceExTax: null,
+        dispersionSpreadPct: null,
+        observationsCount: inputs.length,
+        highComparabilityCount: 0,
+        components,
+        historicalReferences,
+        diagnosticNote:
+          'Todas las observaciones de mercado tienen peso de comparabilidad nulo (UNKNOWN). ' +
+          (diagnosticNotes.join(' ') || ''),
+      };
     }
 
     // Sort ascending by price
@@ -141,13 +286,16 @@ export class BenchmarkCalculator {
       tenantIngredientName: ingredient.name,
       calculatedAt: referenceDate.toISOString(),
       canonicalUnit,
+      benchmarkStatus: 'COMPUTED',
       benchmarkPriceExTax,
       minPriceExTax,
       maxPriceExTax,
       dispersionSpreadPct,
-      observationsCount: components.length,
+      observationsCount: inputs.length,
       highComparabilityCount: highCompCount,
       components,
+      historicalReferences,
+      diagnosticNote: diagnosticNotes.length > 0 ? diagnosticNotes.join(' ') : null,
     };
   }
 
@@ -158,8 +306,20 @@ export class BenchmarkCalculator {
     tenantRef: TenantIngredientEconomicRef,
     benchmark: BenchmarkCalculation
   ): VarianceAnalysis {
-    if (benchmark.benchmarkPriceExTax <= 0) {
-      throw new Error('Benchmark price must be greater than zero to compute variance');
+    if (benchmark.benchmarkPriceExTax === null || benchmark.benchmarkPriceExTax <= 0) {
+      return {
+        tenantIngredientId: tenantRef.id,
+        tenantIngredientName: tenantRef.name,
+        unit: benchmark.canonicalUnit,
+        effectiveWacExTax: tenantRef.effectiveWacExTax,
+        currentInvoicedPriceExTax: tenantRef.currentInvoicedPriceExTax,
+        benchmarkPriceExTax: null,
+        marketVariancePct: null,
+        supplierPriceGapEur: null,
+        annualSpendAtRiskEur: null,
+        status: 'PENDING_DATA',
+        confidenceSummary: 'UNKNOWN',
+      };
     }
 
     const variancePct = this.round(
@@ -172,8 +332,8 @@ export class BenchmarkCalculator {
     const invoicedRef = tenantRef.currentInvoicedPriceExTax ?? tenantRef.effectiveWacExTax;
     const supplierPriceGapEur = this.round(invoicedRef - benchmark.benchmarkPriceExTax, 4);
 
-    let annualSpendAtRiskEur: number | undefined;
-    if (tenantRef.annualVolume && tenantRef.annualVolume > 0) {
+    let annualSpendAtRiskEur: number | null = null;
+    if (tenantRef.annualVolume != null && tenantRef.annualVolume > 0) {
       annualSpendAtRiskEur = this.round(tenantRef.annualVolume * supplierPriceGapEur, 2);
     }
 
@@ -210,6 +370,7 @@ export class BenchmarkCalculator {
 
   /**
    * Generates a structured Negotiation Brief for procurement operators.
+   * D-010 Integrity: No synthetic fallback volume (never invent 1000 kg).
    */
   public static generateNegotiationBrief(
     tenant: { id: string; name: string },
@@ -218,36 +379,49 @@ export class BenchmarkCalculator {
     variance: VarianceAnalysis,
     referenceDate: Date = new Date()
   ): NegotiationBrief {
-    const consumptionVol = tenantRef.annualVolume ?? 1000;
+    const hasVolume = tenantRef.annualVolume != null && tenantRef.annualVolume > 0;
+    const consumptionVol = hasVolume ? (tenantRef.annualVolume as number) : null;
     const invoicedPrice = tenantRef.currentInvoicedPriceExTax ?? tenantRef.effectiveWacExTax;
-    const projectedAnnualSpend = this.round(consumptionVol * invoicedPrice, 2);
+    const projectedAnnualSpend = hasVolume
+      ? this.round((consumptionVol as number) * invoicedPrice, 2)
+      : null;
 
     // Target re-negotiation price: midpoint between benchmark and current invoice if overpaying,
     // or benchmark itself
     const targetPrice =
+      benchmark.benchmarkPriceExTax !== null &&
+      variance.supplierPriceGapEur !== null &&
       variance.supplierPriceGapEur > 0
         ? this.round(benchmark.benchmarkPriceExTax + variance.supplierPriceGapEur * 0.25, 4)
         : invoicedPrice;
 
     const potentialSavings =
+      hasVolume &&
+      variance.supplierPriceGapEur !== null &&
       variance.supplierPriceGapEur > 0
-        ? this.round(consumptionVol * (invoicedPrice - targetPrice), 2)
-        : 0;
+        ? this.round((consumptionVol as number) * (invoicedPrice - targetPrice), 2)
+        : hasVolume
+        ? 0
+        : null;
 
     const talkingPoints: NegotiationTalkingPoint[] = [];
 
-    // Point 1: Volume leverage
-    if (consumptionVol > 0) {
+    // Point 1: Volume leverage (Only when real annual volume is documented)
+    if (consumptionVol !== null && consumptionVol > 0) {
       talkingPoints.push({
         topic: 'Volume Scale',
         point: `Our annual volume of ${consumptionVol.toLocaleString()} ${tenantRef.unit} qualifies for Tier-2 wholesale baseline pricing.`,
         evidence: `Tenant annual consumption: ${consumptionVol} ${tenantRef.unit}.`,
-        impactEur: potentialSavings,
+        impactEur: potentialSavings ?? undefined,
       });
     }
 
     // Point 2: Market gap
-    if (variance.marketVariancePct > 0) {
+    if (
+      variance.marketVariancePct !== null &&
+      variance.marketVariancePct > 0 &&
+      benchmark.benchmarkPriceExTax !== null
+    ) {
       const wholesaleRef = benchmark.components.find((c) => c.sourceType === 'b2b_wholesale');
       talkingPoints.push({
         topic: 'Wholesale Market Gap',
@@ -255,7 +429,7 @@ export class BenchmarkCalculator {
         evidence: wholesaleRef
           ? `Observed at ${wholesaleRef.sourceName} on ${wholesaleRef.observedAt.slice(0, 10)}.`
           : `Benchmark across ${benchmark.observationsCount} regional observations.`,
-        impactEur: potentialSavings,
+        impactEur: potentialSavings ?? undefined,
       });
     }
 
@@ -264,7 +438,7 @@ export class BenchmarkCalculator {
       topic: 'Target Alignment',
       point: `We propose adjusting our unit rate to ${targetPrice.toFixed(2)} €/${tenantRef.unit} to maintain supplier exclusivity while closing the market divergence.`,
       evidence: `Target price incorporates quality overhead while delivering competitive market parity.`,
-      impactEur: potentialSavings,
+      impactEur: potentialSavings ?? undefined,
     });
 
     return {

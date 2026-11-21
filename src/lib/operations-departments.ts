@@ -63,6 +63,7 @@ const DEPARTMENT_CATALOG: readonly OperationsDepartment[] = [
     id: "cost_intelligence",
     path: "/admin/cost-intelligence",
     labelKey: "costIntelligence",
+    moduleFlag: PILOT_ADMIN_MODULE_FLAGS.costIntelligence,
   },
   {
     id: "customers",

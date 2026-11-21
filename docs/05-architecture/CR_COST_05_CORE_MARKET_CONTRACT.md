@@ -110,3 +110,45 @@ En Bloque 2 se persisten los metadatos fiscales y comerciales necesarios sin imp
 - El script de reversión (`supabase/migrations/rollback/20261112200000_cr_cost_05_pr2_physical_geo_fiscal_contract_down.sql`) es estrictamente **fail-closed**: **prohibido** fabricar valores por defecto (`ex_tax`, `0%`, `price_raw`, fechas inferidas) o deshabilitar la inmutabilidad de observaciones para forzar una bajada de versión.
 - Si existen filas con datos reales o metadatos específicos de Bloque 2 (observaciones con fiscalidad desconocida/`NULL`, metadatos fiscales/geo/comerciales, coberturas en `market_delivery_coverages`, establecimientos en `market_establishments`, packs/GTIN en `market_products` o regiones/códigos ampliados en `market_sources`), el rollback debe abortar explícitamente (`RAISE EXCEPTION`).
 - **Una vez registrados datos reales de Bloque 2, cualquier remediación en entornos activos debe realizarse únicamente mediante migración hacia adelante (*forward-only*).**
+
+---
+
+## 9. Seguridad Multi-Tenant, Activación de Módulos e Integridad Económica (PR3A)
+
+PR3A establece el blindaje de seguridad y activación sin introducir comparadores automatizados ni pantallas nuevas de UI:
+
+1. **Aislamiento de Catálogo en `market_products` (`owner_tenant_id`):**
+   - `owner_tenant_id IS NULL`: Producto público compartido de YourMealOS Core. Lectura pública para cualquier usuario autenticado; inserción y actualización reservadas a `saas_admin`.
+   - `owner_tenant_id = <tenant_uuid>`: Producto privado del tenant (tarifas negociadas o fichas internas exclusivas). Lectura y mutación restringidas exclusivamente a roles autorizados del tenant propietario.
+   - Restricción de unicidad mediante índices parciales:
+     - `uq_market_products_public_source_sku` (`source_id, external_sku WHERE owner_tenant_id IS NULL`).
+     - `uq_market_products_tenant_source_sku` (`owner_tenant_id, source_id, external_sku WHERE owner_tenant_id IS NOT NULL`).
+2. **Aislamiento Cruzado en `product_mappings`:**
+   - La directiva RLS `WITH CHECK` y los servicios de dominio prohíben que un tenant mapee un producto perteneciente a otro tenant (`mp.owner_tenant_id IS NULL OR mp.owner_tenant_id = product_mappings.tenant_id`).
+3. **Banderas de Módulo Independientes (`public.feature_flags`):**
+   - `admin_module_cost_intelligence`: Controla el acceso y mutación de estudios económicos (`economic_studies`), simulaciones de margen (`cost_simulation_scenarios`), intenciones de decisión (`cost_decision_intents`) y mapeos de ingredientes (`product_mappings`).
+   - `admin_module_market_intelligence`: Controla el acceso y mutación de productos privados (`market_products`), tarifas privadas (`market_price_observations`), establecimientos privados y coberturas privadas.
+   - Ambas banderas se inicializan fail-closed (`enabled = false`, `tenant_id = NULL`).
+4. **Comportamiento ante Desactivación de Módulo (Decisión 1):**
+   - Si un tenant desactiva el módulo, el histórico permanece visible en **modo lectura estricta** para sus roles autorizados.
+   - Cualquier intento de mutación (`INSERT`, `UPDATE`, `DELETE`) queda bloqueado a nivel de RLS y en la capa de servicios de aplicación. Los borradores e intenciones quedan congelados.
+5. **Matriz de Roles Autorizados (Decisión 3):**
+   - **Autorizados:** `company_admin`, `operations_manager`, `purchasing`, `accounting`, `inventory`, `production`, más `saas_admin`.
+   - **Excluidos:** `kitchen`, `delivery`, `logistics`, `support`, `employee`, `customer`, `driver`.
+   - La función `public.has_cost_intelligence_access(p_user_id, p_tenant_id)` (`SECURITY DEFINER`, `search_path = public, pg_temp`) evalúa esta pertenencia de forma estricta.
+6. **Integridad en Mediana Ponderada y Referencias Históricas (Decisión 4):**
+   - Si la observación más reciente de un SKU posee fiscalidad desconocida (`tax_mode = 'unknown'` o tasa ausente), se excluye de la mediana activa.
+   - Si existe una observación computable previa, se preserva como referencia histórica (`historicalReferences`) con aviso diagnóstico visible; **nunca se trata como precio actual**.
+   - Si la observación previa está caducada o no existe, el benchmark reporta `benchmarkStatus = 'PENDING_NORMALIZATION'`, `benchmarkPriceExTax = null`, y el análisis de varianza reporta `status = 'PENDING_DATA'` sin ahorros anuales ficticios ni valores artificiales de relleno.
+7. **Ingesta de Catálogos sin Modo Fiscal (Decisión 5):**
+   - Filas CSV sin `tax_mode` se almacenan estrictamente con `tax_mode = 'unknown'`, `tax_rate = NULL`, `normalized_price_ex_tax = NULL`, `normalization_status = 'tax_unknown'`. Queda prohibido heredar el modo fiscal de la fuente.
+   - Filas compartidas (`owner_tenant_id IS NULL`) omiten `rawLine`/`raw_line` de `raw_payload` para evitar fugas de información.
+
+---
+
+## 10. Política de Rollback Fail-Closed de PR3A
+
+- El script de reversión (`supabase/migrations/rollback/20261112220000_cr_cost_05_pr3a_multi_tenant_security_down.sql`) implementa un preflight guard fail-closed:
+  - Si existen productos privados (`owner_tenant_id IS NOT NULL`), aborta inmediatamente con excepción `restrict_violation` para evitar la pérdida accidental o destrucción silenciosa de catálogos privados de clientes.
+  - Al ejecutarse sobre una base de datos sin productos privados, restituye exactamente el baseline de PR2, restaura la restricción global de unicidad de SKUs, revoca privilegios extendidos y elimina las funciones de seguridad de PR3A.
+

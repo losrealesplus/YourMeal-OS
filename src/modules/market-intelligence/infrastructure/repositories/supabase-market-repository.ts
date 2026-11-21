@@ -127,13 +127,25 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
   // Establishments & Delivery Coverages
   // --------------------------------------------------------------------------
 
-  public async getEstablishmentsBySource(sourceId: string): Promise<MarketEstablishment[]> {
-    const { data, error } = await this.supabase
+  public async getEstablishmentsBySource(
+    sourceId: string,
+    tenantId?: string | null
+  ): Promise<MarketEstablishment[]> {
+    let query = this.supabase
       .from('market_establishments')
       .select('*')
       .eq('source_id', sourceId)
-      .eq('is_active', true)
-      .order('name');
+      .eq('is_active', true);
+
+    if (tenantId !== undefined) {
+      if (tenantId) {
+        query = query.or(`owner_tenant_id.is.null,owner_tenant_id.eq.${tenantId}`);
+      } else {
+        query = query.is('owner_tenant_id', null);
+      }
+    }
+
+    const { data, error } = await query.order('name');
 
     if (error) throw error;
     return (data || []).map(this.mapEstablishmentFromDb);
@@ -164,12 +176,24 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     if (error) throw error;
   }
 
-  public async getCoveragesBySource(sourceId: string): Promise<MarketDeliveryCoverage[]> {
-    const { data, error } = await this.supabase
+  public async getCoveragesBySource(
+    sourceId: string,
+    tenantId?: string | null
+  ): Promise<MarketDeliveryCoverage[]> {
+    let query = this.supabase
       .from('market_delivery_coverages')
       .select('*')
-      .eq('source_id', sourceId)
-      .order('country_code');
+      .eq('source_id', sourceId);
+
+    if (tenantId !== undefined) {
+      if (tenantId) {
+        query = query.or(`owner_tenant_id.is.null,owner_tenant_id.eq.${tenantId}`);
+      } else {
+        query = query.is('owner_tenant_id', null);
+      }
+    }
+
+    const { data, error } = await query.order('country_code');
 
     if (error) throw error;
     return (data || []).map(this.mapCoverageFromDb);
@@ -215,23 +239,49 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     return this.mapProductFromDb(data);
   }
 
-  public async getProductsBySource(sourceId: string): Promise<MarketProduct[]> {
-    const { data, error } = await this.supabase
+  public async getProductsBySource(
+    sourceId: string,
+    tenantId?: string | null
+  ): Promise<MarketProduct[]> {
+    let query = this.supabase
       .from('market_products')
       .select('*')
-      .eq('source_id', sourceId)
-      .order('raw_name');
+      .eq('source_id', sourceId);
+
+    if (tenantId !== undefined) {
+      if (tenantId) {
+        query = query.or(`owner_tenant_id.is.null,owner_tenant_id.eq.${tenantId}`);
+      } else {
+        query = query.is('owner_tenant_id', null);
+      }
+    }
+
+    const { data, error } = await query.order('raw_name');
 
     if (error) throw error;
     return (data || []).map(this.mapProductFromDb);
   }
 
-  public async findProductBySku(sourceId: string, sku: string): Promise<MarketProduct | null> {
-    const { data, error } = await this.supabase
+  public async findProductBySku(
+    sourceId: string,
+    sku: string,
+    tenantId?: string | null
+  ): Promise<MarketProduct | null> {
+    let query = this.supabase
       .from('market_products')
       .select('*')
       .eq('source_id', sourceId)
-      .eq('external_sku', sku)
+      .eq('external_sku', sku);
+
+    if (tenantId) {
+      query = query.or(`owner_tenant_id.is.null,owner_tenant_id.eq.${tenantId}`);
+    } else {
+      query = query.is('owner_tenant_id', null);
+    }
+
+    const { data, error } = await query
+      .order('owner_tenant_id', { ascending: false, nullsFirst: false })
+      .limit(1)
       .maybeSingle();
 
     if (error) throw error;
@@ -239,12 +289,25 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     return this.mapProductFromDb(data);
   }
 
-  public async findProductByName(sourceId: string, rawName: string): Promise<MarketProduct | null> {
-    const { data, error } = await this.supabase
+  public async findProductByName(
+    sourceId: string,
+    rawName: string,
+    tenantId?: string | null
+  ): Promise<MarketProduct | null> {
+    let query = this.supabase
       .from('market_products')
       .select('*')
       .eq('source_id', sourceId)
-      .ilike('raw_name', rawName.trim())
+      .ilike('raw_name', rawName.trim());
+
+    if (tenantId) {
+      query = query.or(`owner_tenant_id.is.null,owner_tenant_id.eq.${tenantId}`);
+    } else {
+      query = query.is('owner_tenant_id', null);
+    }
+
+    const { data, error } = await query
+      .order('owner_tenant_id', { ascending: false, nullsFirst: false })
       .limit(1)
       .maybeSingle();
 
@@ -258,6 +321,7 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     const { error } = await this.supabase.from('market_products').insert({
       id: productId,
       source_id: product.sourceId,
+      owner_tenant_id: product.ownerTenantId ?? null,
       external_sku: product.externalSku || `SKU-${productId.slice(0, 8)}`,
       gtin: product.gtin ?? null,
       raw_name: product.rawName,
@@ -310,12 +374,24 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     return this.mapObservationFromDb(obsData, tiers);
   }
 
-  public async getObservationsByProduct(productId: string): Promise<MarketPriceObservation[]> {
-    const { data: obsData, error: obsErr } = await this.supabase
+  public async getObservationsByProduct(
+    productId: string,
+    tenantId?: string | null
+  ): Promise<MarketPriceObservation[]> {
+    let query = this.supabase
       .from('market_price_observations')
       .select('*')
-      .eq('market_product_id', productId)
-      .order('observed_at', { ascending: false });
+      .eq('market_product_id', productId);
+
+    if (tenantId !== undefined) {
+      if (tenantId) {
+        query = query.or(`owner_tenant_id.is.null,owner_tenant_id.eq.${tenantId}`);
+      } else {
+        query = query.is('owner_tenant_id', null);
+      }
+    }
+
+    const { data: obsData, error: obsErr } = await query.order('observed_at', { ascending: false });
 
     if (obsErr) throw obsErr;
     if (!obsData || obsData.length === 0) return [];
@@ -448,7 +524,17 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
   ): Promise<void> {
     const patch: Record<string, unknown> = { valid_to: validTo };
     if (rawPayload !== undefined) {
-      patch.raw_payload = rawPayload;
+      let ownerTenantId: string | null = null;
+      try {
+        const fromTable = this.supabase.from('market_price_observations');
+        if (typeof fromTable?.select === 'function') {
+          const { data } = await fromTable.select('owner_tenant_id').eq('id', observationId).maybeSingle();
+          ownerTenantId = data?.owner_tenant_id ?? null;
+        }
+      } catch {
+        ownerTenantId = null;
+      }
+      patch.raw_payload = sanitizeRawPayloadForScope(rawPayload, ownerTenantId);
     }
 
     const { error } = await this.supabase
@@ -580,6 +666,7 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       .from('market_price_observations')
       .select('*')
       .in('market_product_id', productIds)
+      .or(`owner_tenant_id.is.null,owner_tenant_id.eq.${tenantId}`)
       .order('observed_at', { ascending: false });
 
     if (obsErr) throw obsErr;
@@ -607,6 +694,7 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
       const mapping = this.mapMappingFromDb(rawMap);
       const product = productsMap.get(mapping.marketProductId);
       if (!product) continue;
+      if (product.ownerTenantId != null && product.ownerTenantId !== tenantId) continue;
 
       const source = sourcesMap.get(product.sourceId);
       if (!source) continue;
@@ -697,6 +785,7 @@ export class SupabaseMarketRepository implements IMarketIntelligenceRepository {
     return {
       id: row.id,
       sourceId: row.source_id,
+      ownerTenantId: row.owner_tenant_id ?? null,
       externalSku: row.external_sku || undefined,
       gtin: row.gtin,
       rawName: row.raw_name,

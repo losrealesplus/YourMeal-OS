@@ -125,6 +125,8 @@ const FORBIDDEN_PUBLIC_RAW_PAYLOAD_KEYS = new Set([
   "ownerTenantId",
   "owner_tenant_id",
   "privateConditions",
+  "rawLine",
+  "raw_line",
 ]);
 
 function sanitizeUnknownValue(value: unknown): unknown {
@@ -169,14 +171,14 @@ function parseOptionalInt(raw: string | undefined): number | null {
 function resolveTaxModeInput(
   rawTaxMode: string | undefined,
   rawTaxInclusion: TaxInclusion | undefined,
-  sourceDefault: TaxMode,
+  _sourceDefault?: TaxMode,
 ): TaxMode {
   if (rawTaxInclusion === "included") return "inc_tax";
   if (rawTaxInclusion === "excluded") return "ex_tax";
   if (rawTaxInclusion === "unknown") return "unknown";
 
   const clean = (rawTaxMode || "").trim().toLowerCase();
-  if (!clean) return sourceDefault || "unknown";
+  if (!clean) return "unknown";
   if (clean === "inc_tax" || clean === "included" || clean === "si" || clean === "true") {
     return "inc_tax";
   }
@@ -186,7 +188,7 @@ function resolveTaxModeInput(
   if (clean === "unknown" || clean === "desconocido") {
     return "unknown";
   }
-  return sourceDefault || "unknown";
+  return "unknown";
 }
 
 function mapTaxInclusion(taxMode: TaxMode): TaxInclusion {
@@ -340,6 +342,7 @@ export class MarketCatalogIngestionService {
 
     for (const row of rows) {
       const data = row.data;
+      const ownerTenantId = options.ownerTenantId ?? null;
 
       // 1. Validate mandatory core fields
       const sourceNameRaw = data.source_name || options.defaultSourceId;
@@ -557,12 +560,13 @@ export class MarketCatalogIngestionService {
 
       // 6. Resolve / Create Market Product in Core
       const externalSku = data.external_sku || this.generateSku(matchedSource.id, productName);
-      let marketProduct = await this.repository.findProductBySku(matchedSource.id, externalSku);
+      let marketProduct = await this.repository.findProductBySku(matchedSource.id, externalSku, ownerTenantId);
 
       if (!marketProduct) {
         marketProduct = {
           id: generateMarketEntityUuid(),
           sourceId: matchedSource.id,
+          ownerTenantId,
           externalSku,
           gtin: gtinResult.gtin,
           rawName: productName,
@@ -601,7 +605,6 @@ export class MarketCatalogIngestionService {
         data.promotion_status === "temporary_discount" || data.promotion_status === "clearance"
           ? data.promotion_status
           : "standard";
-      const ownerTenantId = options.ownerTenantId ?? null;
       const currency = (data.currency?.trim().toUpperCase() || "EUR").slice(0, 3);
       const aiemStatus: AiemStatus = (data.aiem_status as AiemStatus) || "unknown";
 
@@ -631,7 +634,7 @@ export class MarketCatalogIngestionService {
         {
           fileName: options.fileName || null,
           lineNumber: row.lineNumber,
-          rawLine: row.rawLine,
+          ...(ownerTenantId ? { rawLine: row.rawLine } : {}),
           parsedFields: data,
         },
         ownerTenantId,

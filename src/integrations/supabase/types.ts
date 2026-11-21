@@ -1827,6 +1827,7 @@ export type Database = {
           net_content_qty: number | null
           net_content_unit: string | null
           origin: string | null
+          owner_tenant_id: string | null
           pack_count: number | null
           pack_presentation: string | null
           quality_grade: string
@@ -1854,6 +1855,7 @@ export type Database = {
           net_content_qty?: number | null
           net_content_unit?: string | null
           origin?: string | null
+          owner_tenant_id?: string | null
           pack_count?: number | null
           pack_presentation?: string | null
           quality_grade?: string
@@ -1881,6 +1883,7 @@ export type Database = {
           net_content_qty?: number | null
           net_content_unit?: string | null
           origin?: string | null
+          owner_tenant_id?: string | null
           pack_count?: number | null
           pack_presentation?: string | null
           quality_grade?: string
@@ -1894,6 +1897,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "market_products_owner_tenant_id_fkey"
+            columns: ["owner_tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "market_products_source_id_fkey"
             columns: ["source_id"]
