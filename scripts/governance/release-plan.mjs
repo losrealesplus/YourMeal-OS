@@ -1,4 +1,11 @@
 import {
+  CR_COST_05_582,
+  crCost05_582Payload,
+  crCost05_582ScopeId,
+  authorizeCrCost05_582,
+  verifyCrCost05_582Reconciliation,
+} from "./release-cr-cost-05-582.mjs";
+import {
   SMOKE_RETRY_574,
   smokeRetry574Payload,
   smokeRetry574ScopeId,
@@ -472,6 +479,57 @@ export function rollbackV1Snapshot(ctx, base, diff, prs, currentMainSha) {
   }
   return { ...s, diff };
 }
+export function crCost05_582Snapshot(ctx, base, diff, prs, currentMainSha) {
+  const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
+  s.candidatePr = api(`pulls/${CR_COST_05_582.candidatePr}`);
+  s.productPrs = CR_COST_05_582.productPrs.map((num) => {
+    try {
+      return api(`pulls/${num}`);
+    } catch {
+      return num;
+    }
+  });
+  s.commits = s.commits.map((c) => {
+    let parent;
+    try {
+      parent = git("rev-parse", `${c.sha}^1`).trim();
+    } catch {
+      parent = null;
+    }
+    let headSha;
+    try {
+      headSha = execFileSync("git", ["rev-parse", `${c.sha}^2`], {
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "ignore"],
+      }).trim();
+    } catch {
+      try {
+        headSha = api(`pulls/${c.pr}`).head.sha;
+      } catch {
+        headSha = null;
+      }
+    }
+    return {
+      sha: c.sha,
+      parent,
+      headSha,
+      pr: c.pr,
+      files: c.paths.map((p) => {
+        const fileHash = (rev) => {
+          const entry = git("ls-tree", rev, "--", p);
+          if (!entry) return null;
+          const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+          demand(blob, "CR-COST-05 requires regular Git blobs");
+          return hash(
+            execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+          );
+        };
+        return { path: p, before: fileHash(`${c.sha}^1`), after: fileHash(c.sha) };
+      }),
+    };
+  });
+  return { ...s, diff };
+}
 export function smokeRetry574Snapshot(ctx, base, diff, prs, currentMainSha) {
   const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
   s.candidatePr = api(`pulls/${SMOKE_RETRY_574.candidatePr}`);
@@ -855,6 +913,15 @@ export function p1Orders532Snapshot(ctx, base, diff, prs, currentMainSha) {
 }
 export function routeExactInterval(ctx, base, diff, prs, currentMain, inputs, run, policy) {
   const prNumber = (p) => (typeof p === "number" ? p : p?.number);
+  if (base.sha === CR_COST_05_582.baseline.sha) {
+    return authorizeCrCost05_582(
+      crCost05_582Snapshot(ctx, base, diff, prs, currentMain),
+      inputs,
+      ctx,
+      run,
+      policy,
+    );
+  }
   if (base.sha === SMOKE_RETRY_574.baseline.sha) {
     return authorizeSmokeRetry574(
       smokeRetry574Snapshot(ctx, base, diff, prs, currentMain),
@@ -1012,6 +1079,24 @@ export function prepare(ctx, publishing = false) {
       api(`actions/runs/${ctx.runId}`),
       policy,
     );
+  }
+  if (
+    !initial &&
+    !exact &&
+    classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION" &&
+    base.sha === CR_COST_05_582.baseline.sha
+  ) {
+    try {
+      reconciliation = verifyCrCost05_582Reconciliation(
+        crCost05_582Snapshot(ctx, base, diff, prs, currentMain),
+        inputs,
+        ctx,
+        api(`actions/runs/${ctx.runId}`),
+        policy,
+      );
+    } catch {
+      // Reconciliation check failed; remains REQUIRES_SEPARATE_AUTHORIZATION
+    }
   }
   if (!initial && !exact && classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION") {
     if (base.sha === TRACK_B_RECONCILIATION.baselineSha) {
@@ -1351,6 +1436,30 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         `${JSON.stringify({ payload, authorizationId: hash(JSON.stringify(payload)) }, null, 2)}\n`,
       );
       process.exit(0); // Read-only reconciliation, never artifact/ledger or authorization.
+    }
+    if (process.argv[2] === "--cr-cost-05-582-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((c) => assertMergedCommit(pages(`commits/${c}/pulls`), c));
+      const payload = crCost05_582Payload(
+        crCost05_582Snapshot(ctx, base, diff, prs, sha),
+        policy,
+      );
+      fs.writeSync(
+        1,
+        JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: crCost05_582ScopeId(payload),
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+      process.exit(0); // Read-only proposal; never dispatch or production authority.
     }
     if (process.argv[2] === "--smoke-retry-574-payload") {
       const sha = api("git/ref/heads/main").object.sha;

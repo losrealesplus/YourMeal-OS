@@ -305,6 +305,12 @@ test("Smoke Retry 574: end-to-end CLI proposal and exact_interval dispatch in is
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.copyFileSync(path.join(repoRoot, rel), target);
     }
+    for (const rel of [
+      "scripts/governance/release-cr-cost-05-582.mjs",
+      "scripts/governance/release-cr-cost-05-582.json",
+    ]) {
+      fs.copyFileSync(path.join(repoRoot, rel), path.join(dir, rel));
+    }
 
     git("add", ...r.governancePaths);
     const govTree = git("write-tree");
