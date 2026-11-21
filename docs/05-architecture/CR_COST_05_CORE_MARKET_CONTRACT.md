@@ -249,6 +249,51 @@ El Bloque 4 institucionaliza la canalización segura de catálogos mayoristas, a
    - Se conecta opcionalmente mediante `OpenFoodFactsClient` con caché en memoria (TTL 24h) y control de timeout (AbortController).
    - **Invariante Absoluto:** OFF se emplea **únicamente** como enriquecedor de catálogo físico (peso neto, peso escurrido, formato de presentación enlatado/botella/bolsa, marca comercial y país de origen). Queda **estrictamente prohibido** extraer, inferir o registrar precios, fiscalidad o costes logísticos desde fuentes públicas colaborativas.
 
+## 15. Conectores Públicos, Adaptadores Aislados y Política de Fuentes (Bloque 5 · PR5)
+
+El Bloque 5 amplía la capacidad de ingestión de **YourMealOS Core** incorporando adaptadores desacoplados para fuentes públicas abiertas y feeds mayoristas estructurados, bajo un marco de estricto cumplimiento legal, cortesía técnica y resiliencia de datos:
+
+1. **Arquitectura Desacoplada (`IMarketSourceConnector` + `BaseHttpConnector`):**
+   - Los conectores externos residen de forma aislada en `src/modules/market-intelligence/infrastructure/connectors/`.
+   - **Invariante de Aislamiento:** Un conector **nunca interactúa directamente con la capa de persistencia (base de datos o repositorios)**. Su única responsabilidad consiste en descargar el documento o feed, parsearlo y emitir un resultado tipado `ConnectorFetchResult` (`items: RawObservationItem[]`, `quarantinedItems: QuarantinedConnectorItem[]`).
+   - La persistencia, normalización e idempotencia se delegan íntegramente a `MarketCatalogIngestionService.ingestConnectorResult(...)`.
+   - Cada conector acepta inyección de `fetchFn` y extractores, garantizando suites de tests unitarios e integración 100% deterministas con fixtures locales (`.pdf`, `.json`, `.csv`) sin tráfico de red en CI.
+
+2. **Cortesía Técnica y Resiliencia HTTP (`BaseHttpConnector`):**
+   - **Identificación Institucional:** Toda petición emite una cabecera `User-Agent` transparente:  
+     `YourMeal-OS/1.0 - Core Market Intelligence (contact@yourmeal.io; public-data-bot)`.
+   - **Rate Limiting por Host:** Control de frecuencia que impone un intervalo mínimo configurable (por defecto 1.000 ms, máx 1 req/s por dominio) para evitar sobrecargas en servidores de terceros.
+   - **Control de Timeout y Abort:** Integración nativa con `AbortController` (timeout predeterminado de 10.000 ms) para prevenir bloqueos de workers.
+   - **Gestión Estricta de HTTP 429 (Too Many Requests):** Ante respuestas 429, el conector detiene inmediatamente las peticiones respetando la cabecera `Retry-After` y lanza `HttpRateLimitError` con diagnóstico explicativo en español, abortando en *fail-closed* sin reintentos agresivos.
+   - **Barrera ante HTTP 401/403:** Respuestas no autorizadas o prohibidas lanzan `HttpAuthenticationRequiredError`, impidiendo cualquier intento de elusión de autenticación o bypass de defensas.
+
+3. **Política de Fuentes Restringidas y Prohibición de Scraping Ilegal (`RestrictedSourcePolicy`):**
+   - Se tipifican y catalogan expresamente aquellas fuentes mayoristas o minoristas protegidas por barreras de acceso, tarjetas de cliente o términos de servicio estrictos:
+     - *Mayoristas HORECA con tarjeta:* Makro (`src-makro`), GM Cash / Transgourmet (`src-gmcash`).
+     - *Retailers con barreras antibot o términos cerrados:* HiperDino (`src-hiperdino`), Mercadona (`src-mercadona`), Carrefour (`src-carrefour`), Alcampo (`src-alcampo`), Eroski (`src-eroski`), El Corte Inglés (`src-eci`).
+   - **Compuerta de Bloqueo por Diseño:** El método `RestrictedSourcePolicy.assertScrapingAllowed(sourceId)` bloquea en tiempo de ejecución cualquier conector público que intente extraer datos mediante scraping no autorizado o bypass de credenciales sobre estas fuentes.
+   - **Vía Oficial de Ingesta para Fuentes Restringidas:** La incorporación de datos de estas entidades solo está permitida mediante:
+     1. Facturas, albaranes o presupuestos B2B reales aportados por los propios restaurantes clientes (`b2b_invoice_pdf`, `b2b_document_image`, `manual_entry`).
+     2. Feeds EDI/API autorizados formalmente bajo acuerdo comercial (`authorized_feed`).
+
+4. **Adaptadores Aislados Híbridos (Canarias y Península):**
+   - **Conector de Catálogos / Folletos PDF Públicos (`PublicPdfCatalogConnector`):**
+     - Diseñado para folletos quincenales y catálogos de ofertas de libre acceso (ej. folletos públicos de distribución canaria como *Cash Diplo Canarias* o *5 Océanos*).
+     - Descarga el buffer binario o procesa fixtures locales y delega en `DocumentCatalogExtractor` para la lectura tabular OCR/texto.
+     - Exige código de región geográfico explícito (`ES_TENERIFE_TF`, `ES_GRAN_CANARIA_GC`, `ES_LANZAROTE_LZ`, `ES_FUERTEVENTURA_FUE`, etc., o `ES_CANARIAS_REGIONAL`) y `defaultTaxMode` (`ex_tax` o `inc_tax`), prohibiendo terminantemente inferir arbitrariamente tipos de IGIC/AIEM.
+     - Aplica las reglas D-010 de validación física: líneas con confianza OCR `< 0.70`, precios `<= 0` o sin cantidad/unidad física válida son enviadas a `quarantinedItems`.
+   - **Conector de Feeds Estructurados Abiertos (`PublicStructuredFeedConnector`):**
+     - Consume endpoints JSON abiertos o ficheros CSV de precios de referencia mayorista.
+     - Permite parametrizar el mapeo de campos (`nombre`, `precio`, `unidad`, `ean`, `marca`, etc.).
+     - Valida la integridad GS1 de los códigos de barras GTIN/EAN-13 mediante el algoritmo Modulo-10.
+
+5. **Orquestación Híbrida y Estrategia de Fallos (`ConnectorIngestionService`):**
+   - **Ejecución Bajo Demanda:** El servicio coordina la ejecución bajo demanda de cualquier conector registrado en `MarketConnectorRegistry`, ofreciendo a la vez compatibilidad de interfaz para su invocación futura desde un planificador (cron / edge scheduled function).
+   - **Comportamiento Híbrido ante Errores:**
+     - **Fallo Estructural (*Fail-Closed*):** Si se produce un fallo de red, HTTP 429/401, timeout, error de parseo o 0 filas válidas extraídas, el lote se registra inmediatamente en `market_catalog_ingestion_batches` con estado `failed`, no se publica ninguna observación y se emite un diagnóstico claro en español (`failureReason`).
+     - **Extracción Parcial con Cuarentena:** Si el catálogo o feed contiene registros válidos mezclados con filas ambiguas o de baja calidad, las ofertas válidas se incorporan al catálogo global de mercado con `status = 'partial_quarantine'`, `batch_type = 'authorized_feed'`, `capture_method = 'authorized_feed'` y `owner_tenant_id = null` (accesibles para todos los restaurantes de la plataforma). Las filas dudosas quedan auditadas en `quarantine_payload` sin detener el servicio ni contaminar los estudios económicos.
+
+
 
 
 

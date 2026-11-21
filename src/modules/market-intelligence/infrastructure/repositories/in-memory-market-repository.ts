@@ -484,6 +484,28 @@ export class InMemoryMarketRepository implements IMarketIntelligenceRepository {
         createdAt: '2026-01-01T00:00:00Z',
         updatedAt: '2026-01-01T00:00:00Z',
       },
+      {
+        id: 'src-cash-diplo',
+        name: 'Cash Diplo Canarias',
+        sourceType: 'cash_carry',
+        defaultTaxMode: 'ex_tax',
+        defaultRegion: 'ES_CANARIAS_REGIONAL',
+        isActive: true,
+        notes: 'Canary Islands Cash & Carry Wholesale',
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z',
+      },
+      {
+        id: 'src-open-wholesale',
+        name: 'Mercado Mayorista Abierto',
+        sourceType: 'b2b_wholesale',
+        defaultTaxMode: 'ex_tax',
+        defaultRegion: 'ES_PENINSULA_MAINLAND',
+        isActive: true,
+        notes: 'Open wholesale benchmark feed',
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z',
+      },
     ];
 
     for (const src of defaultSources) {
