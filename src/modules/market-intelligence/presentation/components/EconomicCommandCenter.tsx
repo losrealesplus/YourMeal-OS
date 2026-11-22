@@ -39,6 +39,7 @@ import {
   DollarSign,
   PieChart,
   Scale,
+  ShoppingCart,
 } from "lucide-react";
 import { MarketBenchmarkBadge } from "./MarketBenchmarkBadge";
 import { MarketSourceSpreadCard } from "./MarketSourceSpreadCard";
@@ -93,6 +94,7 @@ export interface EconomicCommandCenterProps {
   onOpenMacroSimulator?: () => void;
   onNavigateToAnatomy?: () => void;
   onNavigateToMarket?: () => void;
+  onNavigateToPurchasing?: () => void;
   isCostIntelligenceEnabled?: boolean;
 }
 
@@ -111,6 +113,7 @@ export function EconomicCommandCenter({
   onOpenMacroSimulator,
   onNavigateToAnatomy,
   onNavigateToMarket,
+  onNavigateToPurchasing,
   isCostIntelligenceEnabled,
 }: EconomicCommandCenterProps) {
   const costModuleActive = isCostIntelligenceEnabled ?? true;
@@ -695,10 +698,21 @@ export function EconomicCommandCenter({
           </div>
 
           {/* Context Navigation Shortcuts */}
-          {(onNavigateToAnatomy || onNavigateToMarket || onOpenMacroSimulator) && (
+          {(onNavigateToAnatomy || onNavigateToMarket || onNavigateToPurchasing || onOpenMacroSimulator) && (
             <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
               <span className="text-[11px]">Accesos rápidos a módulos vinculados:</span>
               <div className="flex flex-wrap items-center gap-2">
+                {onNavigateToPurchasing && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onNavigateToPurchasing}
+                    className="h-6 text-[11px] px-2 text-slate-600 hover:text-slate-900"
+                  >
+                    <ShoppingCart className="w-3 h-3 mr-1 text-emerald-600" />
+                    Facturas de Compra
+                  </Button>
+                )}
                 {onNavigateToAnatomy && (
                   <Button
                     variant="ghost"

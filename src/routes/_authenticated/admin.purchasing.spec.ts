@@ -54,4 +54,32 @@ describe("CR-COST-04 — Purchasing & Invoices Surface (admin.purchasing)", () =
     expect(src).toContain("en estado Borrador (DRAFT)");
     expect(src).toContain("revisión humana soberana");
   });
+
+  it("connects purchasing, mapping queue and market inquiry assistants with D-010 human review", () => {
+    const src = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.purchasing.tsx"),
+      "utf8",
+    );
+
+    // 1. Mounts assisted drawers and modals
+    expect(src).toContain("<ProductMappingQueueDrawer");
+    expect(src).toContain("<MarketInquiryExplorerModal");
+    expect(src).toContain("<NegotiationBriefModal");
+
+    // 2. Header quick actions
+    expect(src).toContain("Cola de Mapeo (");
+    expect(src).toContain("Preguntar al Mercado");
+
+    // 3. Line-level assisted actions
+    expect(src).toContain("Sugerido:");
+    expect(src).toContain("Cola Mapeo");
+    expect(src).toContain("Consultar Mercado");
+    expect(src).toContain("Brief");
+
+    // 4. Contextual pre-population parameters
+    expect(src).toContain("initialSelectedIngredientId={mappingInitialIngredientId}");
+    expect(src).toContain("initialSearchQuery={mappingInitialSearch}");
+    expect(src).toContain("initialIngredientQuery={inquiryInitialQuery}");
+    expect(src).toContain("initialUnitPrice={inquiryInitialUnitPrice}");
+  });
 });

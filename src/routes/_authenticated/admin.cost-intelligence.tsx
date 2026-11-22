@@ -4,7 +4,7 @@
  * Capabilities: inventory.operate / accounting.operate / operations_manager
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -110,6 +110,7 @@ function formatPercent(pct: number): string {
 }
 
 export function CostIntelligenceCockpitPage() {
+  const navigate = useNavigate();
   const { user, tenantId, roles, isSaasAdmin } = useAuth();
   const { can } = useCan();
   const { flags: moduleFlags, ready: flagsReady } = usePilotAdminModuleFlags();
@@ -690,6 +691,7 @@ export function CostIntelligenceCockpitPage() {
           onOpenMacroSimulator={() => setActiveTab("simulator")}
           onNavigateToAnatomy={() => setActiveTab("anatomy")}
           onNavigateToMarket={() => setActiveTab("market_intelligence")}
+          onNavigateToPurchasing={() => navigate({ to: "/admin/purchasing" })}
         />
       )}
 
