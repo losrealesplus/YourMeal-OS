@@ -91,6 +91,8 @@ export interface EconomicCommandCenterProps {
   canEditDishes?: boolean;
   onRefreshData?: () => Promise<void>;
   onOpenMacroSimulator?: () => void;
+  onNavigateToAnatomy?: () => void;
+  onNavigateToMarket?: () => void;
   isCostIntelligenceEnabled?: boolean;
 }
 
@@ -107,6 +109,8 @@ export function EconomicCommandCenter({
   canEditDishes = true,
   onRefreshData,
   onOpenMacroSimulator,
+  onNavigateToAnatomy,
+  onNavigateToMarket,
   isCostIntelligenceEnabled,
 }: EconomicCommandCenterProps) {
   const costModuleActive = isCostIntelligenceEnabled ?? true;
@@ -513,7 +517,13 @@ export function EconomicCommandCenter({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setShowAnatomySection(!showAnatomySection)}
+              onClick={() => {
+                if (onNavigateToAnatomy) {
+                  onNavigateToAnatomy();
+                } else {
+                  setShowAnatomySection(!showAnatomySection);
+                }
+              }}
               className="h-5 text-[10px] px-1.5 text-amber-800 font-semibold hover:bg-amber-100"
             >
               Ver Platos
@@ -541,17 +551,192 @@ export function EconomicCommandCenter({
             <span className="truncate">
               {sources.length > 0 ? sources.map((s) => s.name).join(", ") : "Sin fuentes activas"}
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsMappingQueueOpen(true)}
-              className="h-5 text-[10px] px-1.5 text-indigo-700 font-semibold hover:bg-indigo-100"
-            >
-              Cola de Mapeo
-            </Button>
+            <div className="flex items-center gap-1 shrink-0">
+              {onNavigateToMarket && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onNavigateToMarket}
+                  className="h-5 text-[10px] px-1.5 text-indigo-700 font-semibold hover:bg-indigo-100"
+                >
+                  Ver Fuentes
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMappingQueueOpen(true)}
+                className="h-5 text-[10px] px-1.5 text-indigo-700 font-semibold hover:bg-indigo-100"
+              >
+                Cola de Mapeo
+              </Button>
+            </div>
           </div>
         </PanelCard>
       </div>
+
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* 1.1 GUÍA DE ARRANQUE EN FRÍO (COLD START ONBOARDING)                */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {(opportunities.length === 0 || sources.length === 0 || triageSummary.unmappedCount > 0) && (
+        <PanelCard className="p-5 border-slate-200 bg-linear-to-br from-slate-50 via-white to-indigo-50/30 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-indigo-100 text-indigo-700">
+                <Sparkles className="w-4 h-4" />
+              </span>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                  Guía de Arranque en Frío · Inteligencia de Costes
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Flujo asistido para conectar precios de mercado y activar el análisis predictivo
+                </p>
+              </div>
+            </div>
+
+            {/* Diagnostic Status Pills */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[11px] bg-white text-slate-700 border-slate-300 font-mono">
+                {`${ingredients.length} Ingredientes`}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-white text-slate-700 border-slate-300 font-mono">
+                {`${sources.length} Fuentes`}
+              </Badge>
+              <Badge
+                variant="outline"
+                className={cn(
+                  "text-[11px] font-mono",
+                  ingredients.length > 0 && triageSummary.unmappedCount === 0
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                    : "bg-amber-50 text-amber-800 border-amber-300",
+                )}
+              >
+                {`${ingredients.length - triageSummary.unmappedCount}/${ingredients.length} Mapeados`}
+              </Badge>
+            </div>
+          </div>
+
+          {/* 3 Step Action Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* Step 1: Ingestion */}
+            <div className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-indigo-300 hover:shadow-xs transition-all flex flex-col justify-between space-y-3">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider font-mono">
+                    Paso 1
+                  </span>
+                  <Upload className="w-4 h-4 text-indigo-500" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-900">Cargar Catálogo / Factura</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Importa tarifas o facturas de proveedores en formato CSV, PDF o imagen para alimentar fuentes de mercado.
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsIngestionOpen(true)}
+                className="w-full h-7 text-xs font-semibold text-indigo-700 border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100"
+              >
+                <Upload className="w-3 h-3 mr-1.5" />
+                Importar Catálogo
+              </Button>
+            </div>
+
+            {/* Step 2: Mapping Queue */}
+            <div className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-indigo-300 hover:shadow-xs transition-all flex flex-col justify-between space-y-3">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider font-mono">
+                    Paso 2
+                  </span>
+                  <Layers className="w-4 h-4 text-indigo-500" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-900">Vincular en Cola de Mapeo</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Asocia los ingredientes de tu restaurante con los productos de proveedores para calcular la dispersión.
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsMappingQueueOpen(true)}
+                className="w-full h-7 text-xs font-semibold text-slate-700 border-slate-300 bg-slate-50 hover:bg-slate-100"
+              >
+                <Layers className="w-3 h-3 mr-1.5" />
+                Abrir Cola ({triageSummary.unmappedCount} pendientes)
+              </Button>
+            </div>
+
+            {/* Step 3: Inquiry */}
+            <div className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 hover:shadow-xs transition-all flex flex-col justify-between space-y-3">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider font-mono">
+                    Paso 3
+                  </span>
+                  <Sparkles className="w-4 h-4 text-emerald-500" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-900">Preguntar al Mercado</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Consulta precios observados en Canarias y Península o diseña nuevos platos con estimaciones reales.
+                </p>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => setIsInquiryOpen(true)}
+                className="w-full h-7 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+              >
+                <Sparkles className="w-3 h-3 mr-1.5" />
+                Explorar Mercado
+              </Button>
+            </div>
+          </div>
+
+          {/* Context Navigation Shortcuts */}
+          {(onNavigateToAnatomy || onNavigateToMarket || onOpenMacroSimulator) && (
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
+              <span className="text-[11px]">Accesos rápidos a módulos vinculados:</span>
+              <div className="flex flex-wrap items-center gap-2">
+                {onNavigateToAnatomy && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onNavigateToAnatomy}
+                    className="h-6 text-[11px] px-2 text-slate-600 hover:text-slate-900"
+                  >
+                    <PieChart className="w-3 h-3 mr-1 text-amber-600" />
+                    Ficha Técnica de Platos
+                  </Button>
+                )}
+                {onNavigateToMarket && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onNavigateToMarket}
+                    className="h-6 text-[11px] px-2 text-slate-600 hover:text-slate-900"
+                  >
+                    <Layers className="w-3 h-3 mr-1 text-indigo-600" />
+                    Catálogo y Fuentes de Mercado
+                  </Button>
+                )}
+                {onOpenMacroSimulator && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onOpenMacroSimulator}
+                    className="h-6 text-[11px] px-2 text-slate-600 hover:text-slate-900"
+                  >
+                    <Sliders className="w-3 h-3 mr-1 text-purple-600" />
+                    Simulador Macro (E9)
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </PanelCard>
+      )}
 
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* 2. FEED PRINCIPAL DE OPORTUNIDADES (EL OBJETO NUCLEAR DE DECISIÓN)  */}
@@ -569,7 +754,43 @@ export function EconomicCommandCenter({
           <span className="text-xs text-slate-500">Ordenado por impacto anual verificable</span>
         </div>
 
-        {opportunities.map((op) => {
+        {opportunities.length === 0 ? (
+          <PanelCard className="p-8 text-center bg-white border-slate-200 shadow-xs">
+            <div className="max-w-md mx-auto space-y-3">
+              <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
+                <Sparkles className="w-5 h-5 text-indigo-500" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-slate-800">
+                  Sin oportunidades registradas actualmente
+                </h4>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Agrega ingredientes o platos con escandallos para activar el análisis predictivo contra fuentes de mercado.
+                </p>
+              </div>
+              <div className="pt-1 flex flex-wrap justify-center gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => setIsIngestionOpen(true)}
+                  className="text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+                >
+                  <Upload className="w-3.5 h-3.5 mr-1.5" />
+                  Cargar Catálogo / Factura
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsInquiryOpen(true)}
+                  className="text-xs font-semibold bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+                >
+                  <Sparkles className="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
+                  Preguntar al Mercado
+                </Button>
+              </div>
+            </div>
+          </PanelCard>
+        ) : (
+          opportunities.map((op) => {
           const isSimulating = simulatingOpportunityId === op.ingredientId;
           const isDeciding = decidingOpportunityId === op.ingredientId;
           const isRecorded = op.lifecycleState === "DECISION_RECORDED";
@@ -1130,7 +1351,8 @@ export function EconomicCommandCenter({
               </div>
             </PanelCard>
           );
-        })}
+        })
+      )}
       </div>
 
       {/* ─────────────────────────────────────────────────────────────────── */}
@@ -1163,7 +1385,7 @@ export function EconomicCommandCenter({
             className="text-xs font-semibold bg-white border-slate-300 text-slate-700 hover:bg-slate-100"
           >
             <Upload className="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
-            Importar Catálogo (CSV)
+            Importar Catálogo (CSV / PDF)
           </Button>
 
           <Button

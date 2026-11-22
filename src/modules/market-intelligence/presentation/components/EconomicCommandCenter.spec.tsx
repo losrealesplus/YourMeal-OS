@@ -368,4 +368,59 @@ describe("EconomicCommandCenter & CatalogIngestionDrawer (CR-COST-05 PR1 Integri
     expect(html).toContain("Inteligencia de Costes en Modo Solo Lectura (Desactivado)");
     expect(html).toContain("Solo Lectura");
   });
+
+  it("renders actionable Cold Start Guide with 3 steps, diagnostic pills, and navigation when tenant has 0 opportunities", () => {
+    mockUseMarketIntelligence.mockReturnValue({
+      sources: [],
+      marketProducts: [],
+      mappings: [],
+      benchmarksByIngredient: new Map(),
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+      ingestionService: {} as never,
+      mappingService: {} as never,
+      generateNegotiationBrief: vi.fn(),
+    });
+
+    const onNavigateToAnatomy = vi.fn();
+    const onNavigateToMarket = vi.fn();
+    const onOpenMacroSimulator = vi.fn();
+
+    const html = renderToString(
+      <EconomicCommandCenter
+        tenantId="11111111-1111-4111-8111-111111111111"
+        tenantName="Nuevo Restaurante"
+        userId="22222222-2222-4222-8222-222222222222"
+        ingredients={[]}
+        dishes={[]}
+        onNavigateToAnatomy={onNavigateToAnatomy}
+        onNavigateToMarket={onNavigateToMarket}
+        onOpenMacroSimulator={onOpenMacroSimulator}
+      />,
+    );
+
+    // Cold Start Header & Diagnostics
+    expect(html).toContain("Guía de Arranque en Frío · Inteligencia de Costes");
+    expect(html).toContain("0 Ingredientes");
+    expect(html).toContain("0 Fuentes");
+    expect(html).toContain("0/0 Mapeados");
+
+    // 3 Action Steps
+    expect(html).toContain("Cargar Catálogo / Factura");
+    expect(html).toContain("Vincular en Cola de Mapeo");
+    expect(html).toContain("Preguntar al Mercado");
+
+    // Action buttons in the guide
+    expect(html).toContain("Importar Catálogo");
+    expect(html).toContain("Explorar Mercado");
+
+    // Feed empty state
+    expect(html).toContain("Sin oportunidades registradas actualmente");
+
+    // Context navigation shortcuts
+    expect(html).toContain("Ficha Técnica de Platos");
+    expect(html).toContain("Catálogo y Fuentes de Mercado");
+    expect(html).toContain("Simulador Macro (E9)");
+  });
 });

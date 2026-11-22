@@ -103,4 +103,28 @@ describe("CR-COST-03 — Cost Intelligence Cockpit (admin.cost-intelligence)", (
     // Passes permission checks to editing components
     expect(src).toContain('can("dishes.update") || can("dishes.write")');
   });
+
+  it("streamlines navigation into 4 semantic pillars with dedicated simulation sub-navigation", () => {
+    const src = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.cost-intelligence.tsx"),
+      "utf8",
+    );
+
+    // 4 Semantic Pillars
+    expect(src).toContain("Primary Navigation Tabs (4 Semantic Pillars)");
+    expect(src).toContain("Centro de Decisión Económica (v4.1)");
+    expect(src).toContain("Anatomía de Costes (Ficha Técnica)");
+    expect(src).toContain("Simulador de Escenarios (E9)");
+    expect(src).toContain("Fuentes y Mappings de Mercado");
+
+    // Sub-Navigation for Simulation Pillar
+    expect(src).toContain("Sub-Navigation for Simulation Pillar");
+    expect(src).toContain('activeTab === "simulator" || activeTab === "scenarios" || activeTab === "history"');
+    expect(src).toContain("Escenarios Guardados [SIMULADO]");
+    expect(src).toContain("Histórico de Decisiones");
+
+    // Navigation callbacks wired to EconomicCommandCenter
+    expect(src).toContain('onNavigateToAnatomy={() => setActiveTab("anatomy")}');
+    expect(src).toContain('onNavigateToMarket={() => setActiveTab("market_intelligence")}');
+  });
 });

@@ -284,7 +284,7 @@ export function MarketIntelligenceTab({
             className="text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
           >
             <Upload className="w-3.5 h-3.5 mr-1.5" />
-            Importar Catálogo (CSV)
+            Importar Catálogo (CSV / PDF)
           </Button>
 
           <Button
@@ -422,9 +422,44 @@ export function MarketIntelligenceTab({
             ))}
           </div>
         ) : filteredBenchmarkRows.length === 0 ? (
-          <div className="py-12 text-center text-xs text-slate-400">
-            No se encontraron ingredientes para los criterios seleccionados.
-          </div>
+          sources.length === 0 ? (
+            <div className="py-12 px-4 text-center max-w-md mx-auto space-y-3">
+              <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+                <Upload className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-slate-800">
+                  Sin fuentes ni catálogos de mercado activos
+                </p>
+                <p className="text-xs text-slate-500">
+                  Para calcular benchmarks y comparar precios de compra, importa un catálogo de proveedor (CSV, PDF o imagen) o asocia productos en la cola de mapeo.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-2 pt-1">
+                <Button
+                  size="sm"
+                  onClick={() => setIsIngestionOpen(true)}
+                  className="text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+                >
+                  <Upload className="w-3.5 h-3.5 mr-1.5" />
+                  Importar Catálogo (CSV / PDF)
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsMappingQueueOpen(true)}
+                  className="text-xs font-semibold bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+                >
+                  <Layers className="w-3.5 h-3.5 mr-1.5 text-indigo-500" />
+                  Cola de Mapeo
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="py-12 text-center text-xs text-slate-400">
+              No se encontraron ingredientes para los criterios seleccionados.
+            </div>
+          )
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">

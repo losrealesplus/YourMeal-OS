@@ -547,7 +547,7 @@ export function CostIntelligenceCockpitPage() {
         </div>
       )}
 
-      {/* Primary Navigation Tabs */}
+      {/* Primary Navigation Tabs (4 Semantic Pillars) */}
       <div className="flex border-b border-border gap-2 overflow-x-auto text-xs">
         <button
           onClick={() => setActiveTab("command_center")}
@@ -562,23 +562,11 @@ export function CostIntelligenceCockpitPage() {
           Centro de Decisión Económica (v4.1)
         </button>
         <button
-          onClick={() => setActiveTab("simulator")}
-          className={cn(
-            "px-4 py-2 font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0",
-            activeTab === "simulator"
-              ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground",
-          )}
-        >
-          <Play className="h-4 w-4" />
-          Simulador de Escenarios (E9)
-        </button>
-        <button
           onClick={() => setActiveTab("anatomy")}
           className={cn(
             "px-4 py-2 font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0",
             activeTab === "anatomy"
-              ? "border-primary text-primary"
+              ? "border-primary text-primary font-bold"
               : "border-transparent text-muted-foreground hover:text-foreground",
           )}
         >
@@ -586,35 +574,28 @@ export function CostIntelligenceCockpitPage() {
           Anatomía de Costes (Ficha Técnica) ({liveDishes.length} platos)
         </button>
         <button
-          onClick={() => setActiveTab("scenarios")}
+          onClick={() => setActiveTab("simulator")}
           className={cn(
             "px-4 py-2 font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0",
-            activeTab === "scenarios"
-              ? "border-primary text-primary"
+            activeTab === "simulator" || activeTab === "scenarios" || activeTab === "history"
+              ? "border-primary text-primary font-bold"
               : "border-transparent text-muted-foreground hover:text-foreground",
           )}
         >
-          <FolderOpen className="h-4 w-4" />
-          Escenarios Guardados [SIMULADO] ({savedScenarios.length})
-        </button>
-        <button
-          onClick={() => setActiveTab("history")}
-          className={cn(
-            "px-4 py-2 font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0",
-            activeTab === "history"
-              ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground",
+          <Play className="h-4 w-4" />
+          Simulador de Escenarios (E9)
+          {savedScenarios.length + savedIntents.length > 0 && (
+            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 font-mono">
+              {savedScenarios.length + savedIntents.length}
+            </Badge>
           )}
-        >
-          <History className="h-4 w-4" />
-          Histórico de Decisiones ({savedIntents.length})
         </button>
         <button
           onClick={() => setActiveTab("market_intelligence")}
           className={cn(
             "px-4 py-2 font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0",
             activeTab === "market_intelligence"
-              ? "border-primary text-primary"
+              ? "border-primary text-primary font-bold"
               : "border-transparent text-muted-foreground hover:text-foreground",
           )}
         >
@@ -622,6 +603,48 @@ export function CostIntelligenceCockpitPage() {
           Fuentes y Mappings de Mercado
         </button>
       </div>
+
+      {/* Sub-Navigation for Simulation Pillar */}
+      {(activeTab === "simulator" || activeTab === "scenarios" || activeTab === "history") && (
+        <div className="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl w-fit text-xs border border-slate-200">
+          <button
+            onClick={() => setActiveTab("simulator")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5",
+              activeTab === "simulator"
+                ? "bg-white text-slate-900 shadow-xs font-bold"
+                : "text-slate-600 hover:text-slate-900",
+            )}
+          >
+            <Play className="h-3.5 w-3.5 text-indigo-600" />
+            Simulador de Escenarios (E9)
+          </button>
+          <button
+            onClick={() => setActiveTab("scenarios")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5",
+              activeTab === "scenarios"
+                ? "bg-white text-slate-900 shadow-xs font-bold"
+                : "text-slate-600 hover:text-slate-900",
+            )}
+          >
+            <FolderOpen className="h-3.5 w-3.5 text-indigo-600" />
+            Escenarios Guardados [SIMULADO] ({savedScenarios.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("history")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5",
+              activeTab === "history"
+                ? "bg-white text-slate-900 shadow-xs font-bold"
+                : "text-slate-600 hover:text-slate-900",
+            )}
+          >
+            <History className="h-3.5 w-3.5 text-indigo-600" />
+            Histórico de Decisiones ({savedIntents.length})
+          </button>
+        </div>
+      )}
 
       {/* TAB 0: ECONOMIC COMMAND CENTER (CR-COST-05 v4.1 PRIMARY DECISION SURFACE) */}
       {activeTab === "command_center" && tenantId && (
@@ -665,6 +688,8 @@ export function CostIntelligenceCockpitPage() {
           })}
           onRefreshData={reloadData}
           onOpenMacroSimulator={() => setActiveTab("simulator")}
+          onNavigateToAnatomy={() => setActiveTab("anatomy")}
+          onNavigateToMarket={() => setActiveTab("market_intelligence")}
         />
       )}
 
