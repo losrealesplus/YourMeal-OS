@@ -31,7 +31,10 @@ import {
   IngestionReport,
   QuarantinedRow,
 } from '../../application/market-catalog-ingestion-service';
-import { executeCatalogCsvIngestion } from '../../application/command-center-actions';
+import {
+  executeCatalogCsvIngestion,
+  executeCatalogDocumentIngestion,
+} from '../../application/command-center-actions';
 
 export interface CatalogIngestionDrawerProps {
   open: boolean;
@@ -59,6 +62,9 @@ export function CatalogIngestionDrawer({
     canPublishPublic ? 'public' : 'private'
   );
   const [fileName, setFileName] = useState<string>('manual-upload.csv');
+  const [filePayload, setFilePayload] = useState<Uint8Array | null>(null);
+  const [fileMimeType, setFileMimeType] = useState<string>('text/csv');
+  const [ingestionMode, setIngestionMode] = useState<'csv' | 'document'>('csv');
   const [csvContent, setCsvContent] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [lastResult, setLastResult] = useState<IngestionReport | null>(null);
@@ -80,28 +86,86 @@ export function CatalogIngestionDrawer({
     if (!file) return;
 
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      setCsvContent(content || '');
-      setLastResult(null);
-    };
-    reader.readAsText(file);
+    setLastResult(null);
+
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const isDoc =
+      ext === 'pdf' ||
+      ext === 'png' ||
+      ext === 'jpg' ||
+      ext === 'jpeg' ||
+      ext === 'webp' ||
+      file.type === 'application/pdf' ||
+      file.type.startsWith('image/');
+
+    if (isDoc) {
+      const resolvedMime =
+        file.type === 'application/pdf' || ext === 'pdf'
+          ? 'application/pdf'
+          : file.type === 'image/png' || ext === 'png'
+            ? 'image/png'
+            : file.type === 'image/webp' || ext === 'webp'
+              ? 'image/webp'
+              : 'image/jpeg';
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const buffer = event.target?.result as ArrayBuffer;
+        if (buffer) {
+          const uint8 = new Uint8Array(buffer);
+          setFilePayload(uint8);
+          setFileMimeType(resolvedMime);
+          setIngestionMode('document');
+          setCsvContent(
+            `[Documento comercial cargado: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\n` +
+            `Tipo MIME: ${resolvedMime}\n` +
+            `Listo para extracción estructurada, normalización de precios e ingesta auditable.`
+          );
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target?.result as string;
+        setFilePayload(null);
+        setFileMimeType('text/csv');
+        setIngestionMode('csv');
+        setCsvContent(content || '');
+      };
+      reader.readAsText(file);
+    }
   };
 
   const handleIngest = async () => {
     setIsProcessing(true);
     try {
-      const result = await executeCatalogCsvIngestion({
-        ingestionService,
-        csvContent,
-        fileName,
-        userId,
-        selectedSourceId,
-        visibilityScope,
-        tenantId,
-        canPublishPublic,
-      });
+      let result: IngestionReport;
+
+      if (ingestionMode === 'document' && filePayload) {
+        result = await executeCatalogDocumentIngestion({
+          ingestionService,
+          rawPayload: filePayload,
+          fileName,
+          mimeType: fileMimeType,
+          userId,
+          selectedSourceId,
+          visibilityScope,
+          tenantId,
+          canPublishPublic,
+        });
+      } else {
+        result = await executeCatalogCsvIngestion({
+          ingestionService,
+          csvContent,
+          fileName,
+          userId,
+          selectedSourceId,
+          visibilityScope,
+          tenantId,
+          canPublishPublic,
+        });
+      }
 
       setLastResult(result);
 
@@ -114,6 +178,8 @@ export function CatalogIngestionDrawer({
         toast.warning(
           `Atención: 0 filas válidas procesadas, ${result.quarantinedCount} filas en cuarentena.`
         );
+      } else {
+        toast.info('Proceso completado sin observaciones creadas o modificadas.');
       }
     } catch (err: any) {
       toast.error(`Error de ingesta: ${err.message || 'Error desconocido'}`);
@@ -143,10 +209,10 @@ export function CatalogIngestionDrawer({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
             <Upload className="w-5 h-5 text-indigo-600" />
-            Ingesta de Catálogo de Precios de Mercado (CSV / TSV)
+            Ingesta de Catálogo y Documentos de Mercado
           </DialogTitle>
           <DialogDescription className="text-xs text-slate-500">
-            Importación idempotente de precios observados con deduplicación y cuarentena automática.
+            Importación estructurada de catálogos (CSV/TSV) y documentos comerciales (PDF/facturas/fotos) con deduplicación y cuarentena anti-alucinación.
           </DialogDescription>
         </DialogHeader>
 
@@ -193,14 +259,23 @@ export function CatalogIngestionDrawer({
           {/* File Upload / Paste */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-slate-700">
-                Archivo o Contenido CSV / TSV
-              </Label>
-              <label className="text-xs text-indigo-600 hover:text-indigo-700 cursor-pointer font-medium">
-                <span>📁 Cargar archivo .csv / .tsv</span>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs font-semibold text-slate-700">
+                  {ingestionMode === 'document'
+                    ? 'Documento Comercial (PDF / Imagen)'
+                    : 'Archivo o Contenido CSV / TSV'}
+                </Label>
+                {ingestionMode === 'document' && (
+                  <Badge variant="outline" className="text-[10px] bg-indigo-50 text-indigo-700 border-indigo-200">
+                    {fileMimeType === 'application/pdf' ? 'Factura / Albarán PDF' : 'Foto Documental'}
+                  </Badge>
+                )}
+              </div>
+              <label className="text-xs text-indigo-600 hover:text-indigo-700 cursor-pointer font-medium flex items-center gap-1">
+                <span>📁 Cargar archivo (.csv, .tsv, .pdf, imágenes)</span>
                 <input
                   type="file"
-                  accept=".csv,.tsv,.txt"
+                  accept=".csv,.tsv,.txt,.pdf,image/png,image/jpeg,image/webp"
                   className="hidden"
                   onChange={handleFileUpload}
                 />
@@ -211,13 +286,18 @@ export function CatalogIngestionDrawer({
               onChange={(e) => {
                 setCsvContent(e.target.value);
                 setLastResult(null);
+                if (ingestionMode === 'document') {
+                  setIngestionMode('csv');
+                  setFilePayload(null);
+                  setFileMimeType('text/csv');
+                }
               }}
               placeholder={`sku,producto,precio,unidad,iva,formato\nMK-001,Harina Trigo 1kg,1.20,kg,0.04,1kg\nMK-002,Aceite Girasol 5L,7.50,l,0.10,5L`}
               rows={8}
               className="font-mono text-xs"
             />
             <p className="text-[11px] text-slate-400">
-              Soporta delimitadores automáticos (, ; \t) y aliases de cabecera en español/inglés.
+              Formatos admitidos: CSV/TSV delimitados o archivos PDF/PNG/JPEG/WEBP de facturas y albaranes. Cero invención de datos.
             </p>
           </div>
 
@@ -247,6 +327,43 @@ export function CatalogIngestionDrawer({
                   )}
                 </div>
               </div>
+
+              {/* Audit Meta: Batch ID & SHA-256 Checksum */}
+              {(lastResult.batchId || lastResult.fileChecksumSha256) && (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500 font-mono border-t border-slate-200/80 pt-2">
+                  {lastResult.batchId && (
+                    <span>
+                      Lote: <strong className="text-slate-700 font-semibold">{lastResult.batchId.slice(0, 8)}...</strong>
+                    </span>
+                  )}
+                  {lastResult.batchStatus && (
+                    <span>
+                      Estado: <strong className="text-slate-700 font-semibold">{lastResult.batchStatus}</strong>
+                    </span>
+                  )}
+                  {lastResult.fileChecksumSha256 && (
+                    <span>
+                      SHA-256:{" "}
+                      <strong className="text-slate-700 font-semibold" title={lastResult.fileChecksumSha256}>
+                        {lastResult.fileChecksumSha256.slice(0, 16)}...
+                      </strong>
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Anti-Hallucination Warning when 0 rows are valid */}
+              {lastResult.validCount === 0 && lastResult.quarantinedCount > 0 && (
+                <div className="p-2.5 rounded bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-semibold">Documento enviado a cuarentena sin observaciones válidas</p>
+                    <p className="text-[11px] text-amber-700 mt-0.5">
+                      El documento no contiene texto estructurado legible o líneas de artículos reconocibles. En YourMeal-OS Core rige principio anti-alucinación estricto: cero invención de datos.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Quarantine Error Inspector */}
               {lastResult.quarantinedRows.length > 0 && (
@@ -288,7 +405,10 @@ export function CatalogIngestionDrawer({
           </Button>
           <Button
             onClick={handleIngest}
-            disabled={isProcessing || !csvContent.trim()}
+            disabled={
+              isProcessing ||
+              (ingestionMode === 'document' ? !filePayload : !csvContent.trim())
+            }
             className="text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             {isProcessing ? (

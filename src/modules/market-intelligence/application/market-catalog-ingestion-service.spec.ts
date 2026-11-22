@@ -368,6 +368,37 @@ Makro,Queso Manchego 1kg,14.50,1,kg,ex_tax,2026-10-15
     expect(batch?.quarantinePayload).toHaveLength(2);
   });
 
+  it("ingests B2B document with empty or unparseable text by quarantining without hallucinating data", async () => {
+    const emptyExtractionResult = {
+      header: {},
+      lines: [],
+      rawText: "",
+      fileName: "escaneo_borroso.pdf",
+      fileChecksumSha256: "sha256-unparseable-scan",
+      mimeType: "application/pdf" as const,
+    };
+
+    const report = await service.ingestDocument(emptyExtractionResult, {
+      importedBy: "user-chef-1",
+      fileName: "escaneo_borroso.pdf",
+      batchType: "b2b_invoice_pdf",
+      defaultSourceId: "src-makro",
+    });
+
+    expect(report.totalRows).toBe(1);
+    expect(report.validCount).toBe(0);
+    expect(report.quarantinedCount).toBe(1);
+    expect(report.createdObservationsCount).toBe(0);
+    expect(report.fileChecksumSha256).toBe("sha256-unparseable-scan");
+    expect(report.quarantinedRows[0].reason).toContain(
+      "El documento PDF/imagen no contiene texto estructurado legible o líneas de artículos reconocibles (enviado a cuarentena para revisión sin inventar datos)."
+    );
+
+    const batch = await repository.getBatchById(report.batchId!);
+    expect(batch?.status).toBe("failed");
+    expect(batch?.quarantinedRows).toBe(1);
+  });
+
   it("revokes batch observations safely (soft-revocation neutralizing them from benchmark)", async () => {
     const csv = `
 source_name,product_name,raw_price,quantity,unit,tax_mode
