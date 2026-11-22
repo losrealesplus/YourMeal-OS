@@ -455,6 +455,7 @@ export interface BenchmarkComponent {
   weight: number;
   isStale: boolean;
   isPromo: boolean;
+  isTenantOwned?: boolean;
 }
 
 export type BenchmarkStatus =
@@ -476,6 +477,8 @@ export interface BenchmarkCalculation {
   highComparabilityCount: number;
   components: BenchmarkComponent[];
   historicalReferences?: BenchmarkComponent[];
+  hasRealObservations?: boolean;
+  latestRealPriceExTax?: number | null;
   diagnosticNote?: string | null;
 }
 
@@ -568,6 +571,10 @@ export interface EconomicOpportunity {
   lifecycleState: OpportunityLifecycleState;
   calculation: BenchmarkCalculation | null;
   affectedDishes: AffectedDishSim[];
+  hasRealPurchaseObservation?: boolean;
+  latestRealPriceExTax?: number | null;
+  realObservationSource?: string;
+  realObservationDate?: string;
   recordedDecision?: {
     id: string;
     intentType: string;

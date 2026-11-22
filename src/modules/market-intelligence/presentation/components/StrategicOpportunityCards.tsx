@@ -36,6 +36,10 @@ export interface OpportunityItem {
   potentialAnnualSavingsEur: number | null;
   actionabilityGrade: ActionabilityGrade;
   calculation: BenchmarkCalculation;
+  hasRealPurchaseObservation?: boolean;
+  latestRealPriceExTax?: number | null;
+  realObservationSource?: string;
+  realObservationDate?: string;
 }
 
 export interface StrategicOpportunityCardsProps {
@@ -137,17 +141,40 @@ export function StrategicOpportunityCards({
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-bold text-slate-900 text-sm">{op.ingredientName}</span>
                     {getActionabilityBadge(op.actionabilityGrade)}
+                    {(op.hasRealPurchaseObservation || op.calculation.hasRealObservations) && (
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] bg-emerald-50 text-emerald-800 border-emerald-300 font-mono flex items-center gap-1 font-semibold"
+                      >
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        Basado en facturas reales
+                      </Badge>
+                    )}
                     <Badge variant="outline" className="font-mono text-[10px] text-rose-700 bg-rose-50 border-rose-200">
                       +{op.variancePct.toFixed(1)}% Sobreprecio
                     </Badge>
                   </div>
-                  <div className="text-xs text-slate-500 font-mono">
-                    WAC Actual [REAL]: <span className="font-semibold text-slate-800">{op.effectiveWacExTax.toFixed(2)} €/{op.unit}</span>
-                    {' ──► '}
-                    Benchmark [OBSERVADO]: <span className="font-semibold text-indigo-700">{op.benchmarkPriceExTax.toFixed(2)} €/{op.unit}</span>
+                  <div className="text-xs text-slate-500 font-mono flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    {op.latestRealPriceExTax != null && (
+                      <span>
+                        Última Factura [REAL]:{" "}
+                        <strong className="text-emerald-700 font-bold">
+                          {op.latestRealPriceExTax.toFixed(2)} €/{op.unit}
+                        </strong>
+                        {op.realObservationSource ? ` (${op.realObservationSource})` : ""}
+                        {" · "}
+                      </span>
+                    )}
+                    <span>
+                      WAC Actual [REAL]: <span className="font-semibold text-slate-800">{op.effectiveWacExTax.toFixed(2)} €/{op.unit}</span>
+                    </span>
+                    <span>──►</span>
+                    <span>
+                      Benchmark [OBSERVADO]: <span className="font-semibold text-indigo-700">{op.benchmarkPriceExTax.toFixed(2)} €/{op.unit}</span>
+                    </span>
                     {wholesaleFloor < op.benchmarkPriceExTax && (
                       <span className="text-[11px] text-emerald-600 ml-1">
                         (Suelo: {wholesaleFloor.toFixed(2)} €/{op.unit})

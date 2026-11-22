@@ -274,6 +274,14 @@ export function EconomicCommandCenter({
         };
       });
 
+      const realComponent = calc?.components.find((c) => c.isTenantOwned);
+      const hasRealPurchaseObservation = Boolean(realComponent || calc?.hasRealObservations);
+      const latestRealPriceExTax = realComponent
+        ? realComponent.normalizedPriceExTax
+        : (calc?.latestRealPriceExTax ?? null);
+      const realObservationSource = realComponent?.sourceName;
+      const realObservationDate = realComponent?.observedAt;
+
       return {
         id: `opp-${ing.id}`,
         ingredientId: ing.id,
@@ -290,6 +298,10 @@ export function EconomicCommandCenter({
         lifecycleState,
         calculation: calc && calc.components.length > 0 ? calc : null,
         affectedDishes: affectedDishesSim,
+        hasRealPurchaseObservation,
+        latestRealPriceExTax,
+        realObservationSource,
+        realObservationDate,
         recordedDecision: recordedDecisions[ing.id],
       };
     });
@@ -852,6 +864,15 @@ export function EconomicCommandCenter({
                         🟡 REVISAR DATOS
                       </Badge>
                     )}
+                    {op.hasRealPurchaseObservation && (
+                      <Badge
+                        variant="outline"
+                        className="bg-emerald-50 text-emerald-800 border-emerald-300 text-[10px] font-bold flex items-center gap-1 font-mono"
+                      >
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        Basado en facturas reales
+                      </Badge>
+                    )}
 
                     {/* Lifecycle Badge */}
                     {isRecorded && (
@@ -868,6 +889,16 @@ export function EconomicCommandCenter({
                   </div>
 
                   <div className="text-xs text-slate-500 font-mono flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    {op.latestRealPriceExTax != null && (
+                      <span>
+                        Última Factura [REAL]:{" "}
+                        <strong className="text-emerald-700 font-bold">
+                          {op.latestRealPriceExTax.toFixed(2)} €/{op.unit}
+                        </strong>
+                        {op.realObservationSource ? ` (${op.realObservationSource})` : ""}
+                        {" · "}
+                      </span>
+                    )}
                     <span>
                       WAC Real [REAL]:{" "}
                       <strong className="text-slate-800">

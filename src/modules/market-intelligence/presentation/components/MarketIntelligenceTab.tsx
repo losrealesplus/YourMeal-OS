@@ -144,6 +144,14 @@ export function MarketIntelligenceTab({
             ? (r.ingredient.cost - r.benchmarkExTax) * r.ingredient.annualVolume
             : null;
 
+        const realComponent = r.calculation?.components.find((c) => c.isTenantOwned);
+        const hasRealPurchaseObservation = Boolean(realComponent || r.calculation?.hasRealObservations);
+        const latestRealPriceExTax = realComponent
+          ? realComponent.normalizedPriceExTax
+          : (r.calculation?.latestRealPriceExTax ?? null);
+        const realObservationSource = realComponent?.sourceName;
+        const realObservationDate = realComponent?.observedAt;
+
         return {
           ingredientId: r.ingredient.id,
           ingredientName: r.ingredient.name,
@@ -156,6 +164,10 @@ export function MarketIntelligenceTab({
           potentialAnnualSavingsEur,
           actionabilityGrade: r.actionabilityGrade,
           calculation: r.calculation!,
+          hasRealPurchaseObservation,
+          latestRealPriceExTax,
+          realObservationSource,
+          realObservationDate,
         };
       });
   }, [benchmarkRows]);

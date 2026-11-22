@@ -328,4 +328,35 @@ describe('BenchmarkCalculator (CR-COST-05)', () => {
     expect(calculation.components[1].weight).toBe(0.0); // UNKNOWN comparability
     expect(calculation.benchmarkPriceExTax).toBe(5.25);
   });
+
+  it('marks observations with ownerTenantId as isTenantOwned and calculates latestRealPriceExTax', () => {
+    const inputsWithTenantOwned: BenchmarkInputObservation[] = [
+      {
+        ...sampleInputs[0],
+        observation: {
+          ...sampleInputs[0].observation,
+          ownerTenantId: 'tenant-pilot-eatclean',
+          normalizedPriceExTax: 5.60,
+        },
+      },
+      {
+        ...sampleInputs[1],
+        observation: {
+          ...sampleInputs[1].observation,
+          ownerTenantId: null, // public market observation
+        },
+      },
+    ];
+
+    const calculation = BenchmarkCalculator.calculateBenchmark(
+      chickenIngredient,
+      inputsWithTenantOwned,
+      refDate
+    );
+
+    expect(calculation.hasRealObservations).toBe(true);
+    expect(calculation.latestRealPriceExTax).toBe(5.60);
+    expect(calculation.components[0].isTenantOwned).toBe(true);
+    expect(calculation.components[1].isTenantOwned).toBe(false);
+  });
 });
