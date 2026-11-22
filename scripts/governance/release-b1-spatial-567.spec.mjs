@@ -733,6 +733,8 @@ test("B1 Spatial 567 integrated: --b1-567-payload and prepare() reconcile post-G
     ).trim();
     execFileSync("git", ["checkout", "--quiet", govCommit], { cwd: dir });
     for (const rel of [
+      "scripts/governance/release-cost-read-only-592.mjs",
+      "scripts/governance/release-cost-read-only-592.json",
       "scripts/governance/release-cr-cost-05-582.mjs",
       "scripts/governance/release-cr-cost-05-582.json",
       "scripts/governance/release-smoke-retry-574.mjs",
