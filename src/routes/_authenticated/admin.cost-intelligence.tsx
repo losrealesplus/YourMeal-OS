@@ -116,7 +116,7 @@ export function CostIntelligenceCockpitPage() {
   const { flags: moduleFlags, ready: flagsReady } = usePilotAdminModuleFlags();
   const isCostIntelligenceEnabled = flagsReady
     ? Boolean(moduleFlags[PILOT_ADMIN_MODULE_FLAGS.costIntelligence])
-    : true;
+    : false;
 
   const [activeTab, setActiveTab] = useState<
     | "command_center"
@@ -513,8 +513,8 @@ export function CostIntelligenceCockpitPage() {
           <Button
             size="sm"
             onClick={() => setIsSaveScenarioOpen(true)}
-            disabled={!isCostIntelligenceEnabled}
-            title={!isCostIntelligenceEnabled ? "Módulo desactivado: solo lectura" : undefined}
+            disabled={!flagsReady || !isCostIntelligenceEnabled}
+            title={flagsReady && !isCostIntelligenceEnabled ? "Módulo desactivado: solo lectura" : undefined}
             className="gap-1.5 text-xs h-8"
           >
             <Save className="h-3.5 w-3.5" />
@@ -524,7 +524,7 @@ export function CostIntelligenceCockpitPage() {
       </div>
 
       {/* Banner de Módulo Desactivado (Solo Lectura) */}
-      {!isCostIntelligenceEnabled && (
+      {flagsReady && !isCostIntelligenceEnabled && (
         <div className="p-4 rounded-xl border border-amber-300 bg-amber-50/90 text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
           <div className="flex items-start sm:items-center gap-3">
             <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
@@ -653,6 +653,7 @@ export function CostIntelligenceCockpitPage() {
           tenantId={tenantId}
           tenantName={user?.user_metadata?.company_name || "Restaurante"}
           isCostIntelligenceEnabled={isCostIntelligenceEnabled}
+          hideReadOnlyBanner={true}
           userId={user?.id}
           userName={user?.email || "Gerente"}
           canPublishPublic={isSaasAdmin}
@@ -878,8 +879,8 @@ export function CostIntelligenceCockpitPage() {
               </div>
               <Button
                 onClick={() => setIsIntentDialogOpen(true)}
-                disabled={!isCostIntelligenceEnabled}
-                title={!isCostIntelligenceEnabled ? "Módulo desactivado: solo lectura" : undefined}
+                disabled={!flagsReady || !isCostIntelligenceEnabled}
+                title={flagsReady && !isCostIntelligenceEnabled ? "Módulo desactivado: solo lectura" : undefined}
                 className="w-full mt-2 gap-2 text-xs"
                 variant="default"
               >
@@ -1582,7 +1583,7 @@ export function CostIntelligenceCockpitPage() {
               <Button type="button" variant="outline" onClick={() => setIsSaveScenarioOpen(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={busy || !isCostIntelligenceEnabled}>
+              <Button type="submit" disabled={busy || !flagsReady || !isCostIntelligenceEnabled}>
                 Guardar en Base de Datos
               </Button>
             </DialogFooter>
@@ -1656,7 +1657,7 @@ export function CostIntelligenceCockpitPage() {
               <Button type="button" variant="outline" onClick={() => setIsIntentDialogOpen(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={busy || !isCostIntelligenceEnabled}>
+              <Button type="submit" disabled={busy || !flagsReady || !isCostIntelligenceEnabled}>
                 Guardar Decisión en Audit Trail
               </Button>
             </DialogFooter>

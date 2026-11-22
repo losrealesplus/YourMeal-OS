@@ -62,7 +62,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [moreOpen, setMoreOpen] = useState(false);
 
   const admin = isOperationsAdmin(roles);
-  const { flags: moduleFlags } = usePilotAdminModuleFlags();
+  const { flags: moduleFlags, ready: flagsReady } = usePilotAdminModuleFlags();
   const showKitchen = can("kitchen.operate") || roles.includes("kitchen") || admin;
   const showDelivery =
     can("logistics.operate") || roles.includes("delivery") || roles.includes("logistics") || admin;
@@ -196,7 +196,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
       labelKey: "costIntelligence",
       icon: TrendingUp,
       visible: can("inventory.operate") || can("accounting.operate") || showAllOps,
-      badge: !moduleFlags[PILOT_ADMIN_MODULE_FLAGS.costIntelligence] ? "Solo lectura" : undefined,
+      badge:
+        flagsReady && !moduleFlags[PILOT_ADMIN_MODULE_FLAGS.costIntelligence]
+          ? "Solo lectura"
+          : undefined,
     },
     {
       to: "/admin/reports",

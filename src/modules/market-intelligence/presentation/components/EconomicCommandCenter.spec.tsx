@@ -369,6 +369,35 @@ describe("EconomicCommandCenter & CatalogIngestionDrawer (CR-COST-05 PR1 Integri
     expect(html).toContain("Solo Lectura");
   });
 
+  it("suppresses read-only banner when hideReadOnlyBanner is true even if cost intelligence is disabled", () => {
+    mockUseMarketIntelligence.mockReturnValue({
+      sources: [],
+      marketProducts: [],
+      mappings: [],
+      benchmarksByIngredient: new Map(),
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+      ingestionService: {} as never,
+      mappingService: {} as never,
+      generateNegotiationBrief: vi.fn(),
+    });
+
+    const html = renderToString(
+      <EconomicCommandCenter
+        tenantId="11111111-1111-4111-8111-111111111111"
+        tenantName="EatClean"
+        userId="22222222-2222-4222-8222-222222222222"
+        isCostIntelligenceEnabled={false}
+        hideReadOnlyBanner={true}
+        ingredients={[]}
+        dishes={[]}
+      />,
+    );
+
+    expect(html).not.toContain("Inteligencia de Costes en Modo Solo Lectura (Desactivado)");
+  });
+
   it("renders actionable Cold Start Guide with 3 steps, diagnostic pills, and navigation when tenant has 0 opportunities", () => {
     mockUseMarketIntelligence.mockReturnValue({
       sources: [],
