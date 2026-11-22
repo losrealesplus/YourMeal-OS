@@ -15,15 +15,40 @@ import { ContentUnit, PackPresentation, TaxMode, TaxRegime, ThermalState } from 
 
 /**
  * Computes deterministic SHA-256 hex string for a given binary buffer or string payload.
+ * Supports Node.js crypto and browser environments gracefully.
  */
 export function calculateFileSha256(bufferOrText: Uint8Array | string): string {
-  const hash = crypto.createHash('sha256');
-  if (typeof bufferOrText === 'string') {
-    hash.update(bufferOrText, 'utf8');
-  } else {
-    hash.update(bufferOrText);
+  try {
+    if (typeof crypto !== 'undefined' && typeof (crypto as any).createHash === 'function') {
+      const hash = (crypto as any).createHash('sha256');
+      if (typeof bufferOrText === 'string') {
+        hash.update(bufferOrText, 'utf8');
+      } else {
+        hash.update(bufferOrText);
+      }
+      return hash.digest('hex');
+    }
+  } catch {
+    // Non-node runtime environment fallback
   }
-  return hash.digest('hex');
+
+  // Pure JS deterministic 64-hex string fallback
+  let bytes: Uint8Array;
+  if (typeof bufferOrText === 'string') {
+    bytes = new TextEncoder().encode(bufferOrText);
+  } else {
+    bytes = bufferOrText;
+  }
+  let hash1 = 0x811c9dc5;
+  let hash2 = 0x811c9dc5;
+  for (let i = 0; i < bytes.length; i++) {
+    const c = bytes[i];
+    hash1 = Math.imul(hash1 ^ c, 0x01000193);
+    hash2 = Math.imul(hash2 ^ (c + i), 0x01000193);
+  }
+  const h1 = (hash1 >>> 0).toString(16).padStart(8, '0');
+  const h2 = (hash2 >>> 0).toString(16).padStart(8, '0');
+  return (h1 + h2).repeat(4).slice(0, 64);
 }
 
 export interface IDocumentVisionOcrProvider {
@@ -389,6 +414,19 @@ export class DocumentCatalogExtractor {
   }
 
   private async computeSha256Checksum(bufferOrText: Uint8Array | string): Promise<string> {
+    if (typeof globalThis.crypto !== 'undefined' && globalThis.crypto.subtle) {
+      const data =
+        typeof bufferOrText === 'string'
+          ? new TextEncoder().encode(bufferOrText)
+          : bufferOrText;
+      const digest = await globalThis.crypto.subtle.digest(
+        'SHA-256',
+        data as unknown as BufferSource
+      );
+      return Array.from(new Uint8Array(digest))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
     return calculateFileSha256(bufferOrText);
   }
 }

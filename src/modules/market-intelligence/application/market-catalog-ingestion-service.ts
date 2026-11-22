@@ -78,6 +78,7 @@ export interface QuarantinedRow {
 export interface IngestionReport {
   batchId?: string;
   batchStatus?: MarketBatchStatus;
+  fileChecksumSha256?: string;
   totalRows: number;
   validCount: number;
   quarantinedCount: number;
@@ -265,6 +266,20 @@ export class MarketCatalogIngestionService {
 
     const rows: RawCsvRow[] = [];
     const preQuarantined: QuarantinedRow[] = [];
+
+    if (extraction.lines.length === 0) {
+      preQuarantined.push({
+        lineNumber: 1,
+        rawLine: extraction.fileName,
+        reason:
+          "El documento PDF/imagen no contiene texto estructurado legible o líneas de artículos reconocibles (enviado a cuarentena para revisión sin inventar datos).",
+        fields: {
+          file_name: extraction.fileName,
+          mime_type: extraction.mimeType,
+          checksum_sha256: extraction.fileChecksumSha256,
+        },
+      });
+    }
 
     for (const line of extraction.lines) {
       const validation = validateExtractedLine(line);
@@ -1259,6 +1274,7 @@ export class MarketCatalogIngestionService {
     return {
       batchId,
       batchStatus: finalStatus,
+      fileChecksumSha256: options.fileChecksumSha256,
       totalRows: totalProcessed,
       validCount,
       quarantinedCount: quarantinedRows.length,

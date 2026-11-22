@@ -5,6 +5,8 @@ import type {
   IngestionReport,
   MarketCatalogIngestionService,
 } from "./market-catalog-ingestion-service";
+import { DocumentCatalogExtractor } from "../infrastructure/document-catalog-extractor";
+import type { DocumentMimeType } from "../domain/document-extraction";
 
 export interface PersistDecisionIntentParams {
   supabaseClient?: typeof supabase;
@@ -185,6 +187,88 @@ export async function executeCatalogCsvIngestion({
 
   return ingestionService.ingestCsv(csvContent, {
     fileName,
+    importedBy: userId,
+    defaultSourceId: selectedSourceId || undefined,
+    ownerTenantId: visibilityScope === "private" && tenantId ? tenantId : null,
+  });
+}
+
+export interface ExecuteCatalogDocumentIngestionParams {
+  ingestionService: MarketCatalogIngestionService;
+  documentExtractor?: DocumentCatalogExtractor;
+  rawPayload: Uint8Array;
+  fileName: string;
+  mimeType: string;
+  userId?: string;
+  selectedSourceId?: string;
+  visibilityScope: "public" | "private";
+  tenantId?: string;
+  canPublishPublic?: boolean;
+}
+
+export async function executeCatalogDocumentIngestion({
+  ingestionService,
+  documentExtractor = new DocumentCatalogExtractor(),
+  rawPayload,
+  fileName,
+  mimeType,
+  userId,
+  selectedSourceId,
+  visibilityScope,
+  tenantId,
+  canPublishPublic = false,
+}: ExecuteCatalogDocumentIngestionParams): Promise<IngestionReport> {
+  if (!rawPayload || rawPayload.length === 0) {
+    throw new Error("Por favor, selecciona un archivo PDF o imagen válido con contenido.");
+  }
+
+  if (!isValidUuid(userId)) {
+    throw new Error("Se requiere una sesión autenticada válida (UUID) para auditar la ingesta.");
+  }
+
+  if (visibilityScope === "public" && !canPublishPublic) {
+    throw new Error(
+      "Solo administradores de plataforma pueden publicar observaciones públicas globales; selecciona tarifa privada del tenant.",
+    );
+  }
+
+  const validMimeTypes: DocumentMimeType[] = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ];
+
+  let resolvedMime: DocumentMimeType = "application/pdf";
+  if (validMimeTypes.includes(mimeType as DocumentMimeType)) {
+    resolvedMime = mimeType as DocumentMimeType;
+  } else if (fileName.toLowerCase().endsWith(".pdf")) {
+    resolvedMime = "application/pdf";
+  } else if (fileName.toLowerCase().endsWith(".png")) {
+    resolvedMime = "image/png";
+  } else if (fileName.toLowerCase().endsWith(".webp")) {
+    resolvedMime = "image/webp";
+  } else if (
+    fileName.toLowerCase().endsWith(".jpg") ||
+    fileName.toLowerCase().endsWith(".jpeg")
+  ) {
+    resolvedMime = "image/jpeg";
+  } else {
+    throw new Error(
+      `Tipo de archivo no soportado (${mimeType}). Formatos admitidos: PDF, PNG, JPEG, WEBP.`,
+    );
+  }
+
+  const extraction = await documentExtractor.extract({
+    bufferOrText: rawPayload,
+    fileName,
+    mimeType: resolvedMime,
+  });
+
+  return ingestionService.ingestDocument(extraction, {
+    fileName,
+    fileMimeType: resolvedMime,
+    fileChecksumSha256: extraction.fileChecksumSha256,
     importedBy: userId,
     defaultSourceId: selectedSourceId || undefined,
     ownerTenantId: visibilityScope === "private" && tenantId ? tenantId : null,
