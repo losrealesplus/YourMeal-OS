@@ -49,6 +49,9 @@ export interface DraftFormLineItem {
 export interface DraftExtractionCandidateLine extends DraftFormLineItem {
   confidence: number;
   matchedIngredient: boolean;
+  suggestedIngredientId?: string;
+  suggestedIngredientName?: string;
+  suggestedConfidence?: number;
   sku?: string;
   gtin?: string;
   rawText: string;
@@ -201,6 +204,47 @@ export async function extractPurchasingDraftFromDocument(options: {
       });
     }
 
+    let suggestedIngredientId: string | undefined = undefined;
+    let suggestedIngredientName: string | undefined = undefined;
+    let suggestedConfidence: number | undefined = undefined;
+
+    // If not matched, compute heuristic suggestion for human validation (Anti-Hallucination D-010: does not auto-assign)
+    if (!matchedIng) {
+      let bestSim = 0;
+      let candidateIng: IngredientRef | undefined = undefined;
+
+      for (const ing of ingredients) {
+        const ingNorm = normalizeString(ing.name);
+        if (!ingNorm) continue;
+        const wordsA = Array.from(new Set(lineNameNorm.split(/\s+/).filter((w) => w.length >= 3)));
+        const wordsB = Array.from(new Set(ingNorm.split(/\s+/).filter((w) => w.length >= 3)));
+        if (wordsA.length === 0 || wordsB.length === 0) continue;
+        let matches = 0;
+        for (const wA of wordsA) {
+          if (
+            wordsB.some(
+              (wB) =>
+                wA === wB ||
+                (wA.length >= 4 && wB.length >= 4 && (wA.startsWith(wB.slice(0, 4)) || wB.startsWith(wA.slice(0, 4))))
+            )
+          ) {
+            matches++;
+          }
+        }
+        const sim = (2 * matches) / (wordsA.length + wordsB.length);
+        if (sim > bestSim && sim >= 0.30) {
+          bestSim = sim;
+          candidateIng = ing;
+        }
+      }
+
+      if (candidateIng) {
+        suggestedIngredientId = candidateIng.id;
+        suggestedIngredientName = candidateIng.name;
+        suggestedConfidence = Math.round(bestSim * 100) / 100;
+      }
+    }
+
     const lineId =
       typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
@@ -224,6 +268,9 @@ export async function extractPurchasingDraftFromDocument(options: {
       taxRate: taxRateStr,
       confidence: line.confidence,
       matchedIngredient: Boolean(matchedIng),
+      suggestedIngredientId,
+      suggestedIngredientName,
+      suggestedConfidence,
       sku: line.sku,
       gtin: line.gtin,
       rawText: line.rawText,

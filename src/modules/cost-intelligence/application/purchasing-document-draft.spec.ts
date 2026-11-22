@@ -200,9 +200,33 @@ MK-999 | Trufa Negra de Verano | 1.0 | kg | 120.00 | 10%
     });
 
     expect(result.validLinesCount).toBe(1);
+    const lineItem = result.candidateLines[0];
+    expect(lineItem.itemName).toBe('Trufa Negra de Verano');
+    expect(lineItem.itemId).toBe(''); // Must be selected by operator
+    expect(lineItem.matchedIngredient).toBe(false);
+  });
+
+  it('provides heuristic suggestions for unassigned candidate lines without auto-assigning (D-010 human sovereign review)', async () => {
+    const content = `
+MK-888 | Pechugas Pollo Fileteadas | 15.0 | kg | 5.45 | 10%
+    `.trim();
+
+    const result = await extractPurchasingDraftFromDocument({
+      bufferOrText: content,
+      fileName: 'pollo_fileteado.txt',
+      suppliers: sampleSuppliers,
+      ingredients: sampleIngredients, // contains "Pechuga de Pollo Fresca"
+    });
+
+    expect(result.validLinesCount).toBe(1);
     const line = result.candidateLines[0];
-    expect(line.itemName).toBe('Trufa Negra de Verano');
-    expect(line.itemId).toBe(''); // Must be selected by operator
+    // itemId remains empty ensuring human review
+    expect(line.itemId).toBe('');
     expect(line.matchedIngredient).toBe(false);
+    // Heuristic suggestion is populated for 1-click human assignment
+    expect(line.suggestedIngredientId).toBe('ing-chicken');
+    expect(line.suggestedIngredientName).toBe('Pechuga de Pollo Fresca');
+    expect(line.suggestedConfidence).toBeDefined();
+    expect(line.suggestedConfidence).toBeGreaterThanOrEqual(0.35);
   });
 });

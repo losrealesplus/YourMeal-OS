@@ -4,7 +4,7 @@
  * Strictly respects ratified matching thresholds (>=90%, 70-89%, 50-69%, <50%).
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -62,6 +62,8 @@ export interface ProductMappingQueueDrawerProps {
   existingMappings: ProductMapping[];
   mappingService: ProductMappingService;
   onMappingUpdated?: () => void;
+  initialSelectedIngredientId?: string | null;
+  initialSearchQuery?: string | null;
 }
 
 export function ProductMappingQueueDrawer({
@@ -74,11 +76,27 @@ export function ProductMappingQueueDrawer({
   existingMappings,
   mappingService,
   onMappingUpdated,
+  initialSelectedIngredientId,
+  initialSearchQuery,
 }: ProductMappingQueueDrawerProps) {
-  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
+  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(
+    initialSelectedIngredientId ?? null
+  );
   const [gradeByProductId, setGradeByProductId] = useState<Record<string, ComparabilityGrade>>({});
-  const [searchFilter, setSearchFilter] = useState<string>('');
+  const [searchFilter, setSearchFilter] = useState<string>(initialSearchQuery ?? '');
   const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (open && initialSelectedIngredientId) {
+      setSelectedIngredientId(initialSelectedIngredientId);
+    }
+  }, [open, initialSelectedIngredientId]);
+
+  useEffect(() => {
+    if (open && initialSearchQuery) {
+      setSearchFilter(initialSearchQuery);
+    }
+  }, [open, initialSearchQuery]);
 
   // Map of confirmed mappings (1:N) by tenantIngredientId
   const confirmedMap = useMemo(() => {

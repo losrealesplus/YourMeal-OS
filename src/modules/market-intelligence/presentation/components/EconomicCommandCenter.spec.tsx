@@ -385,6 +385,7 @@ describe("EconomicCommandCenter & CatalogIngestionDrawer (CR-COST-05 PR1 Integri
 
     const onNavigateToAnatomy = vi.fn();
     const onNavigateToMarket = vi.fn();
+    const onNavigateToPurchasing = vi.fn();
     const onOpenMacroSimulator = vi.fn();
 
     const html = renderToString(
@@ -396,6 +397,7 @@ describe("EconomicCommandCenter & CatalogIngestionDrawer (CR-COST-05 PR1 Integri
         dishes={[]}
         onNavigateToAnatomy={onNavigateToAnatomy}
         onNavigateToMarket={onNavigateToMarket}
+        onNavigateToPurchasing={onNavigateToPurchasing}
         onOpenMacroSimulator={onOpenMacroSimulator}
       />,
     );
@@ -419,6 +421,7 @@ describe("EconomicCommandCenter & CatalogIngestionDrawer (CR-COST-05 PR1 Integri
     expect(html).toContain("Sin oportunidades registradas actualmente");
 
     // Context navigation shortcuts
+    expect(html).toContain("Facturas de Compra");
     expect(html).toContain("Ficha Técnica de Platos");
     expect(html).toContain("Catálogo y Fuentes de Mercado");
     expect(html).toContain("Simulador Macro (E9)");

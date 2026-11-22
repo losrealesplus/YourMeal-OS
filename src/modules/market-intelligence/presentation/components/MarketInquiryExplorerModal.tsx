@@ -104,6 +104,8 @@ export interface MarketInquiryExplorerModalProps {
   studyId?: string;
   initialStudy?: any;
   onSaveInquiry?: (data: any) => void;
+  initialIngredientQuery?: string;
+  initialUnitPrice?: number;
 }
 
 export function MarketInquiryExplorerModal({
@@ -116,6 +118,8 @@ export function MarketInquiryExplorerModal({
   studyId,
   initialStudy,
   onSaveInquiry,
+  initialIngredientQuery,
+  initialUnitPrice,
 }: MarketInquiryExplorerModalProps) {
   // Navigation: 4 Levels
   const [currentLevel, setCurrentLevel] = useState<1 | 2 | 3 | 4>(1);
@@ -132,18 +136,59 @@ export function MarketInquiryExplorerModal({
   }, [initialStudy]);
 
   // Level 1: Market & Basic Dish Info
-  const [dishName, setDishName] = useState<string>(
-    () => initialStudy?.product_name || 'Tarta de Zanahoria Casera'
-  );
-  const [dishCategory, setDishCategory] = useState<string>(
-    () => initialStudy?.product_category || 'Repostería / Postres'
-  );
+  const [dishName, setDishName] = useState<string>(() => {
+    if (initialIngredientQuery) return `Consulta: ${initialIngredientQuery}`;
+    return initialStudy?.product_name || 'Tarta de Zanahoria Casera';
+  });
+  const [dishCategory, setDishCategory] = useState<string>(() => {
+    if (initialIngredientQuery) return 'Consulta de Compras / Mercado';
+    return initialStudy?.product_category || 'Repostería / Postres';
+  });
   const [targetSalesPrice, setTargetSalesPrice] = useState<string>(() =>
     initialActiveVer?.target_pvp != null ? String(initialActiveVer.target_pvp) : '4.00'
   );
   const [monthlyVolume, setMonthlyVolume] = useState<string>('300');
 
+  useEffect(() => {
+    if (open && initialIngredientQuery) {
+      setDishName(`Consulta: ${initialIngredientQuery}`);
+      setDishCategory('Consulta de Compras / Mercado');
+      if (initialUnitPrice != null && initialUnitPrice > 0) {
+        setIngredients([
+          {
+            id: `ing-inquiry-${Date.now()}`,
+            name: initialIngredientQuery,
+            grossAmount: 1,
+            grossUnit: 'kg',
+            unitPrice: initialUnitPrice,
+            provenance: 'REAL',
+            sourceName: 'Factura de Compra',
+            densityKgPerL: null,
+            pieceMassKg: null,
+            trimmingLossPct: 0,
+          },
+        ]);
+      }
+    }
+  }, [open, initialIngredientQuery, initialUnitPrice]);
+
   const [ingredients, setIngredients] = useState<InquiryIngredientRow[]>(() => {
+    if (initialIngredientQuery && initialUnitPrice != null && initialUnitPrice > 0) {
+      return [
+        {
+          id: 'ing-inquiry-1',
+          name: initialIngredientQuery,
+          grossAmount: 1,
+          grossUnit: 'kg',
+          unitPrice: initialUnitPrice,
+          provenance: 'REAL',
+          sourceName: 'Factura de Compra',
+          densityKgPerL: null,
+          pieceMassKg: null,
+          trimmingLossPct: 0,
+        },
+      ];
+    }
     if (initialActiveVer?.study_ingredients && initialActiveVer.study_ingredients.length > 0) {
       return initialActiveVer.study_ingredients.map((ing: any) => ({
         id: ing.id,
@@ -1026,7 +1071,7 @@ export function MarketInquiryExplorerModal({
                             )}
                             {ing.provenance === 'REAL' && (
                               <Badge variant="outline" className="text-[9px] bg-emerald-50 text-emerald-700 border-emerald-200">
-                                [REAL] Factura
+                                [REAL] {ing.sourceName || 'Factura'}
                               </Badge>
                             )}
                             {ing.provenance === 'MANUAL' && (

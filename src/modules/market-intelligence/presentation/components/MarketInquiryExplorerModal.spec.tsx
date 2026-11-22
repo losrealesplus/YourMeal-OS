@@ -181,4 +181,21 @@ describe('MarketInquiryExplorerModal (CR-COST-07 Progressive Funnel)', () => {
 
     expect(html).toBe('');
   });
+
+  it('pre-populates inquiry from external procurement context when initialIngredientQuery and initialUnitPrice are provided', () => {
+    const html = renderToString(
+      <MarketInquiryExplorerModal
+        open={true}
+        onOpenChange={() => {}}
+        marketProducts={[]}
+        tenantId="tenant-test"
+        initialIngredientQuery="Salmón Fresco Noruego"
+        initialUnitPrice={14.85}
+      />
+    );
+
+    expect(html).toContain('Consulta: Salmón Fresco Noruego');
+    expect(html).toContain('[REAL]');
+    expect(html).toContain('Factura de Compra');
+  });
 });

@@ -23,6 +23,8 @@ import {
   AlertTriangle,
   FileWarning,
   RefreshCw,
+  Search,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
@@ -39,6 +41,10 @@ import type {
 import type { ProrationMethod } from "@/modules/cost-intelligence/domain/types";
 import { MarketBenchmarkBadge } from "@/modules/market-intelligence/presentation/components/MarketBenchmarkBadge";
 import { useMarketIntelligence } from "@/modules/market-intelligence/presentation/hooks/use-market-intelligence";
+import { ProductMappingQueueDrawer } from "@/modules/market-intelligence/presentation/components/ProductMappingQueueDrawer";
+import { MarketInquiryExplorerModal } from "@/modules/market-intelligence/presentation/components/MarketInquiryExplorerModal";
+import { NegotiationBriefModal } from "@/modules/market-intelligence/presentation/components/NegotiationBriefModal";
+import type { NegotiationBrief } from "@/modules/market-intelligence/domain/types";
 import { AdminHeader, DataTable, PanelCard, SectionTitle, StatusChip } from "@/components/admin";
 import type { Column } from "@/components/admin/data-table";
 import { Button } from "@/components/ui/button";
@@ -102,6 +108,8 @@ type FormLineItem = {
   unitPrice: string;
   discountAmount: string;
   taxRate: string;
+  suggestedIngredientId?: string;
+  suggestedIngredientName?: string;
 };
 
 function createInitialLineItem(nature: ItemNature = "INVENTORYABLE"): FormLineItem {
@@ -123,7 +131,26 @@ function createInitialLineItem(nature: ItemNature = "INVENTORYABLE"): FormLineIt
 export function AdminPurchasingPage() {
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
-  const { benchmarksByIngredient, mappings } = useMarketIntelligence(tenantId);
+  const {
+    benchmarksByIngredient,
+    mappings,
+    marketProducts,
+    mappingService,
+    generateNegotiationBrief,
+    refetch: refetchMarket,
+  } = useMarketIntelligence(tenantId);
+
+  // Market & Mapping Assisted Drawers State
+  const [isMappingQueueOpen, setIsMappingQueueOpen] = useState(false);
+  const [mappingInitialIngredientId, setMappingInitialIngredientId] = useState<string | null>(null);
+  const [mappingInitialSearch, setMappingInitialSearch] = useState<string | null>(null);
+
+  const [isInquiryOpen, setIsInquiryOpen] = useState(false);
+  const [inquiryInitialQuery, setInquiryInitialQuery] = useState<string | undefined>(undefined);
+  const [inquiryInitialUnitPrice, setInquiryInitialUnitPrice] = useState<number | undefined>(undefined);
+
+  const [isBriefOpen, setIsBriefOpen] = useState(false);
+  const [selectedBrief, setSelectedBrief] = useState<NegotiationBrief | null>(null);
   const [invoices, setInvoices] = useState<CalculatedPurchaseInvoice[]>([]);
   const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
   const [ingredients, setIngredients] = useState<IngredientOption[]>([]);
@@ -223,6 +250,8 @@ export function AdminPurchasingPage() {
             unitPrice: c.unitPrice,
             discountAmount: c.discountAmount,
             taxRate: c.taxRate,
+            suggestedIngredientId: c.suggestedIngredientId,
+            suggestedIngredientName: c.suggestedIngredientName,
           }))
         );
       } else {
@@ -716,7 +745,33 @@ export function AdminPurchasingPage() {
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setMappingInitialIngredientId(null);
+              setMappingInitialSearch(null);
+              setIsMappingQueueOpen(true);
+            }}
+            className="gap-1.5 text-xs"
+          >
+            <Layers className="h-4 w-4 text-indigo-500" />
+            Cola de Mapeo ({mappings.filter((m) => m.matchStatus === "confirmed").length}/{ingredients.length})
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setInquiryInitialQuery(undefined);
+              setInquiryInitialUnitPrice(undefined);
+              setIsInquiryOpen(true);
+            }}
+            className="gap-1.5 text-xs"
+          >
+            <Sparkles className="h-4 w-4 text-emerald-500" />
+            Preguntar al Mercado
+          </Button>
+
           <Button
             variant="outline"
             onClick={() => {
@@ -966,6 +1021,40 @@ export function AdminPurchasingPage() {
                 <div className="col-span-1 text-right">Borrar</div>
               </div>
 
+              {/* Assisted Callout when unassigned items exist */}
+              {(() => {
+                const unassignedCount = lineItems.filter(
+                  (l) => !l.itemId && l.itemNature !== "EXPENSE_SERVICE"
+                ).length;
+                if (unassignedCount === 0) return null;
+                return (
+                  <div className="bg-indigo-50/70 border border-indigo-200/80 rounded-lg p-2.5 text-xs text-indigo-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-indigo-600 shrink-0" />
+                      <span>
+                        Hay <strong>{unassignedCount} {unassignedCount === 1 ? "línea pendiente" : "líneas pendientes"}</strong> de asignar ingrediente. Revisa las sugerencias automáticas o consulta el mercado.
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setMappingInitialIngredientId(null);
+                          setMappingInitialSearch(null);
+                          setIsMappingQueueOpen(true);
+                        }}
+                        className="h-6 text-[11px] px-2 text-indigo-700 bg-white border border-indigo-200 hover:bg-indigo-100"
+                      >
+                        <Layers className="w-3 h-3 mr-1 text-indigo-500" />
+                        Cola de Mapeo
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })()}
+
               <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                 {lineItems.map((line, idx) => (
                   <div
@@ -1009,7 +1098,14 @@ export function AdminPurchasingPage() {
                       ) : ingredients.length > 0 ? (
                         <Select
                           value={line.itemId}
-                          onValueChange={(val) => updateLine(idx, { itemId: val })}
+                          onValueChange={(val) => {
+                            const ing = ingredients.find((i) => i.id === val);
+                            updateLine(idx, {
+                              itemId: val,
+                              itemName: ing ? ing.name : line.itemName,
+                              unit: ing ? ing.unit : line.unit,
+                            });
+                          }}
                         >
                           <SelectTrigger className="h-8 text-xs">
                             <SelectValue placeholder="Ingrediente..." />
@@ -1030,10 +1126,139 @@ export function AdminPurchasingPage() {
                           onChange={(e) => updateLine(idx, { itemName: e.target.value })}
                         />
                       )}
-                      {line.itemNature !== "EXPENSE_SERVICE" && !line.itemId && (
-                        <p className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
-                          ⚠️ Asignar ingrediente
-                        </p>
+
+                      {/* Assisted Feedback & Market Links */}
+                      {line.itemNature !== "EXPENSE_SERVICE" && (
+                        line.itemId ? (
+                          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                            {(() => {
+                              const benchmarkCalc = benchmarksByIngredient.get(line.itemId);
+                              const isMapped = mappings.some(
+                                (m) => m.tenantIngredientId === line.itemId && m.matchStatus === "confirmed"
+                              );
+                              return (
+                                <>
+                                  <MarketBenchmarkBadge
+                                    benchmarkPriceExTax={benchmarkCalc?.benchmarkPriceExTax}
+                                    effectiveWacExTax={Number(line.unitPrice) || 0}
+                                    unit={line.unit}
+                                    comparabilityGrade={benchmarkCalc?.components[0]?.comparabilityGrade}
+                                    isMapped={isMapped}
+                                  />
+                                  {benchmarkCalc && (
+                                    <button
+                                      type="button"
+                                      onClick={async () => {
+                                        const suppName = suppliers.find((s) => s.id === selectedSupplierId)?.name;
+                                        const brief = await generateNegotiationBrief(
+                                          user?.user_metadata?.company_name || "Restaurante",
+                                          {
+                                            id: line.itemId,
+                                            tenantId: tenantId || "",
+                                            name: line.itemName,
+                                            category: "General",
+                                            unit: (line.unit === "kg" || line.unit === "l" ? line.unit : "unit") as "kg" | "l" | "unit",
+                                            effectiveWacExTax: Number(line.unitPrice) || 0,
+                                            currentInvoicedPriceExTax: Number(line.unitPrice) || 0,
+                                            annualVolume: 0,
+                                            primarySupplierName: suppName,
+                                          }
+                                        );
+                                        setSelectedBrief(brief);
+                                        setIsBriefOpen(true);
+                                      }}
+                                      className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5 cursor-pointer"
+                                      title="Generar Brief de Negociación con este proveedor"
+                                    >
+                                      <FileText className="w-3 h-3 text-indigo-500" />
+                                      <span>Brief</span>
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setMappingInitialIngredientId(line.itemId);
+                                      setMappingInitialSearch(line.itemName);
+                                      setIsMappingQueueOpen(true);
+                                    }}
+                                    className="text-[10px] text-slate-500 hover:text-indigo-600 flex items-center gap-0.5 cursor-pointer"
+                                    title="Abrir Cola de Mapeo"
+                                  >
+                                    <Layers className="w-3 h-3 text-indigo-500" />
+                                    <span>Mapeo</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setInquiryInitialQuery(line.itemName);
+                                      setInquiryInitialUnitPrice(Number(line.unitPrice) || undefined);
+                                      setIsInquiryOpen(true);
+                                    }}
+                                    className="text-[10px] text-slate-500 hover:text-emerald-600 flex items-center gap-0.5 cursor-pointer"
+                                    title="Consultar en Mercado"
+                                  >
+                                    <Search className="w-3 h-3 text-emerald-500" />
+                                    <span>Mercado</span>
+                                  </button>
+                                </>
+                              );
+                            })()}
+                          </div>
+                        ) : (
+                          <div className="space-y-0.5 pt-0.5">
+                            {line.suggestedIngredientId && line.suggestedIngredientName ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const matched = ingredients.find((ing) => ing.id === line.suggestedIngredientId);
+                                  updateLine(idx, {
+                                    itemId: line.suggestedIngredientId,
+                                    itemName: line.suggestedIngredientName,
+                                    unit: matched ? matched.unit : line.unit,
+                                  });
+                                }}
+                                className="inline-flex items-center gap-1 text-[10px] text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded hover:bg-indigo-100 transition-colors cursor-pointer text-left font-medium"
+                                title="Asignar ingrediente sugerido (revisión humana D-010)"
+                              >
+                                <Sparkles className="w-3 h-3 text-indigo-500 shrink-0" />
+                                <span>Sugerido: <strong>{line.suggestedIngredientName}</strong> (Asignar)</span>
+                              </button>
+                            ) : (
+                              <p className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                                ⚠️ Asignar ingrediente
+                              </p>
+                            )}
+                            <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setMappingInitialIngredientId(null);
+                                  setMappingInitialSearch(line.itemName);
+                                  setIsMappingQueueOpen(true);
+                                }}
+                                className="hover:text-indigo-600 flex items-center gap-0.5 cursor-pointer"
+                                title="Abrir Cola de Mapeo para buscar este producto"
+                              >
+                                <Layers className="w-3 h-3 text-indigo-500" />
+                                <span>Cola Mapeo</span>
+                              </button>
+                              <span>·</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setInquiryInitialQuery(line.itemName);
+                                  setInquiryInitialUnitPrice(Number(line.unitPrice) || undefined);
+                                  setIsInquiryOpen(true);
+                                }}
+                                className="hover:text-emerald-600 flex items-center gap-0.5 cursor-pointer"
+                                title="Consultar precio y benchmark en Mercado"
+                              >
+                                <Search className="w-3 h-3 text-emerald-500" />
+                                <span>Consultar Mercado</span>
+                              </button>
+                            </div>
+                          </div>
+                        )
                       )}
                     </div>
 
@@ -1246,7 +1471,7 @@ export function AdminPurchasingPage() {
                         className="p-2.5 bg-background border rounded flex justify-between items-center"
                       >
                         <div className="space-y-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-semibold">{it.itemName}</p>
                             <MarketBenchmarkBadge
                               benchmarkPriceExTax={benchmarkCalc?.benchmarkPriceExTax}
@@ -1255,6 +1480,61 @@ export function AdminPurchasingPage() {
                               comparabilityGrade={benchmarkCalc?.components[0]?.comparabilityGrade}
                               isMapped={isMapped}
                             />
+                            {benchmarkCalc && (
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const suppName = supplierMap.get(selectedInvoice.supplierId) || selectedInvoice.supplierId;
+                                  const brief = await generateNegotiationBrief(
+                                    user?.user_metadata?.company_name || "Restaurante",
+                                    {
+                                      id: it.itemId,
+                                      tenantId: tenantId || "",
+                                      name: it.itemName,
+                                      category: "General",
+                                      unit: (it.unit === "kg" || it.unit === "l" ? it.unit : "unit") as "kg" | "l" | "unit",
+                                      effectiveWacExTax: it.effectiveUnitCost || 0,
+                                      currentInvoicedPriceExTax: Number(it.unitPrice) || 0,
+                                      annualVolume: 0,
+                                      primarySupplierName: suppName,
+                                    }
+                                  );
+                                  setSelectedBrief(brief);
+                                  setIsBriefOpen(true);
+                                }}
+                                className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5 cursor-pointer"
+                                title="Generar Informe Ejecutivo de Negociación"
+                              >
+                                <FileText className="w-3 h-3 text-indigo-500" />
+                                <span>Brief</span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setMappingInitialIngredientId(it.itemId);
+                                setMappingInitialSearch(it.itemName);
+                                setIsMappingQueueOpen(true);
+                              }}
+                              className="text-[10px] text-slate-500 hover:text-indigo-600 flex items-center gap-0.5 cursor-pointer"
+                              title="Ver en Cola de Mapeo de Mercado"
+                            >
+                              <Layers className="w-3 h-3 text-indigo-500" />
+                              <span>Mapeo</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setInquiryInitialQuery(it.itemName);
+                                setInquiryInitialUnitPrice(Number(it.unitPrice) || undefined);
+                                setIsInquiryOpen(true);
+                              }}
+                              className="text-[10px] text-slate-500 hover:text-emerald-600 flex items-center gap-0.5 cursor-pointer"
+                              title="Consultar en Mercado"
+                            >
+                              <Search className="w-3 h-3 text-emerald-500" />
+                              <span>Mercado</span>
+                            </button>
                           </div>
                           <p className="text-[11px] text-muted-foreground">
                             {it.quantity} {it.unit} @ {Number(it.unitPrice).toFixed(4)} €/u
@@ -1418,6 +1698,46 @@ export function AdminPurchasingPage() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Assisted Market & Mapping Drawers / Modals */}
+      <ProductMappingQueueDrawer
+        open={isMappingQueueOpen}
+        onOpenChange={setIsMappingQueueOpen}
+        tenantId={tenantId || ""}
+        userId={user?.id}
+        ingredients={ingredients.map((ing) => ({
+          id: ing.id,
+          name: ing.name,
+          unit: ing.unit,
+          currentWac: ing.cost,
+        }))}
+        marketProducts={marketProducts}
+        existingMappings={mappings}
+        mappingService={mappingService}
+        onMappingUpdated={() => {
+          refetchMarket();
+          reload();
+        }}
+        initialSelectedIngredientId={mappingInitialIngredientId}
+        initialSearchQuery={mappingInitialSearch}
+      />
+
+      <MarketInquiryExplorerModal
+        open={isInquiryOpen}
+        onOpenChange={setIsInquiryOpen}
+        marketProducts={marketProducts}
+        tenantId={tenantId || ""}
+        userId={user?.id}
+        userName={user?.email || "Gerente"}
+        initialIngredientQuery={inquiryInitialQuery}
+        initialUnitPrice={inquiryInitialUnitPrice}
+      />
+
+      <NegotiationBriefModal
+        open={isBriefOpen}
+        onOpenChange={setIsBriefOpen}
+        brief={selectedBrief}
+      />
     </div>
   );
 }
