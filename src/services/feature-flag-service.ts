@@ -24,18 +24,11 @@ export const FeatureFlagService = {
     }
   },
   async isEnabled(ctx: ServiceContext, key: string): Promise<boolean> {
-    let query = ctx.supabase
+    const { data, error } = await ctx.supabase
       .from("feature_flags")
       .select("key, enabled, tenant_id, metadata")
-      .eq("key", key);
-
-    if (ctx.tenantId) {
-      query = query.or(`tenant_id.eq.${ctx.tenantId},tenant_id.is.null`);
-    } else {
-      query = query.is("tenant_id", null);
-    }
-
-    const { data, error } = await query;
+      .eq("key", key)
+      .or(`tenant_id.eq.${ctx.tenantId},tenant_id.is.null`);
 
     if (error) {
       throw new Error(`FeatureFlagService.isEnabled failed: ${error.message}`);
