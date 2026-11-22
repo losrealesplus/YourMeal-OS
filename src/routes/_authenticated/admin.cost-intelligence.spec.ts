@@ -127,4 +127,26 @@ describe("CR-COST-03 — Cost Intelligence Cockpit (admin.cost-intelligence)", (
     expect(src).toContain('onNavigateToAnatomy={() => setActiveTab("anatomy")}');
     expect(src).toContain('onNavigateToMarket={() => setActiveTab("market_intelligence")}');
   });
+
+  it("enforces fail-closed feature flag evaluation and prevents duplicate read-only banners", () => {
+    const src = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.cost-intelligence.tsx"),
+      "utf8",
+    );
+
+    // Fail-closed default: false when flagsReady is false
+    expect(src).toContain(
+      "const isCostIntelligenceEnabled = flagsReady\n    ? Boolean(moduleFlags[PILOT_ADMIN_MODULE_FLAGS.costIntelligence])\n    : false;",
+    );
+
+    // Banner only rendered when flags are ready and module is not enabled
+    expect(src).toContain("{flagsReady && !isCostIntelligenceEnabled && (");
+
+    // Pass hideReadOnlyBanner to EconomicCommandCenter to avoid duplicate banners
+    expect(src).toContain("hideReadOnlyBanner={true}");
+
+    // Buttons disabled fail-closed
+    expect(src).toContain("disabled={!flagsReady || !isCostIntelligenceEnabled}");
+    expect(src).toContain('title={flagsReady && !isCostIntelligenceEnabled ? "Módulo desactivado: solo lectura" : undefined}');
+  });
 });

@@ -96,6 +96,7 @@ export interface EconomicCommandCenterProps {
   onNavigateToMarket?: () => void;
   onNavigateToPurchasing?: () => void;
   isCostIntelligenceEnabled?: boolean;
+  hideReadOnlyBanner?: boolean;
 }
 
 export function EconomicCommandCenter({
@@ -115,6 +116,7 @@ export function EconomicCommandCenter({
   onNavigateToMarket,
   onNavigateToPurchasing,
   isCostIntelligenceEnabled,
+  hideReadOnlyBanner = false,
 }: EconomicCommandCenterProps) {
   const costModuleActive = isCostIntelligenceEnabled ?? true;
 
@@ -452,7 +454,7 @@ export function EconomicCommandCenter({
   return (
     <div className="space-y-6 pb-12">
       {/* Banner de Módulo Desactivado (Solo Lectura) */}
-      {!costModuleActive && (
+      {!costModuleActive && !hideReadOnlyBanner && (
         <div className="p-3.5 rounded-lg border border-amber-300 bg-amber-50/90 text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
           <div className="flex items-start sm:items-center gap-2.5">
             <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
