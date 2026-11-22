@@ -33,6 +33,7 @@ import { createServiceContext } from "@/services/types";
 import { ProcurementCostService } from "@/modules/cost-intelligence/application/procurement-cost-service";
 import { isValidUuid } from "@/modules/cost-intelligence/domain/purchase-invoice-calculator";
 import { extractPurchasingDraftFromDocument } from "@/modules/cost-intelligence/application/purchasing-document-draft";
+import { recordPurchaseObservationsFromInvoice } from "@/modules/cost-intelligence/application/purchasing-market-observation-bridge";
 import type {
   CalculatedPurchaseInvoice,
   ItemNature,
@@ -136,6 +137,7 @@ export function AdminPurchasingPage() {
     mappings,
     marketProducts,
     mappingService,
+    repository,
     generateNegotiationBrief,
     refetch: refetchMarket,
   } = useMarketIntelligence(tenantId);
@@ -487,6 +489,36 @@ export function AdminPurchasingPage() {
       });
 
       toast.success(`Factura ${invoiceNumber} registrada como borrador.`);
+
+      // Bridge confirmed mapped lines into private market price observations [REAL]
+      if (tenantId && mappings.length > 0 && repository) {
+        await recordPurchaseObservationsFromInvoice({
+          tenantId,
+          invoice: {
+            id: currentDraftId || (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "draft-invoice"),
+            tenantId,
+            supplierId: selectedSupplierId,
+            supplierName: supplierMap.get(selectedSupplierId) || "Proveedor",
+            invoiceNumber: invoiceNumber.trim(),
+            invoiceDate,
+            items: items.map((it) => ({
+              id: it.id || "",
+              itemId: it.itemId,
+              itemName: it.itemName,
+              unitPrice: it.unitPrice,
+              quantity: it.quantity,
+              unit: it.unit,
+              taxRate: it.taxRate,
+            })),
+          },
+          mappings,
+          repository,
+        }).catch((err) => {
+          console.warn("Could not sync purchase observation to market intelligence:", err);
+        });
+        refetchMarket();
+      }
+
       setIsCreateOpen(false);
       setInvoiceNumber("");
       setDraftInvoiceId(typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "");
@@ -546,6 +578,39 @@ export function AdminPurchasingPage() {
         toast.success(
           `Recepción confirmada: ${result.summary.totalStockIncrement} uds añadidas a existencias y WAC actualizado atómicamente.`,
         );
+
+        // Bridge confirmed mapped lines into private market price observations [REAL]
+        if (tenantId && mappings.length > 0 && repository) {
+          const matchingInv = invoices.find((i) => i.id === receiptPreview.invoiceId);
+          if (matchingInv) {
+            await recordPurchaseObservationsFromInvoice({
+              tenantId,
+              invoice: {
+                id: matchingInv.id,
+                tenantId: matchingInv.tenantId,
+                supplierId: matchingInv.supplierId,
+                supplierName: supplierMap.get(matchingInv.supplierId) || "Proveedor",
+                invoiceNumber: matchingInv.invoiceNumber,
+                invoiceDate: matchingInv.invoiceDate,
+                items: matchingInv.items.map((it) => ({
+                  id: it.id,
+                  itemId: it.itemId,
+                  itemName: it.itemName,
+                  unitPrice: it.unitPrice,
+                  quantity: it.quantity,
+                  unit: it.unit,
+                  taxRate: it.taxRate,
+                  effectiveUnitCost: it.effectiveUnitCost,
+                })),
+              },
+              mappings,
+              repository,
+            }).catch((err) => {
+              console.warn("Could not sync purchase observation to market intelligence:", err);
+            });
+            refetchMarket();
+          }
+        }
       }
 
       setIsReceiptDialogOpen(false);

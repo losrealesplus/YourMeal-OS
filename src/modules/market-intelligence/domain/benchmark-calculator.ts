@@ -240,6 +240,7 @@ export class BenchmarkCalculator {
         weight: finalWeight,
         isStale,
         isPromo,
+        isTenantOwned: Boolean(observation.ownerTenantId),
       });
     }
 
@@ -261,6 +262,8 @@ export class BenchmarkCalculator {
         highComparabilityCount: 0,
         components,
         historicalReferences,
+        hasRealObservations: false,
+        latestRealPriceExTax: null,
         diagnosticNote:
           'Todas las observaciones de mercado tienen peso de comparabilidad nulo (UNKNOWN). ' +
           (diagnosticNotes.join(' ') || ''),
@@ -280,6 +283,9 @@ export class BenchmarkCalculator {
         : 0;
 
     const highCompCount = components.filter((c) => c.comparabilityGrade === 'HIGH').length;
+    const realComponents = components.filter((c) => c.isTenantOwned);
+    const hasRealObservations = realComponents.length > 0;
+    const latestRealPriceExTax = hasRealObservations ? realComponents[0].normalizedPriceExTax : null;
 
     return {
       tenantIngredientId: ingredient.id,
@@ -295,6 +301,8 @@ export class BenchmarkCalculator {
       highComparabilityCount: highCompCount,
       components,
       historicalReferences,
+      hasRealObservations,
+      latestRealPriceExTax,
       diagnosticNote: diagnosticNotes.length > 0 ? diagnosticNotes.join(' ') : null,
     };
   }
