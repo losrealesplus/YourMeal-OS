@@ -280,11 +280,20 @@ export class DocumentCatalogExtractor {
       return null;
     }
 
-    // Delimited row match (pipe, semicolon, or multiple spaces/tabs)
+    // Delimited row match (pipe, semicolon, tab)
     // Format: [SKU/Code]? Description Quantity Unit Price [Tax%]?
-    const pipeParts = rawLine.split('|').map((p) => p.trim());
-    if (pipeParts.length >= 4) {
-      return this.parsePipedLine(pipeParts, rawLine, lineNumber);
+    const delimiter = rawLine.includes('|')
+      ? '|'
+      : rawLine.includes(';')
+        ? ';'
+        : rawLine.includes('\t')
+          ? '\t'
+          : null;
+    if (delimiter) {
+      const parts = rawLine.split(delimiter).map((p) => p.trim());
+      if (parts.length >= 4) {
+        return this.parsePipedLine(parts, rawLine, lineNumber);
+      }
     }
 
     // Tabular whitespace match: Description  Qty  Unit  Price

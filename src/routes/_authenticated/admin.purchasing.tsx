@@ -19,6 +19,10 @@ import {
   Layers,
   Building2,
   Trash2,
+  Upload,
+  AlertTriangle,
+  FileWarning,
+  RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
@@ -26,6 +30,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import { ProcurementCostService } from "@/modules/cost-intelligence/application/procurement-cost-service";
 import { isValidUuid } from "@/modules/cost-intelligence/domain/purchase-invoice-calculator";
+import { extractPurchasingDraftFromDocument } from "@/modules/cost-intelligence/application/purchasing-document-draft";
 import type {
   CalculatedPurchaseInvoice,
   ItemNature,
@@ -147,6 +152,117 @@ export function AdminPurchasingPage() {
 
   // View Invoice Detail Dialog
   const [selectedInvoice, setSelectedInvoice] = useState<CalculatedPurchaseInvoice | null>(null);
+
+  // Document Ingestion State (CR-COST-05 Bloque 1)
+  const [isUploadDocOpen, setIsUploadDocOpen] = useState(false);
+  const [isProcessingDoc, setIsProcessingDoc] = useState(false);
+  const [d010Notice, setD010Notice] = useState<string | null>(null);
+  const [docSummary, setDocSummary] = useState<{
+    fileName: string;
+    checksum: string;
+    validCount: number;
+    quarantinedCount: number;
+    quarantinedLines: Array<{ lineNumber: number; productName: string; reason: string }>;
+  } | null>(null);
+
+  async function handleProcessDocument(file: File) {
+    if (!file) return;
+    setIsProcessingDoc(true);
+    setD010Notice(null);
+    setDocSummary(null);
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+
+      const extraction = await extractPurchasingDraftFromDocument({
+        bufferOrText: bytes,
+        fileName: file.name,
+        mimeType: file.type,
+        suppliers: suppliers.map((s) => ({ id: s.id, name: s.name })),
+        ingredients: ingredients.map((ing) => ({
+          id: ing.id,
+          name: ing.name,
+          unit: ing.unit,
+          cost: ing.cost,
+          stock: ing.stock,
+        })),
+      });
+
+      setDraftInvoiceId(
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : ""
+      );
+
+      if (extraction.invoiceNumber) {
+        setInvoiceNumber(extraction.invoiceNumber);
+      }
+      if (extraction.invoiceDate) {
+        setInvoiceDate(extraction.invoiceDate);
+      }
+      if (extraction.selectedSupplierId) {
+        setSelectedSupplierId(extraction.selectedSupplierId);
+      }
+      if (extraction.additionalCosts && Number(extraction.additionalCosts) > 0) {
+        setAdditionalCosts(extraction.additionalCosts);
+      }
+      if (extraction.notes) {
+        setNotes(extraction.notes);
+      }
+
+      if (extraction.candidateLines.length > 0) {
+        setLineItems(
+          extraction.candidateLines.map((c) => ({
+            lineId: c.lineId,
+            itemId: c.itemId,
+            itemName: c.itemName,
+            itemNature: c.itemNature,
+            quantity: c.quantity,
+            unit: c.unit,
+            unitPrice: c.unitPrice,
+            discountAmount: c.discountAmount,
+            taxRate: c.taxRate,
+          }))
+        );
+      } else {
+        setLineItems([createInitialLineItem()]);
+      }
+
+      if (extraction.d010Warning) {
+        setD010Notice(extraction.d010Warning);
+      }
+
+      setDocSummary({
+        fileName: extraction.fileName,
+        checksum: extraction.fileChecksumSha256,
+        validCount: extraction.validLinesCount,
+        quarantinedCount: extraction.quarantinedLines.length,
+        quarantinedLines: extraction.quarantinedLines.map((q) => ({
+          lineNumber: q.lineNumber,
+          productName: q.productName,
+          reason: q.reason,
+        })),
+      });
+
+      setIsUploadDocOpen(false);
+      setIsCreateOpen(true);
+
+      if (extraction.validLinesCount > 0) {
+        toast.success(
+          `Documento procesado: ${extraction.validLinesCount} líneas extraídas.${
+            extraction.matchedSupplierName ? ` Proveedor: ${extraction.matchedSupplierName}.` : ""
+          }`
+        );
+      } else if (extraction.d010Warning) {
+        toast.warning(extraction.d010Warning);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al procesar el documento");
+    } finally {
+      setIsProcessingDoc(false);
+    }
+  }
 
   async function reload() {
     if (!user || !tenantId) return;
@@ -600,21 +716,36 @@ export function AdminPurchasingPage() {
           </button>
         </div>
 
-        <Button
-          onClick={() => {
-            setDraftInvoiceId(typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "");
-            setLineItems([createInitialLineItem()]);
-            setInvoiceNumber("");
-            setSelectedSupplierId("");
-            setAdditionalCosts("0.00");
-            setNotes("");
-            setIsCreateOpen(true);
-          }}
-          className="gap-1.5"
-        >
-          <Plus className="h-4 w-4" />
-          Nueva Factura de Compra
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsUploadDocOpen(true);
+            }}
+            className="gap-1.5"
+          >
+            <Upload className="h-4 w-4 text-primary" />
+            Cargar Factura desde Documento
+          </Button>
+
+          <Button
+            onClick={() => {
+              setDraftInvoiceId(typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "");
+              setLineItems([createInitialLineItem()]);
+              setInvoiceNumber("");
+              setSelectedSupplierId("");
+              setAdditionalCosts("0.00");
+              setNotes("");
+              setD010Notice(null);
+              setDocSummary(null);
+              setIsCreateOpen(true);
+            }}
+            className="gap-1.5"
+          >
+            <Plus className="h-4 w-4" />
+            Nueva Factura de Compra
+          </Button>
+        </div>
       </div>
 
       {/* Invoices List Table */}
@@ -640,9 +771,93 @@ export function AdminPurchasingPage() {
                 Registrar Factura de Compra
               </DialogTitle>
               <DialogDescription className="text-xs">
-                Registra la factura del proveedor con sus líneas de compra y costes adicionales de transporte/aduanas.
+                Registra la factura del proveedor con sus líneas de compra y costes adicionales de transporte/aduanas en estado Borrador (DRAFT).
               </DialogDescription>
             </DialogHeader>
+
+            {/* Quick File Assist Action */}
+            <div className="flex items-center justify-between bg-muted/30 border rounded-lg p-2.5 text-xs">
+              <div className="flex items-center gap-2">
+                <Upload className="h-4 w-4 text-primary shrink-0" />
+                <span className="text-muted-foreground">
+                  ¿Deseas precargar desde albarán o factura en PDF, foto o CSV?
+                </span>
+              </div>
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,image/png,image/jpeg,image/webp,.csv,.tsv,.txt"
+                  disabled={isProcessingDoc}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleProcessDocument(f);
+                  }}
+                />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors shadow-xs">
+                  {isProcessingDoc ? (
+                    <>
+                      <RefreshCw className="h-3 w-3 animate-spin" />
+                      Procesando...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-3 w-3" />
+                      Precargar desde Archivo
+                    </>
+                  )}
+                </span>
+              </label>
+            </div>
+
+            {/* D-010 Integrity Notice */}
+            {d010Notice && (
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-xs text-amber-800 dark:text-amber-200 flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="font-semibold">Control de Integridad D-010 (Anti-Alucinación)</p>
+                  <p>{d010Notice}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Document Extraction Summary */}
+            {docSummary && (
+              <div className="bg-muted/40 border rounded-lg p-2.5 text-xs space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary shrink-0" />
+                    <span className="font-medium truncate max-w-[200px]">{docSummary.fileName}</span>
+                    <Badge variant="outline" className="font-mono text-[10px]">
+                      SHA-256: {docSummary.checksum.slice(0, 10)}…
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Badge variant="secondary" className="text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                      {docSummary.validCount} líneas válidas
+                    </Badge>
+                    {docSummary.quarantinedCount > 0 && (
+                      <Badge variant="outline" className="text-[10px] text-amber-600 border-amber-500/30">
+                        {docSummary.quarantinedCount} en cuarentena
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                {docSummary.quarantinedCount > 0 && (
+                  <div className="border-t pt-1.5 text-[11px] text-muted-foreground space-y-1 max-h-24 overflow-y-auto">
+                    <p className="font-medium text-amber-700 dark:text-amber-400">
+                      Líneas descartadas por filtro de calidad:
+                    </p>
+                    {docSummary.quarantinedLines.map((ql, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-[10px] text-muted-foreground">
+                        <span className="truncate max-w-[260px]">• {ql.productName}</span>
+                        <span className="text-amber-600 italic">{ql.reason}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
               <div className="space-y-1.5">
@@ -815,6 +1030,11 @@ export function AdminPurchasingPage() {
                           onChange={(e) => updateLine(idx, { itemName: e.target.value })}
                         />
                       )}
+                      {line.itemNature !== "EXPENSE_SERVICE" && !line.itemId && (
+                        <p className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                          ⚠️ Asignar ingrediente
+                        </p>
+                      )}
                     </div>
 
                     <div className="col-span-2 space-y-1">
@@ -901,10 +1121,82 @@ export function AdminPurchasingPage() {
                 Cancelar
               </Button>
               <Button type="submit" disabled={busy}>
-                Crear Factura Borrador
+                Crear Factura Borrador (DRAFT)
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload Document Modal (CR-COST-05 Bloque 1) */}
+      <Dialog open={isUploadDocOpen} onOpenChange={setIsUploadDocOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-primary" />
+              Carga Asistida de Factura o Albarán
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Sube un documento comercial (.pdf, imagen JPG/PNG/WebP, o .csv/.tsv/.txt) para extraer automáticamente cabecera y líneas candidatas según la regla anti-alucinación D-010.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <div className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-muted/30 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer relative">
+              <input
+                type="file"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                accept=".pdf,image/png,image/jpeg,image/webp,.csv,.tsv,.txt"
+                disabled={isProcessingDoc}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleProcessDocument(f);
+                }}
+              />
+              {isProcessingDoc ? (
+                <>
+                  <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-sm font-medium">Extrayendo y validando líneas con regla D-010…</p>
+                  <p className="text-xs text-muted-foreground">Calculando SHA-256 y cotejando catálogo...</p>
+                </>
+              ) : (
+                <>
+                  <div className="p-3 bg-primary/10 rounded-full text-primary">
+                    <FileText className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Arrastra un archivo o haz clic para explorar</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      PDF, JPG, PNG, WebP, CSV o TXT (máx. 10 MB)
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="bg-muted/40 p-3 rounded-lg text-[11px] text-muted-foreground space-y-1.5 border">
+              <div className="flex items-center gap-1.5 font-semibold text-foreground">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                Gobernanza Anti-Alucinación D-010:
+              </div>
+              <ul className="list-disc pl-4 space-y-0.5">
+                <li>Los datos extraídos se precargan en estado <strong>Borrador (DRAFT)</strong> para revisión humana soberana.</li>
+                <li>Nunca se inventan precios, cantidades ni ingredientes ausentes.</li>
+                <li>No se ejecuta ninguna mutación de inventario ni recálculo WAC hasta que el operador decida recepcionar.</li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooter className="pt-2 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsUploadDocOpen(false)}
+              disabled={isProcessingDoc}
+            >
+              Cancelar
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
