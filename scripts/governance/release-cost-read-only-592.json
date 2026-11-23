@@ -1,0 +1,118 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "deploymentId": 7979664051,
+    "sha": "891f18c8047f04ff9a827aa90bc44a1174db4748",
+    "versionId": "ba7695b3-37a9-469f-87a2-a3130da3e9ad"
+  },
+  "candidateSha": "a12e6a1da3d92d08c889288c9798e0f384feb119",
+  "candidatePr": 591,
+  "candidateHeadSha": "8c4f2212274fe36cde9e1a74992798794533239b",
+  "candidateBranch": "fix/cost-cockpit-read-only-status",
+  "candidateFiles": [
+    {
+      "path": "src/components/admin-shell.navigation.spec.ts",
+      "before": null,
+      "after": "36df66d7c6a7cf4d65cef81ab132cc278959d741da02036a659d7bcee337e66d"
+    },
+    {
+      "path": "src/components/admin-shell.tsx",
+      "before": "40f18cfa9dfc1424881f7d4ec3a9f0abb3169114a7309a71481d4d6e09eb4ecb",
+      "after": "1db22c270b20031f995fd5b4ccb532907faea5899031acd2c3d3bd51845738bc"
+    },
+    {
+      "path": "src/modules/market-intelligence/presentation/components/EconomicCommandCenter.spec.tsx",
+      "before": "1009fd026ada17fec94b9d046d9db9c6bb5a74c08294b3da82d501f30009fd2d",
+      "after": "4525d45520c616918c40d9d0fd5ef31e0bdff356661f80767ce47d9ded009bf1"
+    },
+    {
+      "path": "src/modules/market-intelligence/presentation/components/EconomicCommandCenter.tsx",
+      "before": "8b35b6f00789ba0636043e93bf982fd7bddfcf492b908fa16b7660895fcbd829",
+      "after": "57a544fa2503ea380e93e2378203bf8980340434045261b54e8f8f33a761186c"
+    },
+    {
+      "path": "src/routes/_authenticated/admin.cost-intelligence.spec.ts",
+      "before": "68359ca20379a24b87d064407daf4cd7f8224a75e66eea8e1c3c06fdd2bd645d",
+      "after": "90c1ab3856be2ee76702242b3954029d9efe59ade9bda5336f0c0f1ad8f3af72"
+    },
+    {
+      "path": "src/routes/_authenticated/admin.cost-intelligence.tsx",
+      "before": "1d4b5bf8422cb37a1ce9ec7da04fae4a2d72c32039a0fbbcd804cb3c5864ed56",
+      "after": "2ae1ca81cc0438bde429bb7ac53fab46209f6ce5b459e3fb97ce3f8254dc6d04"
+    },
+    {
+      "path": "src/services/feature-flag-service.ts",
+      "before": "2ec59d07fdc28c839c72d709a67a9da33b5a657a6196e121d50931385ebe7bf0",
+      "after": "4fe2891453cd77d9a2f37f85a855569888320d5be4d1fce92728fbf6bc79bb3f"
+    }
+  ],
+  "revertSha": "0ba407d8fb4b7a3957c4a462f1de38bb7fab611f",
+  "revertPr": 592,
+  "revertHeadSha": "964589aa18a999095f9557bc36f50e72ce36f47e",
+  "revertBranch": "fix/revert-feature-flag-service-for-gate7",
+  "revertFiles": [
+    {
+      "path": "src/services/feature-flag-service.ts",
+      "before": "4fe2891453cd77d9a2f37f85a855569888320d5be4d1fce92728fbf6bc79bb3f",
+      "after": "2ec59d07fdc28c839c72d709a67a9da33b5a657a6196e121d50931385ebe7bf0"
+    }
+  ],
+  "featureFlagServiceBlob": "489f06d9ca78037e9d747f725fdaa6f2ebdba57b",
+  "productPrs": [
+    591,
+    592
+  ],
+  "productFiles": [
+    {
+      "path": "src/components/admin-shell.navigation.spec.ts",
+      "before": null,
+      "after": "36df66d7c6a7cf4d65cef81ab132cc278959d741da02036a659d7bcee337e66d"
+    },
+    {
+      "path": "src/components/admin-shell.tsx",
+      "before": "40f18cfa9dfc1424881f7d4ec3a9f0abb3169114a7309a71481d4d6e09eb4ecb",
+      "after": "1db22c270b20031f995fd5b4ccb532907faea5899031acd2c3d3bd51845738bc"
+    },
+    {
+      "path": "src/modules/market-intelligence/presentation/components/EconomicCommandCenter.spec.tsx",
+      "before": "1009fd026ada17fec94b9d046d9db9c6bb5a74c08294b3da82d501f30009fd2d",
+      "after": "4525d45520c616918c40d9d0fd5ef31e0bdff356661f80767ce47d9ded009bf1"
+    },
+    {
+      "path": "src/modules/market-intelligence/presentation/components/EconomicCommandCenter.tsx",
+      "before": "8b35b6f00789ba0636043e93bf982fd7bddfcf492b908fa16b7660895fcbd829",
+      "after": "57a544fa2503ea380e93e2378203bf8980340434045261b54e8f8f33a761186c"
+    },
+    {
+      "path": "src/routes/_authenticated/admin.cost-intelligence.spec.ts",
+      "before": "68359ca20379a24b87d064407daf4cd7f8224a75e66eea8e1c3c06fdd2bd645d",
+      "after": "90c1ab3856be2ee76702242b3954029d9efe59ade9bda5336f0c0f1ad8f3af72"
+    },
+    {
+      "path": "src/routes/_authenticated/admin.cost-intelligence.tsx",
+      "before": "1d4b5bf8422cb37a1ce9ec7da04fae4a2d72c32039a0fbbcd804cb3c5864ed56",
+      "after": "2ae1ca81cc0438bde429bb7ac53fab46209f6ce5b459e3fb97ce3f8254dc6d04"
+    }
+  ],
+  "governanceBranch": "fix/gate7-cost-read-only-reconciliation",
+  "governancePaths": [
+    ".github/workflows/deploy-production.yml",
+    "docs/99-internal/development-journal/2026-11-22-gate7-cost-read-only-592.md",
+    "scripts/governance/release-b1-spatial-567.spec.mjs",
+    "scripts/governance/release-cost-read-only-592.json",
+    "scripts/governance/release-cost-read-only-592.mjs",
+    "scripts/governance/release-cost-read-only-592.spec.mjs",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-smoke-retry-574.spec.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false
+  }
+}

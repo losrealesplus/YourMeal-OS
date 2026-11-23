@@ -306,6 +306,8 @@ test("Smoke Retry 574: end-to-end CLI proposal and exact_interval dispatch in is
       fs.copyFileSync(path.join(repoRoot, rel), target);
     }
     for (const rel of [
+      "scripts/governance/release-cost-read-only-592.mjs",
+      "scripts/governance/release-cost-read-only-592.json",
       "scripts/governance/release-cr-cost-05-582.mjs",
       "scripts/governance/release-cr-cost-05-582.json",
     ]) {
